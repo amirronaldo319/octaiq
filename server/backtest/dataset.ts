@@ -44,6 +44,8 @@ export interface Bout {
 export interface FighterProfile {
   dob: number | null
   reachCm: number | null
+  /** True for a southpaw; null when the stance is unknown. Stance does not change over a career. */
+  southpaw?: boolean | null
 }
 
 export interface RawFiles {
@@ -132,10 +134,11 @@ export function parseProfiles(csvText: string): { profiles: Map<string, FighterP
     // Two people sharing a name cannot be told apart in the results file, so their bio is unusable.
     if ((counts.get(key) ?? 0) > 1) {
       ambiguous++
-      profiles.set(key, { dob: null, reachCm: null })
+      profiles.set(key, { dob: null, reachCm: null, southpaw: null })
       continue
     }
-    profiles.set(key, { dob: parseDate(r.dob ?? ''), reachCm: parseReach(r.reach ?? '') })
+    const stance = (r.stance ?? '').trim().toLowerCase()
+    profiles.set(key, { dob: parseDate(r.dob ?? ''), reachCm: parseReach(r.reach ?? ''), southpaw: stance === '' ? null : stance === 'southpaw' })
   }
   return { profiles, ambiguous }
 }

@@ -7,7 +7,7 @@
     "dev": "vite --port 5173",
     "server": "node --env-file-if-exists=.env server/index.ts",
     "start": "npm run build && npm run server",
-    "build": "tsc --noEmit && vite build",
+    "build": "tsc --noEmit && vite build && node server/prerender.ts",
     "test": "vitest run",
     "preview": "vite preview",
     "check-keys": "node --env-file-if-exists=.env server/check.ts",
@@ -16,7 +16,8 @@
     "snapshot": "node server/snapshot.ts",
     "ledger": "node server/ledger.ts",
     "refresh": "npm run backtest && npm run ledger && npm run snapshot",
-    "market": "node server/market.ts"
+    "prices": "node server/prices.ts",
+    "e2e": "playwright test"
   },
   "dependencies": {
     "@fontsource/barlow": "^5.3.0",
@@ -25,6 +26,7 @@
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
+    "@playwright/test": "^1.64.1",
     "@testing-library/dom": "^10.4.2",
     "@testing-library/react": "^16.3.3",
     "@testing-library/user-event": "^14.6.8",

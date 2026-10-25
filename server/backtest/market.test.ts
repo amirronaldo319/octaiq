@@ -143,7 +143,7 @@ describe('market comparison', () => {
       const year = 2014 + (i % 6)
       const model = sig(logit(truth) + opts.modelNoise * noise())
       const mkt = sig(logit(truth) + opts.marketNoise * noise())
-      preds.push({ id: `b${i}`, event: `E${year}-${Math.floor(i / 8)}`, year, y, priorA: 5, priorB: 5, coin: 0.5, elo: model, lr: model, lrStats: model, lrCal: null })
+      preds.push({ id: `b${i}`, event: `E${year}-${Math.floor(i / 8)}`, year, y, priorA: 5, priorB: 5, coin: 0.5, elo: model, lr: model, lrStats: model, lrCal: null, gbm: null, ens: null })
       lines.set(`b${i}`, { pA: mkt, overround: 1.03, oddsA: 100, oddsB: -100, offsetDays: 0 })
     }
     return { preds, lines }

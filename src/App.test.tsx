@@ -113,7 +113,7 @@ describe('event page', () => {
     await headline()
     await user.selectOptions(screen.getByLabelText('Sort'), 'close')
     const first = screen.getAllByRole('button', { name: /Open details\.$/ })[1]
-    expect(first.getAttribute('aria-label')).toMatch(/Toss-up|Slight lean/)
+    expect(first.textContent).toMatch(/Toss-up|Slight lean/)
   })
 
   it('switches events from the picker and puts the event in the URL', async () => {
@@ -281,5 +281,142 @@ describe('accessibility', () => {
     render(<App />)
     const dialog = await screen.findByRole('dialog')
     for (const img of within(dialog).getAllByRole('img')) expect(img.getAttribute('aria-label')).toBeTruthy()
+  })
+})
+
+/** Static hosting plus extra published files, such as market prices. */
+function stubFetchWith(extra: Record<string, unknown>): void {
+  vi.stubGlobal('fetch', vi.fn(async (input: string | URL | Request) => {
+    const url = String(input)
+    const m = /data\/([\w.-]+\.json)$/.exec(url)
+    if (m && extra[m[1]] !== undefined) return new Response(JSON.stringify(extra[m[1]]), { status: 200 })
+    if (m) {
+      try {
+        return new Response(read(m[1]), { status: 200 })
+      } catch {
+        return new Response('<html>nf</html>', { status: 404 })
+      }
+    }
+    return new Response('<html>nf</html>', { status: 404 })
+  }))
+}
+
+const marketFor = (pA: number) => ({
+  generatedAt: '2026-10-26T06:00:00Z', source: 'The Odds API', attribution: 'Prices: The Odds API.',
+  events: { 'ufc-vegas-123': Object.fromEntries(vegas.fights.map((f, i) => [f.id, { pA: i === 0 ? pA : 0.5, pLo: 0.4, pHi: 0.6, books: 9 }])) },
+})
+
+describe('bout detail extras', () => {
+  it('explains the pick in plain words and lets you choose your own', async () => {
+    const user = userEvent.setup()
+    window.location.hash = '#/event/ufc-vegas-123/bout/ufc-vegas-123-1'
+    render(<App />)
+    const dialog = await screen.findByRole('dialog')
+    expect(await within(dialog).findByRole('region', { name: 'Why this pick' })).toBeTruthy()
+    expect(within(dialog).getByText('Younger')).toBeTruthy()
+    const group = within(dialog).getByRole('group', { name: 'Your pick' })
+    const first = within(group).getAllByRole('button')[0]
+    await user.click(first)
+    expect(first.getAttribute('aria-pressed')).toBe('true')
+    await user.click(first)
+    expect(first.getAttribute('aria-pressed')).toBe('false')
+  })
+
+  it('shows how often picks this confident have won, from the backtest', async () => {
+    window.location.hash = '#/event/ufc-vegas-123/bout/ufc-vegas-123-1'
+    render(<App />)
+    const dialog = await screen.findByRole('dialog')
+    await waitFor(() => expect(within(dialog).getByText(/picks have won \d+% of the time/)).toBeTruthy())
+  })
+
+  it('draws the market movement once there are two looks, and offers a fair-price parlay leg', async () => {
+    const user = userEvent.setup()
+    const id = vegas.fights[0].id
+    stubFetchWith({
+      'market.json': marketFor(0.55),
+      'prices.json': { generatedAt: 'x', events: { 'ufc-vegas-123': [
+        { t: '2026-10-25T00:00:00Z', bouts: { [id]: { pA: 0.5, books: 8 } } },
+        { t: '2026-10-26T00:00:00Z', bouts: { [id]: { pA: 0.55, books: 9 } } },
+      ] } },
+    })
+    window.location.hash = `#/event/ufc-vegas-123/bout/${id}`
+    render(<App />)
+    const dialog = await screen.findByRole('dialog')
+    expect(await within(dialog).findByRole('region', { name: 'Price movement' })).toBeTruthy()
+    await user.click(within(dialog).getAllByRole('button', { name: /to parlay at the fair price/ })[0])
+    await waitFor(() => expect(screen.getByRole('button', { name: /Parlay \(1\)/ })).toBeTruthy())
+  })
+})
+
+describe('new pages', () => {
+  it('compares two fighters from the searchable list', async () => {
+    const user = userEvent.setup()
+    window.location.hash = '#/compare'
+    render(<App />)
+    expect((await screen.findByRole('heading', { level: 1, name: 'Compare fighters' }))).toBeTruthy()
+    await user.type(screen.getByLabelText('Fighter A'), 'jon j')
+    await user.click(await screen.findByRole('option', { name: /Jon Jones/ }))
+    await user.type(screen.getByLabelText('Fighter B'), 'aspin')
+    await user.click(await screen.findByRole('option', { name: /Tom Aspinall/ }))
+    expect(window.location.hash).toBe('#/compare/jon-jones/tom-aspinall')
+    expect(await screen.findByText(/Elo alone gives/)).toBeTruthy()
+    expect(screen.getByText('Wins by KO or TKO')).toBeTruthy()
+  })
+
+  it('opens a comparison straight from a shared link', async () => {
+    window.location.hash = '#/compare/islam-makhachev/jon-jones'
+    render(<App />)
+    expect(await screen.findByText(/Elo alone gives/)).toBeTruthy()
+  })
+
+  it('model versus market: explains the missing prices, then ranks the disagreements', async () => {
+    window.location.hash = '#/gaps'
+    const { unmount } = render(<App />)
+    expect(await screen.findByText(/Betting prices are not published for this card yet/)).toBeTruthy()
+    unmount()
+    stubFetchWith({ 'market.json': marketFor(0.9) })
+    window.location.hash = '#/gaps'
+    render(<App />)
+    const table = await screen.findByRole('table')
+    const first = within(table).getAllByRole('row')[1]
+    expect(within(first).getByText(/pts more on/)).toBeTruthy()
+  })
+
+  it('odds calculator: converts formats and strips the margin', async () => {
+    const user = userEvent.setup()
+    window.location.hash = '#/tools'
+    render(<App />)
+    await user.type(await screen.findByLabelText('Fighter A odds'), '-150')
+    await user.type(screen.getByLabelText('Fighter B odds (optional)'), '+130')
+    expect(screen.getByText(/60\.0%/)).toBeTruthy()
+    expect(screen.getByText(/Bookmaker margin/)).toBeTruthy()
+    await user.clear(screen.getByLabelText('Fighter A odds'))
+    await user.type(screen.getByLabelText('Fighter A odds'), 'abc')
+    expect(screen.getByRole('alert').textContent).toMatch(/not a valid american price/)
+  })
+
+  it('keeps your picks on the Tools page, only in this browser', async () => {
+    const user = userEvent.setup()
+    window.location.hash = '#/event/ufc-vegas-123/bout/ufc-vegas-123-1'
+    const { unmount } = render(<App />)
+    const dialog = await screen.findByRole('dialog')
+    await user.click(within(within(dialog).getByRole('group', { name: 'Your pick' })).getAllByRole('button')[1])
+    unmount()
+    window.location.hash = '#/tools'
+    render(<App />)
+    expect(await screen.findByRole('region', { name: 'My picks' })).toBeTruthy()
+    expect(screen.getAllByRole('button', { name: /Remove your pick of/ })).toHaveLength(1)
+  })
+
+  it('the new pages have no detectable violations', async () => {
+    for (const hash of ['#/compare/jon-jones/tom-aspinall', '#/gaps', '#/tools']) {
+      window.location.hash = hash
+      const { unmount } = render(<App />)
+      await waitFor(() => expect(document.querySelector('h1')).toBeTruthy())
+      await waitFor(() => expect(screen.queryByText('Loading fighters…')).toBeNull())
+      const result = await axe.run(document.body, { rules: { 'color-contrast': { enabled: false }, region: { enabled: false } } })
+      expect(result.violations.map((v) => `${hash} ${v.id}: ${v.help}`)).toEqual([])
+      unmount()
+    }
   })
 })

@@ -128,7 +128,7 @@ export function createResultsModelService(root: string, options: { bootstrap?: n
       outcomes: oc ? { period: oc.period, distance: check(oc.distance), koShare: check(oc.koShare), joint: check(oc.joint), note: oc.note } : undefined,
       bouts: Object.fromEntries(preds.map((p) => [p.id, {
         probA: p.probA, probB: p.probB, probLo: p.probLo, probHi: p.probHi, priorA: p.priorA, priorB: p.priorB,
-        eloDiff: p.eloDiff, distance: p.distance, joint: p.joint,
+        eloDiff: p.eloDiff, distance: p.distance, joint: p.joint, why: p.why,
       }])),
     }
   }

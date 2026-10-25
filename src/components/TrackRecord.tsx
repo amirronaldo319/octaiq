@@ -4,6 +4,18 @@ import type { PublishedLedger } from '../../server/lib/snapshot'
 import type { GradedEvent } from '../../server/ledger/grade'
 import { withBase } from '../lib/fetchJson'
 import { useJson } from '../lib/useJson'
+import { LineChart } from './LineChart'
+
+/** Running share of winners picked correctly, oldest event first. */
+export function runningAccuracy(events: readonly { bouts: readonly { correct: boolean }[] }[]): number[] {
+  let right = 0
+  let total = 0
+  return [...events].reverse().map((e) => {
+    right += e.bouts.filter((b) => b.correct).length
+    total += e.bouts.length
+    return total === 0 ? 0 : (right / total) * 100
+  })
+}
 
 const isLedger = (b: unknown): boolean => typeof b === 'object' && b !== null && Array.isArray((b as PublishedLedger).events)
 const isBacktest = (b: unknown): boolean => typeof b === 'object' && b !== null && 'report' in b
@@ -109,6 +121,15 @@ export function TrackRecord() {
         they show how a typical card goes: expect a good share of misses.
       </p>
       {backtest.status === 'ready' && recent.length === 0 && <p className="empty">No replay data in this report.</p>}
+      {recent.length >= 3 && (
+        <div className="panel replay-chart">
+          <h3>Running accuracy over these events</h3>
+          <LineChart values={runningAccuracy(recent)} label={`Share of winners picked correctly, building up over ${recent.length} events`} formatValue={(v) => `${v.toFixed(0)}%`} />
+          <p className="muted small">
+            Oldest event on the left. A coin flip would sit at 50%. The line wanders a lot from event to event, which is what a modest edge looks like in a few hundred fights.
+          </p>
+        </div>
+      )}
       <ul className="replay">
         {recent.map((e) => (
           <li key={e.event} className="replay-item">

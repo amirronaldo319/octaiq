@@ -90,6 +90,8 @@ export interface ResultsModelBout {
   priorB: number
   /** Elo rating gap, A minus B */
   eloDiff: number
+  /** The main reasons behind the forecast: the biggest factors for the pick and against it */
+  why?: { pick: 'a' | 'b'; for: { text: string; strength: number }[]; against: { text: string; strength: number }[] }
 }
 
 /** The backtested, results-only model. Distinct from the hand-weighted baseline that uses striking stats. */

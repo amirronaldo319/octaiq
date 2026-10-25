@@ -16,6 +16,11 @@ The public site is a snapshot: no API keys, no live bookmaker quotes. Run it you
 | Betting market | A consensus probability with the margin removed, and a market/model toggle. Per-bookmaker quotes are never published |
 | Track record | An append-only ledger of predictions saved before each event, graded automatically once results appear, plus a replay of the last six events |
 | Model health | Backtest results with confidence intervals, calibration, the comparison with betting prices, and the leak I found and fixed |
+| Why this pick | The three biggest factors for the pick and the two against, in plain words, plus how often past picks this confident have won |
+| Model vs market | Where the model and the betting consensus disagree most on the card |
+| Compare | Search about 900 recently active fighters and compare any two, with an Elo-only win chance |
+| Tools | An odds calculator (American, decimal, fractional; shows the bookmaker margin) and your own picks, kept only in your browser and scored against results |
+| Share and print | Save a pick as an image, copy a link to any bout, print a card; each event also has a plain crawlable page and a sitemap |
 | Local-only tools | Value board, parlay builder and bankroll tracker (they need live prices, so they are hidden on the public site) |
 
 Also: a light theme, offline support, link previews, deep links, keyboard and screen-reader support, and a phone layout.
@@ -55,9 +60,10 @@ Keys stay on the server and are never sent to the browser. Odds come from [The O
 | `npm run ledger` | Appends new predictions to `data/ledger/` if they changed and the event has not started |
 | `npm run snapshot` | Rebuilds `public/data/` (events, fighters, ledger, backtest). Rewrites a file only when its content changed |
 | `npm run refresh` | `backtest`, then `ledger`, then `snapshot` |
-| `npm run market` | After a build, writes `dist/data/market.json` from live odds (needs `ODDS_API_KEY`; skips cleanly without it) |
+| `npm run prices` | Looks at live prices once, appends to `data/prices/` when the consensus moved, and writes `public/data/market.json` and `prices.json` (needs `ODDS_API_KEY`; skips cleanly without it) |
 | `npm run check-keys` | Checks API keys without printing them (`-- --no-odds` skips the one credit it costs) |
-| `npm test` | 270+ tests, including a browser-simulated app and accessibility scans |
+| `npm test` | 300+ tests, including a browser-simulated app and accessibility scans |
+| `npm run e2e` | Real-browser checks (Chromium via Playwright, desktop and phone, both themes, with a colour-contrast audit); run `npx playwright install chromium` once first |
 
 ## Keeping the card current
 
@@ -67,11 +73,11 @@ Cards live in `data/events/*.json` as versioned snapshots. To record a change (a
 
 Three GitHub Actions workflows run on this repository:
 
-- **Deploy** (`pages.yml`): on every push and every six hours. Typechecks, tests, builds, adds market prices if a key is set, and deploys.
-- **Refresh** (`refresh.yml`): every six hours. Re-runs the backtest, records new predictions, refreshes the snapshot, commits only if something changed, and triggers a deploy.
+- **Deploy** (`pages.yml`): on every push, and whenever the refresh below changes something. Typechecks, tests, builds and deploys.
+- **Refresh** (`refresh.yml`): every six hours. Re-runs the backtest, records new predictions, saves the latest betting-price consensus (if the key is set), refreshes the snapshot, fails loudly if the data went stale, commits only if something meaningfully changed, and triggers a deploy.
 - **Checks** (`ci.yml`): typecheck, tests and build on pull requests.
 
-To show live prices on the public site, add your Odds API key as a repository secret named `ODDS_API_KEY` (Settings, Secrets and variables, Actions). Without it the site simply shows model probabilities. The consensus (the default view) averages up to ten bookmakers (Pinnacle, DraftKings, FanDuel, BetMGM, Caesars, Bovada, BetOnline, BetRivers, ESPN Bet, Fanatics and so on, in that order of preference). Each fetch costs 3 credits (three regions), so the six-hourly deploy uses about 360 of the free tier's 500 monthly credits; pushes cost 3 each.
+To show live prices on the public site, add your Odds API key as a repository secret named `ODDS_API_KEY` (Settings, Secrets and variables, Actions). Without it the site simply shows model probabilities. The consensus (the default view) averages up to ten bookmakers (Pinnacle, DraftKings, FanDuel, BetMGM, Caesars, Bovada, BetOnline, BetRivers, ESPN Bet, Fanatics and so on, in that order of preference). Only the refresh workflow fetches prices: 3 credits (three regions) every six hours is about 360 of the free tier's 500 monthly credits. Each look is kept in `data/prices/` whenever the consensus moved, building an opening-to-closing record for the site's line-movement chart and for future tests against recent prices.
 
 ## Data and licenses
 
@@ -84,10 +90,16 @@ OctaIQ's own code is MIT licensed ([LICENSE](LICENSE)). Data keeps its own terms
 - **Card information:** the official UFC event pages, read by an automated fetch, plus ESPN Deportes for records.
 - **Fonts:** Barlow and Barlow Condensed (SIL Open Font License), self-hosted.
 
+## Tried and not adopted
+
+Recorded in the backtest so the null results stay visible: stance, weight-class moves, a per-weight-class Elo, age decline, time since a loss, recent knockouts, cage minutes and style-clash features (no gain over the default), boosted trees (clearly worse than the logistic model), and an average of the two (no significant gain). Opponent quality and recent activity were adopted for a small gain (log loss 0.6657 to 0.6639 on matched-price bouts).
+
 ## Not done, on purpose
 
 - **Fighter photos.** Matching the right person to a licensed image, with correct attribution, is a risk I did not want to take with a guess.
 - **Live fight tracking and news monitoring.** They need a verified low-latency feed that is not available here.
+- **Other languages.** A half-translated site, or one translated by machine and unchecked, is worse than none.
+- **Camp, injury and gym data, rankings and stakes.** No licensed or open source I could verify.
 - **Betting execution.** Nothing here places or suggests a wager.
 
 OctaIQ is a research project, not betting advice. Please gamble responsibly.

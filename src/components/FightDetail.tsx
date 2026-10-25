@@ -8,7 +8,10 @@ import { gapPoints, type MarketBout } from '../lib/market'
 import { slugify } from '../lib/slug'
 import { Avatar } from './Avatar'
 import { LineChart } from './LineChart'
+import { HitRate } from './HitRate'
+import { PriceMovement } from './PriceMovement'
 import { TugBar } from './TugBar'
+import { WhyPick } from './WhyPick'
 
 interface FightDetailProps {
   analysis: FightAnalysis
@@ -22,6 +25,13 @@ interface FightDetailProps {
   onShare: () => void
   onBet: (side: SideAnalysis, fightLabel: string) => void
   onAddLeg: (side: SideAnalysis, fightLabel: string) => void
+  eventId?: string | null
+  /** The visitor's own pick for this bout */
+  myPick?: 'a' | 'b'
+  onPick?: (side: 'a' | 'b') => void
+  onSaveImage?: () => void
+  /** Add a side to the parlay at the market's fair (margin-free) price */
+  onAddFairLeg?: (side: 'a' | 'b') => void
 }
 
 const METHODS: Method[] = ['KO/TKO', 'Submission', 'Decision']
@@ -87,6 +97,8 @@ function Prediction({ analysis, view, results, meta }: { analysis: FightAnalysis
           : `The model gives ${favored.name} ${pct0(favoredProb)}, ${Math.round(lean.points)} points above an even split.`}
       </p>
 
+      {view.source === 'validated' && <HitRate pickProb={Math.max(view.probA, view.probB)} />}
+
       {view.source === 'validated' && (
         <div className="trust">
           <div className="trust-head">
@@ -131,7 +143,7 @@ function Prediction({ analysis, view, results, meta }: { analysis: FightAnalysis
   )
 }
 
-function MarketPanel({ analysis, results, market, updated, meta }: { analysis: FightAnalysis; results?: ResultsModelBout; market: MarketBout; updated?: string; meta?: ResultsModel }) {
+function MarketPanel({ analysis, results, market, updated, meta, onAddFairLeg }: { analysis: FightAnalysis; results?: ResultsModelBout; market: MarketBout; updated?: string; meta?: ResultsModel; onAddFairLeg?: (side: 'a' | 'b') => void }) {
   const { fight } = analysis
   const gap = results ? gapPoints(results.probA, market) : null
   const bt = meta?.backtest?.market
@@ -150,6 +162,12 @@ function MarketPanel({ analysis, results, market, updated, meta }: { analysis: F
       <p className="range-note">
         Consensus with the bookmakers’ margin removed. The pale band spans the lowest to highest single bookmaker ({pct0(market.pLo)} to {pct0(market.pHi)} for {fight.a.name}).
       </p>
+      {onAddFairLeg && (
+        <div className="row-actions">
+          <button type="button" className="btn small" onClick={() => onAddFairLeg('a')}>Add {fight.a.name} to parlay at the fair price</button>
+          <button type="button" className="btn small" onClick={() => onAddFairLeg('b')}>Add {fight.b.name} to parlay at the fair price</button>
+        </div>
+      )}
       {leans && (
         <p className="pred-sentence">
           <strong>{leans}</strong>{' '}
@@ -387,7 +405,7 @@ function DeepDive({ analysis, isStatic, onBet, onAddLeg }: Pick<FightDetailProps
   )
 }
 
-export function FightDetail({ analysis, view, results, resultsMeta, market, marketUpdated, isStatic, onFighter, onShare, onBet, onAddLeg }: FightDetailProps) {
+export function FightDetail({ analysis, view, results, resultsMeta, market, marketUpdated, isStatic, onFighter, onShare, onBet, onAddLeg, eventId, myPick, onPick, onSaveImage, onAddFairLeg }: FightDetailProps) {
   const { fight } = analysis
   const notes = fight.bout?.notes ?? []
   return (
@@ -413,11 +431,25 @@ export function FightDetail({ analysis, view, results, resultsMeta, market, mark
             </div>
           ))}
         </div>
-        <button type="button" className="share" onClick={onShare}>Copy link to this bout</button>
+        <div className="detail-actions">
+          <button type="button" className="share" onClick={onShare}>Copy link to this bout</button>
+          {onSaveImage && <button type="button" className="share" onClick={onSaveImage}>Save a pick image</button>}
+          <button type="button" className="share" onClick={() => window.print()}>Print</button>
+        </div>
+        {onPick && (
+          <div className="your-pick" role="group" aria-label="Your pick">
+            <span>Your pick</span>
+            {([['a', fight.a.name], ['b', fight.b.name]] as const).map(([side, name]) => (
+              <button key={side} type="button" className={`chip ${myPick === side ? 'on' : ''}`} aria-pressed={myPick === side} onClick={() => onPick(side)}>{name}</button>
+            ))}
+          </div>
+        )}
       </header>
 
-      {market && <MarketPanel analysis={analysis} results={results} market={market} updated={marketUpdated} meta={resultsMeta} />}
+      {market && <MarketPanel analysis={analysis} results={results} market={market} updated={marketUpdated} meta={resultsMeta} onAddFairLeg={onAddFairLeg} />}
+      {market && eventId && <PriceMovement eventId={eventId} fightId={fight.id} nameA={fight.a.name} />}
       <Prediction analysis={analysis} view={view.source === 'market' && results ? { source: 'validated', probA: results.probA, probB: results.probB } : view} results={results} meta={resultsMeta} />
+      {results?.why && <WhyPick why={results.why} nameA={fight.a.name} nameB={fight.b.name} />}
       <Outcomes analysis={analysis} results={results} meta={resultsMeta} />
       <Facts analysis={analysis} results={results} />
 

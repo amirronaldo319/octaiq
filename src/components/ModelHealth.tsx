@@ -139,12 +139,42 @@ export function ModelHealth() {
             ))}
           </tbody>
         </table>
+        {r.experienced.length > 0 && (
+          <>
+            <h3>Where it does better and worse</h3>
+            <table className="tbl">
+              <thead><tr><th>Situation</th><th>Bouts</th><th>Coin flip</th><th>Results only</th><th>With fight statistics</th><th>Accuracy</th></tr></thead>
+              <tbody>
+                {r.experienced.map((g) => {
+                  const pick = (id: string) => g.models.find((m) => m.id === id)
+                  const stats = pick('lrStats')
+                  return (
+                    <tr key={g.label}>
+                      <td>{g.label}</td><td>{stats?.n ?? '—'}</td>
+                      <td>{f(pick('coin')?.logLoss ?? NaN, 3)}</td><td>{f(pick('lr')?.logLoss ?? NaN, 3)}</td>
+                      <td>{f(stats?.logLoss ?? NaN, 3)}</td><td>{f((stats?.accuracy ?? NaN) * 100, 1)}%</td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+            <p className="muted small">Log loss, lower is better. A situation where the model is no better than the coin flip is one to distrust.</p>
+          </>
+        )}
         {r.statsVsResults && (
           <p className="small">
             <strong>Adoption rule (fixed before looking at test results):</strong> the rolling fight-statistics features are used only if the
             paired log-loss gain over the results-only model has a 95% interval entirely below zero. Gain {f(r.statsVsResults.estimate)}{' '}
             [{f(r.statsVsResults.lo)}, {f(r.statsVsResults.hi)}] → {r.statsAdopted ? 'adopted.' : 'not adopted.'}{' '}
             Older statistics fade by a factor of {r.statsDecay} per fight, chosen on {r.options.firstTestYear - r.options.validationYears}–{r.options.firstTestYear - 1} only.
+          </p>
+        )}
+        {r.ensembleVsStats && r.treesVsStats && (
+          <p className="small">
+            <strong>Other model types, tried and not adopted:</strong> boosted trees were{' '}
+            {r.treesVsStats.lo > 0 ? 'clearly worse than' : 'not clearly different from'} the logistic model (paired log-loss difference {f(r.treesVsStats.estimate)}{' '}
+            [{f(r.treesVsStats.lo)}, {f(r.treesVsStats.hi)}]; positive is worse), and averaging the two changed log loss by {f(r.ensembleVsStats.estimate)}{' '}
+            [{f(r.ensembleVsStats.lo)}, {f(r.ensembleVsStats.hi)}], which does not exclude zero. So the simpler logistic model stays.
           </p>
         )}
         {r.statsDecayValidation && (

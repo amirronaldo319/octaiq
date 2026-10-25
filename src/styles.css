@@ -150,7 +150,7 @@ input[type='range'] { accent-color: var(--ink); }
 .corner-name { font-family: var(--display); font-weight: 700; font-size: 1.5rem; line-height: 1.05; color: var(--ink-2); overflow-wrap: anywhere; }
 .corner.leading .corner-name { color: var(--ink); }
 .corner-rec { color: var(--muted); font-size: 0.85rem; }
-.corner-pct { font-family: var(--display); font-weight: 800; font-size: 2.1rem; line-height: 1; opacity: 0.6; }
+.corner-pct { font-family: var(--display); font-weight: 800; font-size: 2.1rem; line-height: 1; opacity: 0.8; }
 .corner.a .corner-pct { color: var(--red); }
 .corner.b .corner-pct { color: var(--blue); }
 .corner.leading .corner-pct { opacity: 1; }
@@ -471,3 +471,84 @@ label.inline { display: inline-flex; gap: 4px; align-items: center; }
 .theme-toggle { background: none; border: 1px solid var(--line-2); color: var(--ink-2); font: inherit; font-size: 0.85rem; padding: 4px 12px; border-radius: 999px; cursor: pointer; white-space: nowrap; }
 .theme-toggle:hover { color: var(--ink); border-color: var(--ink-2); }
 .flag.ok { border-color: rgba(61, 190, 139, 0.5); color: var(--ok); }
+
+/* Why this pick, hit rate, price movement */
+.why { margin-top: 18px; }
+.why-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.why-col h4 { margin: 0 0 8px; font-size: 0.95rem; color: var(--ink-2); font-weight: 600; }
+.why-col ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.why-col li { display: grid; gap: 4px; font-size: 0.95rem; }
+.why-bar { display: block; height: 6px; border-radius: 999px; background: var(--line); overflow: hidden; }
+.why-bar > span { display: block; height: 100%; border-radius: 999px; background: var(--ok); }
+.why-col.against .why-bar > span { background: var(--warn); }
+.hitrate { margin: 10px 0 0; }
+.movement { margin-top: 16px; }
+
+/* Detail actions and your pick */
+.detail-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+.your-pick { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 10px; }
+.your-pick > span { color: var(--muted); font-size: 0.9rem; }
+
+/* Tools, gaps, compare */
+.tool h2 { margin-top: 0; }
+.calc-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 12px 0; }
+.calc-row label, .picker label { display: grid; gap: 4px; font-size: 0.9rem; color: var(--ink-2); }
+.calc-row input, .picker input { font: inherit; background: var(--panel-2); color: var(--ink); border: 1px solid var(--line-2); border-radius: 8px; padding: 8px 10px; min-width: 0; }
+.calc-row input[aria-invalid='true'] { border-color: var(--bad); }
+.calc-out { display: grid; grid-template-columns: max-content 1fr; gap: 6px 16px; margin: 0; }
+.calc-out dt { color: var(--muted); }
+.calc-out dd { margin: 0; font-weight: 600; }
+.my-picks { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 8px; }
+.my-picks li { display: grid; grid-template-columns: 1fr auto auto; gap: 12px; align-items: center; padding: 8px 0; border-top: 1px solid var(--line); }
+.scorecard { margin: 12px 0 0; }
+.linklike { background: none; border: 0; padding: 0; font: inherit; color: var(--ink); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; text-align: left; }
+.gap-table td, .gap-table th { vertical-align: top; }
+.compare-pickers { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+.picker { position: relative; }
+.picker-list { position: absolute; z-index: 5; left: 0; right: 0; margin: 4px 0 0; padding: 4px; list-style: none; background: var(--panel); border: 1px solid var(--line-2); border-radius: 10px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35); }
+.picker-list button { display: block; width: 100%; text-align: left; background: none; border: 0; color: var(--ink); font: inherit; padding: 8px 10px; border-radius: 6px; cursor: pointer; }
+.picker-list button:hover, .picker-list button:focus-visible { background: var(--panel-2); }
+.vs-head { display: flex; justify-content: space-between; font-family: var(--display); font-size: 1.8rem; margin-bottom: 8px; }
+.vs-head .a, .vs-row .a { color: var(--red); }
+.vs-head .b, .vs-row .b { color: var(--blue); }
+.vs-chance { margin: 0 0 14px; }
+.vs-row { display: grid; grid-template-columns: 70px 1fr 70px; gap: 12px; align-items: center; margin: 10px 0; }
+.vs-v { font-weight: 700; font-variant-numeric: tabular-nums; }
+.vs-v.b { text-align: right; }
+.vs-mid { display: grid; gap: 4px; }
+.vs-label { text-align: center; font-size: 0.8rem; color: var(--muted); }
+.vs-track { display: flex; height: 8px; border-radius: 999px; overflow: hidden; background: var(--line); }
+.vs-a { background: var(--red); }
+.vs-b { background: var(--blue); }
+.facts-row { align-items: start; }
+.replay-chart { margin: 14px 0; }
+
+/* The split point eases when you switch between model and market */
+.tug-a, .tug-b { transition: width 0.5s cubic-bezier(0.2, 0.7, 0.2, 1); }
+
+@media (max-width: 640px) {
+  .why-cols, .calc-row, .compare-pickers { grid-template-columns: 1fr; }
+  .my-picks li { grid-template-columns: 1fr auto; }
+  .my-picks .mp-side { grid-column: 1; }
+  .vs-row { grid-template-columns: 56px 1fr 56px; gap: 8px; }
+}
+
+/* Printing a card or a bout: plain light page without the controls */
+@media print {
+  :root, :root[data-theme='dark'], :root[data-theme='light'] {
+    --bg: #fff; --panel: #fff; --panel-2: #f3f4f6; --line: #d1d5db; --line-2: #9ca3af;
+    --ink: #000; --ink-2: #1f2937; --muted: #4b5563; --glass: #fff;
+  }
+  body { background: #fff; color: #000; }
+  .topbar, .toolbar, .skip, .banner, .toast, .foot .gh, .share, .detail-actions, .your-pick, .theme-toggle, .chips, .row-actions, .modal-close { display: none !important; }
+  .modal-backdrop { position: static; background: none; padding: 0; display: block; }
+  .modal { max-height: none; overflow: visible; box-shadow: none; border: 0; }
+  .panel, .bout, .pred { break-inside: avoid; }
+}
+
+/* Wide result tables scroll inside their panel instead of the page */
+.fold-body { min-width: 0; max-width: 100%; overflow-x: auto; }
+.record, .health, .gaps, .compare, .tools { min-width: 0; }
+.fold-body { grid-template-columns: minmax(0, 1fr); }
+.fold-body .tbl { display: block; overflow-x: auto; }
+.tbl { display: block; max-width: 100%; overflow-x: auto; }

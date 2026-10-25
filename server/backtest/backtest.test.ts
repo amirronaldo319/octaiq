@@ -82,7 +82,7 @@ describe('ingestion', () => {
     const csv = 'FIGHTER,HEIGHT,WEIGHT,REACH,STANCE,DOB,URL\nMike Davis,x,x,70",x,"Jan 01, 1980",u1\nMike Davis,x,x,72",x,"Jan 01, 1990",u2\nJo Solo,x,x,70",x,"Jan 01, 1985",u3'
     const { profiles, ambiguous } = parseProfiles(csv)
     expect(ambiguous).toBe(2)
-    expect(profiles.get('mike davis')).toEqual({ dob: null, reachCm: null })
+    expect(profiles.get('mike davis')).toMatchObject({ dob: null, reachCm: null })
     expect(profiles.get('jo solo')?.reachCm).toBe(178)
   })
 })

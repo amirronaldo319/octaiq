@@ -5,6 +5,7 @@ import { download, fetchDataset, type Manifest } from './fetchDataset.ts'
 import { compareWithMarket, type MarketReport } from './market.ts'
 import { fetchOddsDataset, matchOdds, ODDS_SOURCE, parseOddsArff, type OddsManifest } from './oddsData.ts'
 import { formatReport } from './format.ts'
+import { EXPERIMENTAL_FEATURES } from './features.ts'
 import type { Ablation, BacktestOutput } from './types.ts'
 import { recentEventResults } from './recent.ts'
 import { runBacktest } from './walkForward.ts'
@@ -37,13 +38,14 @@ const files: RawFiles = {
   stats: readFileSync(resolve(RAW, 'ufc_fight_stats.csv'), 'utf8'),
 }
 const { bouts, stats } = parseBouts(files)
-const { report, predictions } = runBacktest(bouts, profilesFor(files))
+const { report, predictions } = runBacktest(bouts, profilesFor(files), { trees: true })
 
 const profiles = profilesFor(files)
 const RESULT_ONLY_DROP = ['winRate', 'finishRate', 'koLossRate', 'subLossRate', 'form', 'layoff', 'age', 'reach', 'debut', 'ageMissing', 'reachMissing']
 const variants: { label: string; excluded: string[]; model: 'lr' | 'lrStats'; note: string }[] = [
   { label: 'Results + rolling fight stats', excluded: report.options.excludeFeatures, model: 'lrStats', note: 'The stats model. Adopted only if it beats results-only beyond noise.' },
   { label: 'Results + stats, without opponent quality and recent activity', excluded: [...report.options.excludeFeatures, 'oppElo', 'activity'], model: 'lrStats', note: 'The same model before the strength-of-schedule and activity features were added.' },
+  { label: 'Results + stats, plus stance, weight-class, age-decline, damage and style-clash features', excluded: report.options.excludeFeatures.filter((f) => !EXPERIMENTAL_FEATURES.includes(f)), model: 'lrStats', note: 'Tried and not adopted: no meaningful gain over the default model.' },
   { label: 'Results only', excluded: report.options.excludeFeatures, model: 'lr', note: 'The previous primary model.' },
   { label: 'Stats + Elo, no other results features', excluded: [...RESULT_ONLY_DROP], model: 'lrStats', note: 'Shows how much the fight statistics carry on their own.' },
   { label: 'Results + stats, plus missing-profile flags', excluded: [], model: 'lrStats', note: 'Known leak: profile completeness today reflects future career length. Shown only for comparison.' },
@@ -78,7 +80,7 @@ try {
   marketNote = `Market comparison skipped: ${err instanceof Error ? err.message : 'unknown error'}`
 }
 
-const recentEvents = recentEventResults(bouts, predictions, report.primary, 6)
+const recentEvents = recentEventResults(bouts, predictions, report.primary, 24)
 const output: BacktestOutput = { generatedAt: new Date().toISOString(), dataset: manifest, ingest: stats, report, predictionCount: predictions.length, ablations, market, oddsDataset, marketNote, recentEvents }
 mkdirSync(resolve(ROOT, 'data/reports'), { recursive: true })
 writeFileSync(OUT, JSON.stringify(output, null, 2))

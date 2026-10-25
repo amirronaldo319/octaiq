@@ -53,8 +53,8 @@ export function BoutCard({ analysis, view, results, market, featured = false, on
       type="button"
       className={`bout ${featured ? 'featured' : ''}`}
       onClick={() => onOpen(fight.id)}
-      aria-label={`${fight.a.name} versus ${fight.b.name}, ${fight.weightClass}. ${hasModel ? `${lean.label}: ${favored}.` : 'No prediction.'} Open details.`}
     >
+      <span className="sr-only">{fight.a.name} versus {fight.b.name}. </span>
       <span className="bout-meta">
         {featured ? <strong className="main-event">Main event</strong> : <span>Bout {fight.bout?.order ?? ''}</span>}
         <span>{fight.weightClass}</span>
@@ -86,6 +86,7 @@ export function BoutCard({ analysis, view, results, market, featured = false, on
         )}
         {notes > 0 && <span className="tag note">{notes} note{notes > 1 ? 's' : ''}</span>}
       </span>
+      <span className="sr-only">. Open details.</span>
     </button>
   )
 }

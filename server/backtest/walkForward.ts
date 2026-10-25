@@ -1,5 +1,6 @@
 import type { Bout, FighterProfile } from './dataset.ts'
-import { buildFeatureRows, FEATURE_NAMES, STATS_FEATURES } from './features.ts'
+import { predictTrees, trainTrees } from './trees.ts'
+import { buildFeatureRows, EXPERIMENTAL_FEATURES, FEATURE_NAMES, STATS_FEATURES } from './features.ts'
 import { bootstrapLogLoss, logLossOne, metrics, type EventAgg, type Interval, type Metrics } from './metrics.ts'
 import { applyTemperature, eloProb, fitTemperature, predictLogistic, trainLogistic } from './models.ts'
 import { evaluateOutcomes, type OutcomeReport } from './outcomes.ts'
@@ -21,6 +22,8 @@ export interface BacktestOptions {
    * future information.
    */
   excludeFeatures: string[]
+  /** Also fit boosted trees and a logistic+trees ensemble, reported but never used for predictions unless adopted */
+  trees: boolean
 }
 
 export const DEFAULT_OPTIONS: BacktestOptions = {
@@ -28,11 +31,12 @@ export const DEFAULT_OPTIONS: BacktestOptions = {
   validationYears: 6,
   eloKCandidates: [16, 24, 32, 48, 64, 96, 128],
   statsDecayCandidates: [1, 0.9, 0.8, 0.7],
-  excludeFeatures: ['ageMissing', 'reachMissing'],
+  excludeFeatures: ['ageMissing', 'reachMissing', ...EXPERIMENTAL_FEATURES],
   ridge: 5,
   minCalibrationRows: 800,
   bootstrap: 1000,
   seed: 20261025,
+  trees: false,
 }
 
 export interface Prediction {
@@ -48,7 +52,14 @@ export interface Prediction {
   lr: number
   /** Logistic regression on results features plus rolling striking and grappling statistics */
   lrStats: number
+  /** Boosted trees on every feature, including the experimental ones; null unless options.trees */
+  gbm: number | null
+  /** Average of lrStats and gbm */
+  ens: number | null
   lrCal: number | null
+  /** Scheduled rounds and whether the division is a women's one, for subgroup reporting */
+  rounds?: number | null
+  womens?: boolean
 }
 
 export interface ModelResult {
@@ -83,6 +94,9 @@ export interface BacktestReport {
    */
   statsVsResults: Interval
   statsAdopted: boolean
+  /** Paired log-loss difference of the trees and of the ensemble against the logistic stats model (negative is better); null without trees */
+  treesVsStats: Interval | null
+  ensembleVsStats: Interval | null
   /** The model used for event predictions: 'lrStats' only if adopted, otherwise 'lr' */
   primary: 'lr' | 'lrStats'
   byYear: { year: number; n: number; coinLogLoss: number; eloLogLoss: number; lrLogLoss: number; lrStatsLogLoss: number }[]
@@ -157,6 +171,7 @@ export function runBacktest(
 
   const keepStats = columnsWithout(opts.excludeFeatures)
   const keepResults = columnsWithout([...opts.excludeFeatures, ...STATS_NAMES])
+  const keepTrees = columnsWithout(['ageMissing', 'reachMissing'])
   const rows = buildFeatureRows(bouts, profiles, { eloK, statsDecay })
   const decisive = rows.filter((r): r is typeof r & { y: 0 | 1 } => r.y !== null)
   const lastYear = yearOf(rows[rows.length - 1].date)
@@ -180,12 +195,17 @@ export function runBacktest(
     // Calibrator sees only predictions from earlier test years.
     const temperature = priorOos.length >= opts.minCalibrationRows ? fitTemperature(priorOos.map((o) => o.p), priorOos.map((o) => o.y)) : null
 
+    const treeModel = opts.trees ? trainTrees(train.map((r) => keepTrees.map((i) => r.x[i])), ys) : null
     const yearPreds: Prediction[] = test.map((r) => {
       const lr = predictLogistic(resultsModel, keepResults.map((i) => r.x[i]))
+      const lrStats = predictLogistic(statsModel, keepStats.map((i) => r.x[i]))
+      const gbm = treeModel ? predictTrees(treeModel, keepTrees.map((i) => r.x[i])) : null
       return {
+        gbm, ens: gbm === null ? null : (lrStats + gbm) / 2,
+        rounds: r.ctx.rounds, womens: /women/i.test(r.ctx.weightClass),
         id: r.id, event: r.event, year, y: r.y, priorA: r.priorA, priorB: r.priorB,
         coin: 0.5, elo: eloProb(r.x[0]), lr,
-        lrStats: predictLogistic(statsModel, keepStats.map((i) => r.x[i])),
+        lrStats,
         lrCal: temperature === null ? null : applyTemperature(lr, temperature),
       }
     })
@@ -207,6 +227,12 @@ export function runBacktest(
     { id: 'elo', label: 'Elo only', get: (p) => p.elo },
     { id: 'lr', label: 'Logistic regression (results features)', get: (p) => p.lr },
     { id: 'lrStats', label: 'Logistic regression (results + rolling fight stats)', get: (p) => p.lrStats },
+    ...(opts.trees
+      ? [
+          { id: 'gbm', label: 'Boosted trees (all features)', get: (p: Prediction) => p.gbm as number },
+          { id: 'ens', label: 'Ensemble (logistic + trees)', get: (p: Prediction) => p.ens as number },
+        ]
+      : []),
   ]
   const byEvent = new Map<string, EventAgg>()
   for (const p of predictions) {
@@ -223,6 +249,7 @@ export function runBacktest(
     logLoss: vsElo.logLoss[i], logLossVsElo: vsElo.diffVsRef[i],
   }))
   const statsVsResults = vsResults.diffVsRef[3]
+  const vsStats = opts.trees ? bootstrapLogLoss(aggs, 3, opts.bootstrap, opts.seed + 3) : null
   // Pre-committed rule: more features are adopted only if they beat the simpler model beyond noise.
   const statsAdopted = opts.bootstrap > 0 && statsVsResults.hi < 0
 
@@ -240,6 +267,10 @@ export function runBacktest(
   const subsets: { label: string; keep: (p: Prediction) => boolean }[] = [
     { label: 'Both fighters have 3+ prior UFC bouts', keep: (p) => p.priorA >= 3 && p.priorB >= 3 },
     { label: 'At least one fighter has fewer than 3 prior UFC bouts', keep: (p) => p.priorA < 3 || p.priorB < 3 },
+    { label: 'Five-round bouts', keep: (p) => p.rounds === 5 },
+    { label: "Women's divisions", keep: (p) => p.womens === true },
+    { label: 'Big favourite (the stats model gives one side 70% or more)', keep: (p) => Math.max(p.lrStats, 1 - p.lrStats) >= 0.7 },
+    { label: 'Close call (the stats model gives each side between 45% and 55%)', keep: (p) => Math.abs(p.lrStats - 0.5) <= 0.05 },
   ]
   const experienced = subsets.map((s) => {
     const sub = predictions.filter(s.keep)
@@ -295,7 +326,7 @@ export function runBacktest(
         testScored: predictions.length,
         testPeriod: `${years[0]}-${years[years.length - 1]}`,
       },
-      models, statsVsResults, statsAdopted, primary, byYear, experienced, calibration, folds, outcomes,
+      models, statsVsResults, statsAdopted, treesVsStats: vsStats?.diffVsRef[4] ?? null, ensembleVsStats: vsStats?.diffVsRef[5] ?? null, primary, byYear, experienced, calibration, folds, outcomes,
       featureWeights: primary === 'lrStats' ? names(keepStats, lastStatsWeights) : names(keepResults, lastResultsWeights),
     },
   }

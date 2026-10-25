@@ -3,10 +3,6 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [main]
-  # Rebuild every few hours so betting prices stay fresh. The key lives in repository secrets; without it
-  # the site still deploys, with model probabilities only.
-  schedule:
-    - cron: '17 */6 * * *'
   workflow_dispatch:
 
 permissions:
@@ -31,10 +27,6 @@ jobs:
       - run: npx tsc --noEmit
       - run: npm test
       - run: npm run build
-      - name: Add live market prices (skipped without a key)
-        run: npm run market
-        env:
-          ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

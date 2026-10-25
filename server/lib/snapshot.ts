@@ -74,6 +74,42 @@ export function buildFighterCareers(root: string, index: EventIndex): Record<str
   return buildCareers(data.bouts, [...names], { eloK: report.report.eloK, aliases: loadAliases(root) })
 }
 
+/** One row per recently active fighter: [name, slug, wins, losses, draws, elo, lastFightDate, weightClass, koWins, subWins]. */
+export type FighterIndexRow = [string, string, number, number, number, number, string, string, number, number]
+
+export interface FighterIndex {
+  generatedAt: string
+  /** Fighters with a UFC fight on or after this date */
+  activeSince: string
+  rows: FighterIndexRow[]
+}
+
+const ACTIVE_YEARS = 3
+
+/** A compact, searchable list of fighters active in the last few years, for search and comparison. */
+export function buildFighterIndex(root: string, now: Date): FighterIndex | null {
+  const reportPath = resolve(root, 'data/reports/backtest-latest.json')
+  const data = loadDataset(root)
+  if (!data || !existsSync(reportPath)) return null
+  const report = JSON.parse(readFileSync(reportPath, 'utf8')) as BacktestOutput
+  const since = Date.UTC(now.getUTCFullYear() - ACTIVE_YEARS, now.getUTCMonth(), now.getUTCDate())
+  const names = new Map<string, string>()
+  for (const b of data.bouts) {
+    if (b.date < since) continue
+    names.set(b.a, b.nameA)
+    names.set(b.b, b.nameB)
+  }
+  const careers = buildCareers(data.bouts, [...names.values()], { eloK: report.report.eloK, aliases: loadAliases(root) })
+  const rows: FighterIndexRow[] = Object.values(careers)
+    .filter((c) => c.matched && c.timeline.length > 0 && c.eloNow !== null)
+    .map((c): FighterIndexRow => {
+      const last = c.timeline[0]
+      return [c.name, c.slug, c.wins, c.losses, c.draws, c.eloNow as number, last.date, last.weightClass.replace(/ Bout$/, ''), c.koWins, c.subWins]
+    })
+    .sort((x, y) => y[5] - x[5])
+  return { generatedAt: now.toISOString(), activeSince: new Date(since).toISOString().slice(0, 10), rows }
+}
+
 export interface PublishedLedger extends LedgerSummary {
   /** Where each ledger file's history can be inspected */
   historyUrl: string

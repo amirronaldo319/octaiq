@@ -1,6 +1,6 @@
 import { useCallback, useSyncExternalStore } from 'react'
 
-export type Tab = 'event' | 'record' | 'health' | 'value' | 'parlay' | 'bankroll'
+export type Tab = 'event' | 'record' | 'gaps' | 'compare' | 'tools' | 'health' | 'value' | 'parlay' | 'bankroll'
 
 export interface Route {
   tab: Tab
@@ -10,9 +10,12 @@ export interface Route {
   boutId?: string
   /** An open fighter page (slug) */
   fighter?: string
+  /** The two fighters on the Compare tab (slugs) */
+  a?: string
+  b?: string
 }
 
-const TABS: readonly Tab[] = ['event', 'record', 'health', 'value', 'parlay', 'bankroll']
+const TABS: readonly Tab[] = ['event', 'record', 'gaps', 'compare', 'tools', 'health', 'value', 'parlay', 'bankroll']
 const SAFE = /^[A-Za-z0-9][A-Za-z0-9._-]{0,119}$/
 
 /** Parses the URL hash. Anything unrecognised falls back to the Event tab rather than throwing. */
@@ -26,6 +29,12 @@ export function parseHash(hash: string): Route {
   })
   const [head, ...rest] = parts
   if (head === undefined || head === '') return { tab: 'event' }
+  if (head === 'compare') {
+    const route: Route = { tab: 'compare' }
+    if (rest[0] && SAFE.test(rest[0])) route.a = rest[0]
+    if (rest[1] && SAFE.test(rest[1])) route.b = rest[1]
+    return route
+  }
   if (head !== 'event') return TABS.includes(head as Tab) && head !== 'event' ? { tab: head as Tab } : { tab: 'event' }
 
   const route: Route = { tab: 'event' }
@@ -41,6 +50,7 @@ export function parseHash(hash: string): Route {
 
 /** The canonical hash for a route; parseHash(buildHash(r)) returns r. */
 export function buildHash(r: Route): string {
+  if (r.tab === 'compare' && (r.a || r.b)) return `#/compare/${encodeURIComponent(r.a ?? '-')}${r.b ? `/${encodeURIComponent(r.b)}` : ''}`
   if (r.tab !== 'event') return `#/${r.tab}`
   const segs = ['event']
   if (r.eventId) segs.push(encodeURIComponent(r.eventId))

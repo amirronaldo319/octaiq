@@ -2,6 +2,7 @@ import { createRng } from '../../src/engine/rng.ts'
 import { buildNameIndex, normalizeName } from '../lib/names.ts'
 import type { Bout, FighterProfile } from './dataset.ts'
 import { buildFeatureRows, STATS_FEATURES, type FeatureRow } from './features.ts'
+import { explain, type Why } from './reasons.ts'
 import { jointProbs, predictOutcomeProbs, trainOutcomeModels, type JointProbs } from './outcomes.ts'
 import { predictLogistic, trainLogistic } from './models.ts'
 import { columnsWithout, DEFAULT_OPTIONS } from './walkForward.ts'
@@ -32,6 +33,8 @@ export interface UpcomingPrediction {
   distance: number
   /** Probability of each (winner, method) outcome; sums to one */
   joint: JointProbs
+  /** The main reasons behind the forecast, in plain language */
+  why: Why
 }
 
 export interface UpcomingOptions {
@@ -129,6 +132,7 @@ export function predictUpcoming(
       priorA: row.priorA, priorB: row.priorB, eloDiff: row.x[0] * 400,
       distance: o.distance,
       joint: jointProbs(probA, o),
+      why: explain(keep, keep.map((k) => row.x[k]), keep.map((k, j) => (model.weights[j] / model.scales[j]) * row.x[k]), probA),
     }
   })
 }

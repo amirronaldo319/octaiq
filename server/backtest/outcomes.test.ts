@@ -181,7 +181,7 @@ describe('recent event grading', () => {
   const bouts = world({ finisherSignal: 1, seed: 31, years: 4, eventsPerYear: 6 })
   const preds: Prediction[] = bouts.map((b) => ({
     id: b.id, event: b.event, year: new Date(b.date).getUTCFullYear(), y: b.result === 'a' ? 1 : 0, priorA: 5, priorB: 5,
-    coin: 0.5, elo: 0.5, lr: 0.5, lrStats: b.result === 'a' ? 0.8 : 0.2, lrCal: null,
+    coin: 0.5, elo: 0.5, lr: 0.5, lrStats: b.result === 'a' ? 0.8 : 0.2, lrCal: null, gbm: null, ens: null,
   }))
 
   it('returns the newest events first, limited to the requested count', () => {

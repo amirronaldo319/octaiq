@@ -7,3 +7,6 @@ data/fighter-cache.json
 data/raw/
 data/reports/
 .claude/
+
+test-results/
+playwright-report/

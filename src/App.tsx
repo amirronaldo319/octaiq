@@ -4,6 +4,9 @@ import { AboutData, Hero } from './components/Hero'
 import { BankrollView } from './components/BankrollView'
 import { BoutCard } from './components/BoutCard'
 import { BoutModal } from './components/BoutModal'
+import { CompareView } from './components/CompareView'
+import { GapsView } from './components/GapsView'
+import { ToolsView } from './components/ToolsView'
 import { EventPicker } from './components/EventPicker'
 import { FightDetail } from './components/FightDetail'
 import { FighterPanel } from './components/FighterPanel'
@@ -16,6 +19,9 @@ import { analyzeCard, findValue, type FightAnalysis, type SideAnalysis } from '.
 import { loadBets, saveBets, type Bet, type BetStatus } from './lib/bets'
 import { withBase } from './lib/fetchJson'
 import { fmtOdds } from './lib/format'
+import { loadPicks, savePicks, togglePick, type MyPick } from './lib/picks'
+import { makePickCard } from './lib/shareCard'
+import { probToAmerican } from './engine/odds'
 import { isMarketFile, marketFor, type MarketFile } from './lib/market'
 import { buildHighlights, primaryView, SORT_LABELS, sortRows, type SortKey, type ViewMode } from './lib/primary'
 import { shareUrl, useRoute, type Tab } from './lib/route'
@@ -83,6 +89,8 @@ export function App() {
   const [minEdge, setMinEdge] = useState(0.03)
   const [kellyScale, setKellyScale] = useState(0.25)
   const [toast, setToast] = useState<string | null>(null)
+  const [picks, setPicks] = useState<Record<string, MyPick>>(() => loadPicks())
+  const [installEvent, setInstallEvent] = useState<{ prompt: () => Promise<void> } | null>(null)
 
   const event = card.source === 'event' ? card.event : null
   const isStatic = event?.static === true
@@ -127,15 +135,27 @@ export function App() {
   const tabs: { id: Tab; label: string }[] = [
     { id: 'event', label: event ? 'Event' : 'Fight card' },
     { id: 'record', label: 'Track record' },
-    ...(isStatic ? [] : [
+    { id: 'gaps', label: 'Model vs market' },
+    { id: 'compare', label: 'Compare' },
+    ...(isStatic ? (hasMarket ? [{ id: 'parlay' as const, label: `Parlay${legs.length ? ` (${legs.length})` : ''}` }] : []) : [
       { id: 'value' as const, label: `Value board${opportunities.length ? ` (${opportunities.length})` : ''}` },
       { id: 'parlay' as const, label: `Parlay${legs.length ? ` (${legs.length})` : ''}` },
       { id: 'bankroll' as const, label: 'Bankroll' },
     ]),
+    { id: 'tools', label: `Tools${Object.keys(picks).length ? ` (${Object.keys(picks).length})` : ''}` },
     { id: 'health', label: 'Model health' },
   ]
 
   useEffect(() => saveBets(bets), [bets])
+  useEffect(() => savePicks(picks), [picks])
+  useEffect(() => {
+    const onPrompt = (e: Event): void => {
+      e.preventDefault()
+      setInstallEvent(e as unknown as { prompt: () => Promise<void> })
+    }
+    window.addEventListener('beforeinstallprompt', onPrompt)
+    return () => window.removeEventListener('beforeinstallprompt', onPrompt)
+  }, [])
   useEffect(() => {
     if (!toast) return
     const id = setTimeout(() => setToast(null), 2500)
@@ -161,6 +181,54 @@ export function App() {
     } catch {
       setToast(url)
     }
+  }
+
+  const gapRows = useMemo(
+    () => rows.flatMap((x) => (x.r && x.m ? [{
+      id: x.an.fight.id, order: x.order, nameA: x.an.fight.a.name, nameB: x.an.fight.b.name,
+      modelProbA: x.r.probA, marketProbA: x.m.pA, books: x.m.books,
+    }] : [])),
+    [rows],
+  )
+
+  const pickBout = (side: 'a' | 'b'): void => {
+    if (!opened || !openedRow) return
+    const f = opened.fight
+    setPicks((prev) => togglePick(prev, {
+      boutId: f.id, side, a: f.a.name, b: f.b.name, eventTitle: event?.event.title ?? 'This card', at: Date.now(),
+      modelProbA: openedRow.r?.probA, marketProbA: openedRow.m?.pA,
+    }))
+  }
+
+  const saveImage = async (): Promise<void> => {
+    if (!opened || !openedRow) return
+    const f = opened.fight
+    const blob = await makePickCard({
+      title: event?.event.title ?? 'UFC', nameA: f.a.name, nameB: f.b.name, probA: openedRow.view.probA,
+      source: openedRow.view.source === 'market' ? 'Betting-market consensus, margin removed' : 'OctaIQ model, backtested',
+    })
+    if (!blob) { setToast('Pick images need a browser with canvas support'); return }
+    const file = new File([blob], `octaiq-${f.id}.png`, { type: 'image/png' })
+    try {
+      if (navigator.canShare?.({ files: [file] })) { await navigator.share({ files: [file], title: 'OctaIQ pick' }); return }
+    } catch { /* fall through to a download */ }
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = file.name
+    a.click()
+    URL.revokeObjectURL(url)
+    setToast('Pick image saved')
+  }
+
+  const addFairLeg = (side: 'a' | 'b'): void => {
+    if (!opened || !openedRow?.m) return
+    const f = opened.fight
+    const p = side === 'a' ? openedRow.m.pA : 1 - openedRow.m.pA
+    const label = side === 'a' ? f.a.name : f.b.name
+    if (legs.some((l) => l.fightId === f.id && l.label === label)) return
+    setLegs((prev) => [...prev, { fightId: f.id, label, american: probToAmerican(p), modelProb: openedRow.r ? (side === 'a' ? openedRow.r.probA : openedRow.r.probB) : p }])
+    setToast(`Added ${label} to the parlay at the fair price`)
   }
 
   const logBet = (side: SideAnalysis, fightLabel: string): void => {
@@ -219,6 +287,9 @@ export function App() {
         <button type="button" className="theme-toggle" onClick={toggleTheme} aria-pressed={theme === 'light'}>
           {theme === 'light' ? 'Dark theme' : 'Light theme'}
         </button>
+        {installEvent && (
+          <button type="button" className="theme-toggle" onClick={() => { void installEvent.prompt(); setInstallEvent(null) }}>Install app</button>
+        )}
         <a className="gh" href="https://github.com/amirronaldo319/octaiq" target="_blank" rel="noopener noreferrer">Source on GitHub</a>
       </header>
 
@@ -277,6 +348,9 @@ export function App() {
         )}
 
         {tab === 'record' && <TrackRecord />}
+        {tab === 'gaps' && <GapsView rows={gapRows} hasMarket={hasMarket} onOpen={openBout} />}
+        {tab === 'compare' && <CompareView a={route.a} b={route.b} onChange={(a, b) => go({ tab: 'compare', a, b })} />}
+        {tab === 'tools' && <ToolsView picks={picks} onRemovePick={(id) => setPicks((prev) => { const next = { ...prev }; delete next[id]; return next })} />}
         {tab === 'health' && <ModelHealth />}
 
         {tab === 'value' && (
@@ -294,6 +368,10 @@ export function App() {
 
       <footer className="foot">
         <p>OctaIQ is a research project, not betting advice. In past tests, betting prices were more accurate than this model. Please gamble responsibly.</p>
+        <p className="muted small">
+          If gambling is causing you harm, free help is available in the US at 1-800-GAMBLER or <a href="https://www.ncpgambling.org/help-treatment/" target="_blank" rel="noopener noreferrer">ncpgambling.org</a>.
+          Outside the US, see <a href="https://www.begambleaware.org" target="_blank" rel="noopener noreferrer">begambleaware.org</a>.
+        </p>
       </footer>
 
       {tab === 'event' && route.fighter && (
@@ -310,7 +388,8 @@ export function App() {
       {tab === 'event' && !route.fighter && opened && openedRow && (
         <BoutModal title={`${opened.fight.a.name} versus ${opened.fight.b.name}`} onClose={closeAll}>
           <FightDetail analysis={opened} view={openedRow.view} results={openedRow.r} resultsMeta={results} market={openedRow.m} marketUpdated={marketFile?.generatedAt} isStatic={isStatic}
-            onFighter={openFighter} onShare={copyLink} onBet={logBet} onAddLeg={addLeg} />
+            onFighter={openFighter} onShare={copyLink} onBet={logBet} onAddLeg={addLeg}
+            eventId={card.eventId} myPick={picks[opened.fight.id]?.side} onPick={pickBout} onSaveImage={saveImage} onAddFairLeg={isStatic && openedRow.m ? addFairLeg : undefined} />
         </BoutModal>
       )}
       <div className="toast" role="status" aria-live="polite">{toast}</div>

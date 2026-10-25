@@ -1,7 +1,7 @@
 import { mkdirSync, readdirSync, rmSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { writeIfChanged } from './lib/stableWrite.ts'
-import { buildFighterCareers, buildPublishedLedger, buildStaticEvents, readBacktestForPublishing } from './lib/snapshot.ts'
+import { buildFighterCareers, buildFighterIndex, buildPublishedLedger, buildStaticEvents, readBacktestForPublishing } from './lib/snapshot.ts'
 
 const ROOT = resolve(import.meta.dirname, '..')
 const OUT = resolve(ROOT, 'public/data')
@@ -33,5 +33,7 @@ put('backtest.json', backtest)
 const careers = buildFighterCareers(ROOT, index)
 if (careers) put('fighters.json', JSON.stringify(careers))
 else console.warn('Skipped fighters.json: dataset or report missing.')
+const fighterIndex = buildFighterIndex(ROOT, new Date())
+if (fighterIndex) put('fighter-index.json', JSON.stringify(fighterIndex))
 put('ledger.json', JSON.stringify(buildPublishedLedger(ROOT, new Date(), 'https://github.com/amirronaldo319/octaiq/commits/main/data/ledger')))
 console.info(written.length ? `Updated ${written.length} files in public/data: ${written.join(', ')}. Commit them to publish.` : 'public/data is already up to date.')

@@ -42,6 +42,11 @@ describe('buildHash', () => {
     { tab: 'record' },
     { tab: 'health' },
     { tab: 'bankroll' },
+    { tab: 'gaps' },
+    { tab: 'tools' },
+    { tab: 'compare' },
+    { tab: 'compare', a: 'jon-jones' },
+    { tab: 'compare', a: 'jon-jones', b: 'tom-aspinall' },
   ]
 
   it('round-trips every route', () => {
@@ -52,5 +57,11 @@ describe('buildHash', () => {
     expect(buildHash({ tab: 'event' })).toBe('#/')
     expect(buildHash({ tab: 'event', eventId: 'e', boutId: 'e-1' })).toBe('#/event/e/bout/e-1')
     expect(buildHash({ tab: 'record', boutId: 'ignored' })).toBe('#/record')
+  })
+
+  it('reads the two compared fighters and rejects unsafe slugs', () => {
+    expect(parseHash('#/compare/jon-jones/tom-aspinall')).toEqual({ tab: 'compare', a: 'jon-jones', b: 'tom-aspinall' })
+    expect(parseHash('#/compare/../x')).toEqual({ tab: 'compare', b: 'x' })
+    expect(buildHash({ tab: 'compare', b: 'tom-aspinall' })).toBe('#/compare/-/tom-aspinall')
   })
 })
