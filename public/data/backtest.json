@@ -1,10 +1,10 @@
 {
-  "generatedAt": "2026-10-25T17:33:14.070Z",
+  "generatedAt": "2026-10-25T18:00:20.862Z",
   "dataset": {
     "source": "https://github.com/Greco1899/scrape_ufc_stats",
     "license": "GPL-3.0 (repository LICENSE file)",
     "upstream": "ufcstats.com (scraped by the repository author)",
-    "retrievedAt": "2026-10-25T16:24:33.426Z",
+    "retrievedAt": "2026-10-25T18:00:08.837Z",
     "files": [
       {
         "name": "ufc_event_details.csv",
@@ -123,7 +123,7 @@
     "statsDecayValidation": [
       {
         "decay": 1,
-        "logLoss": 0.7093083276988669
+        "logLoss": 0.7093083276988671
       },
       {
         "decay": 0.9,
@@ -247,7 +247,7 @@
           "logLoss": 0.681710231272636,
           "brier": 0.24436918359175772,
           "accuracy": 0.5576494910941476,
-          "ece": 0.010295623496366299,
+          "ece": 0.010295623496366297,
           "reliability": [
             {
               "lo": 0.5,
@@ -281,7 +281,7 @@
               "lo": 0.7,
               "hi": 0.75,
               "n": 100,
-              "meanPredicted": 0.7211889775475865,
+              "meanPredicted": 0.7211889775475864,
               "observed": 0.7
             },
             {
@@ -338,9 +338,9 @@
         "metrics": {
           "n": 6288,
           "logLoss": 0.6619662696735548,
-          "brier": 0.2348333359038788,
+          "brier": 0.23483333590387878,
           "accuracy": 0.6045642493638677,
-          "ece": 0.010518291967066317,
+          "ece": 0.010518291967066374,
           "reliability": [
             {
               "lo": 0.5,
@@ -353,7 +353,7 @@
               "lo": 0.55,
               "hi": 0.6,
               "n": 1626,
-              "meanPredicted": 0.5742057750015086,
+              "meanPredicted": 0.5742057750015084,
               "observed": 0.6039360393603936
             },
             {
@@ -421,8 +421,8 @@
         },
         "logLossVsElo": {
           "estimate": -0.019743961599079495,
-          "lo": -0.024663183137715074,
-          "hi": -0.014749011893325094
+          "lo": -0.024663183137714928,
+          "hi": -0.014749011893325238
         }
       },
       {
@@ -495,7 +495,7 @@
               "lo": 0.9,
               "hi": 0.95,
               "n": 8,
-              "meanPredicted": 0.9129767783067112,
+              "meanPredicted": 0.9129767783067113,
               "observed": 0.875
             },
             {
@@ -509,8 +509,8 @@
         },
         "logLoss": {
           "estimate": 0.6545528717732704,
-          "lo": 0.6475306194107406,
-          "hi": 0.6613712984282422
+          "lo": 0.6475306194107405,
+          "hi": 0.6613712984282423
         },
         "logLossVsElo": {
           "estimate": -0.027157359499365222,
@@ -540,15 +540,15 @@
         "n": 464,
         "coinLogLoss": 0.6931471805599468,
         "eloLogLoss": 0.6821365842269834,
-        "lrLogLoss": 0.6773586895054088,
-        "lrStatsLogLoss": 0.6689227084235455
+        "lrLogLoss": 0.6773586895054087,
+        "lrStatsLogLoss": 0.6689227084235454
       },
       {
         "year": 2016,
         "n": 483,
         "coinLogLoss": 0.6931471805599468,
         "eloLogLoss": 0.6724812133748432,
-        "lrLogLoss": 0.653322457443427,
+        "lrLogLoss": 0.6533224574434271,
         "lrStatsLogLoss": 0.6606487765235137
       },
       {
@@ -557,14 +557,14 @@
         "coinLogLoss": 0.6931471805599468,
         "eloLogLoss": 0.6839228697374539,
         "lrLogLoss": 0.6739081983406872,
-        "lrStatsLogLoss": 0.6641348550745902
+        "lrStatsLogLoss": 0.6641348550745904
       },
       {
         "year": 2018,
         "n": 469,
         "coinLogLoss": 0.6931471805599468,
-        "eloLogLoss": 0.6828985985158414,
-        "lrLogLoss": 0.6646810776868044,
+        "eloLogLoss": 0.6828985985158413,
+        "lrLogLoss": 0.6646810776868043,
         "lrStatsLogLoss": 0.6503377058747271
       },
       {
@@ -580,8 +580,8 @@
         "n": 444,
         "coinLogLoss": 0.6931471805599468,
         "eloLogLoss": 0.6777936694374539,
-        "lrLogLoss": 0.6562658922669089,
-        "lrStatsLogLoss": 0.6529284639514421
+        "lrLogLoss": 0.6562658922669088,
+        "lrStatsLogLoss": 0.6529284639514424
       },
       {
         "year": 2021,
@@ -589,7 +589,7 @@
         "coinLogLoss": 0.6931471805599468,
         "eloLogLoss": 0.6814029444731429,
         "lrLogLoss": 0.6623225891047638,
-        "lrStatsLogLoss": 0.6489834075957694
+        "lrStatsLogLoss": 0.6489834075957696
       },
       {
         "year": 2022,
@@ -597,7 +597,7 @@
         "coinLogLoss": 0.6931471805599468,
         "eloLogLoss": 0.6779286750535006,
         "lrLogLoss": 0.656467085018592,
-        "lrStatsLogLoss": 0.6540606506669907
+        "lrStatsLogLoss": 0.6540606506669906
       },
       {
         "year": 2023,
@@ -605,7 +605,7 @@
         "coinLogLoss": 0.6931471805599468,
         "eloLogLoss": 0.684443083380577,
         "lrLogLoss": 0.657655666077512,
-        "lrStatsLogLoss": 0.6521071946819418
+        "lrStatsLogLoss": 0.6521071946819419
       },
       {
         "year": 2024,
@@ -613,13 +613,13 @@
         "coinLogLoss": 0.6931471805599468,
         "eloLogLoss": 0.680776218210134,
         "lrLogLoss": 0.6538493014199219,
-        "lrStatsLogLoss": 0.6336089523851589
+        "lrStatsLogLoss": 0.633608952385159
       },
       {
         "year": 2025,
         "n": 513,
         "coinLogLoss": 0.6931471805599468,
-        "eloLogLoss": 0.6790145034253876,
+        "eloLogLoss": 0.6790145034253874,
         "lrLogLoss": 0.6430865788885151,
         "lrStatsLogLoss": 0.6328021954600718
       },
@@ -629,7 +629,7 @@
         "coinLogLoss": 0.6931471805599468,
         "eloLogLoss": 0.6855115939268243,
         "lrLogLoss": 0.6532003590685608,
-        "lrStatsLogLoss": 0.6489557567217896
+        "lrStatsLogLoss": 0.6489557567217897
       }
     ],
     "experienced": [
@@ -651,7 +651,7 @@
           {
             "id": "lr",
             "n": 3131,
-            "logLoss": 0.6601910466620912,
+            "logLoss": 0.6601910466620909,
             "accuracy": 0.607793037368253
           },
           {
@@ -698,20 +698,20 @@
       "calibratedLogLoss": 0.6601977545278496,
       "diff": {
         "estimate": 0.0005539238926215492,
-        "lo": -0.00020021638165746282,
-        "hi": 0.0013180332248455093
+        "lo": -0.00020021638165737844,
+        "hi": 0.001318033224845424
       },
       "temperatures": [
-        0.7604773898896087,
+        0.7604773898896086,
         0.8725670595700963,
         0.8667104195614026,
-        0.8892110652701928,
-        0.8551917758843998,
-        0.8942702038248094,
-        0.9175486797093058,
+        0.8892110652701929,
+        0.8551917758843999,
+        0.8942702038248096,
+        0.917548679709306,
         0.9435538977567317,
-        0.9572887926353766,
-        0.9801835373583176,
+        0.9572887926353767,
+        0.9801835373583179,
         1.010425913320306
       ]
     },
@@ -735,7 +735,7 @@
         "trainRows": 3462,
         "trainEnd": "2015-12-19",
         "testRows": 483,
-        "calibrationTemperature": 0.7604773898896087
+        "calibrationTemperature": 0.7604773898896086
       },
       {
         "year": 2017,
@@ -756,28 +756,28 @@
         "trainRows": 4860,
         "trainEnd": "2018-12-29",
         "testRows": 506,
-        "calibrationTemperature": 0.8892110652701928
+        "calibrationTemperature": 0.8892110652701929
       },
       {
         "year": 2020,
         "trainRows": 5366,
         "trainEnd": "2019-12-21",
         "testRows": 444,
-        "calibrationTemperature": 0.8551917758843998
+        "calibrationTemperature": 0.8551917758843999
       },
       {
         "year": 2021,
         "trainRows": 5810,
         "trainEnd": "2020-12-19",
         "testRows": 497,
-        "calibrationTemperature": 0.8942702038248094
+        "calibrationTemperature": 0.8942702038248096
       },
       {
         "year": 2022,
         "trainRows": 6307,
         "trainEnd": "2021-12-18",
         "testRows": 506,
-        "calibrationTemperature": 0.9175486797093058
+        "calibrationTemperature": 0.917548679709306
       },
       {
         "year": 2023,
@@ -791,14 +791,14 @@
         "trainRows": 7317,
         "trainEnd": "2023-12-16",
         "testRows": 513,
-        "calibrationTemperature": 0.9572887926353766
+        "calibrationTemperature": 0.9572887926353767
       },
       {
         "year": 2025,
         "trainRows": 7830,
         "trainEnd": "2024-12-14",
         "testRows": 513,
-        "calibrationTemperature": 0.9801835373583176
+        "calibrationTemperature": 0.9801835373583179
       },
       {
         "year": 2026,
@@ -813,13 +813,13 @@
       "distance": {
         "n": 6321,
         "logLoss": {
-          "estimate": 0.6759692084126969,
+          "estimate": 0.675969208412697,
           "lo": 0.6682742696479511,
           "hi": 0.6837904453764978
         },
         "baselineLogLoss": 0.6996068595417523,
         "gain": {
-          "estimate": -0.0236376511290554,
+          "estimate": -0.023637651129055255,
           "lo": -0.03213358791993384,
           "hi": -0.014811374007963058
         },
@@ -845,14 +845,14 @@
       "joint": {
         "n": 6273,
         "logLoss": {
-          "estimate": 1.6289639428277025,
+          "estimate": 1.628963942827702,
           "lo": 1.6120676192284455,
-          "hi": 1.6452553206220875
+          "hi": 1.6452553206220877
         },
         "baselineLogLoss": 1.7234645918771392,
         "gain": {
-          "estimate": -0.0945006490494367,
-          "lo": -0.10765981981703544,
+          "estimate": -0.09450064904943699,
+          "lo": -0.10765981981703573,
           "hi": -0.0813005548187099
         },
         "accuracy": 0.3224932249322493,
@@ -867,31 +867,31 @@
       },
       {
         "name": "experience",
-        "weight": -0.050291594981637065
+        "weight": -0.050291594981636975
       },
       {
         "name": "winRate",
-        "weight": -1.5240651140964683
+        "weight": -1.5240651140964676
       },
       {
         "name": "finishRate",
-        "weight": 0.948278035561267
+        "weight": 0.9482780355612668
       },
       {
         "name": "koLossRate",
-        "weight": -0.6938682970842799
+        "weight": -0.6938682970842801
       },
       {
         "name": "subLossRate",
-        "weight": -1.0392160745291181
+        "weight": -1.0392160745291186
       },
       {
         "name": "form",
-        "weight": -0.43068369887318836
+        "weight": -0.4306836988731889
       },
       {
         "name": "layoff",
-        "weight": -0.08647885071615442
+        "weight": -0.08647885071615445
       },
       {
         "name": "age",
@@ -907,39 +907,39 @@
       },
       {
         "name": "sigDiff",
-        "weight": 0.15141269962760354
+        "weight": 0.15141269962759749
       },
       {
         "name": "sigLanded",
-        "weight": 0.007410309958539842
+        "weight": 0.00741030995854597
       },
       {
         "name": "sigAbsorbed",
-        "weight": -0.10138458560633398
+        "weight": -0.10138458560634006
       },
       {
         "name": "sigAcc",
-        "weight": 0.30986839977669645
+        "weight": 0.30986839977669617
       },
       {
         "name": "tdRate",
-        "weight": 0.0781852753087576
+        "weight": 0.07818527530875763
       },
       {
         "name": "tdDef",
-        "weight": 0.5197304288821368
+        "weight": 0.5197304288821369
       },
       {
         "name": "subRate",
-        "weight": -0.056113535947572186
+        "weight": -0.05611353594757212
       },
       {
         "name": "ctrlNet",
-        "weight": 0.47193972393225364
+        "weight": 0.4719397239322534
       },
       {
         "name": "kdFor",
-        "weight": -0.002865261000993272
+        "weight": -0.002865261000993307
       },
       {
         "name": "kdAgainst",
@@ -970,7 +970,7 @@
       "n": 6288,
       "logLoss": 0.6619662696735548,
       "accuracy": 0.6045642493638677,
-      "brier": 0.2348333359038788,
+      "brier": 0.23483333590387878,
       "note": "The previous primary model."
     },
     {
@@ -989,7 +989,7 @@
         "reachMissing"
       ],
       "n": 6288,
-      "logLoss": 0.6705275522094017,
+      "logLoss": 0.6705275522094016,
       "accuracy": 0.5873886768447837,
       "brier": 0.23888548206068658,
       "note": "Shows how much the fight statistics carry on their own."
@@ -998,7 +998,7 @@
       "label": "Results + stats, plus missing-profile flags",
       "excluded": [],
       "n": 6288,
-      "logLoss": 0.6516573970320583,
+      "logLoss": 0.6516573970320582,
       "accuracy": 0.6260337150127226,
       "brier": 0.22847977974114916,
       "note": "Known leak: profile completeness today reflects future career length. Shown only for comparison."
@@ -1012,7 +1012,7 @@
         "reachMissing"
       ],
       "n": 6288,
-      "logLoss": 0.6736092402556049,
+      "logLoss": 0.6736092402556045,
       "accuracy": 0.5774491094147582,
       "brier": 0.24043838036611437,
       "note": "Needs no fighter-profile snapshot at all."
@@ -1033,7 +1033,7 @@
         "reachMissing"
       ],
       "n": 6288,
-      "logLoss": 0.6819520862673949,
+      "logLoss": 0.6819520862673948,
       "accuracy": 0.5600349872773537,
       "brier": 0.24448603394059604,
       "note": "Smallest feature set."
@@ -1248,7 +1248,7 @@
           "logLoss": 0.6839084748021288,
           "brier": 0.24549178330747978,
           "accuracy": 0.5506398537477148,
-          "ece": 0.02149185735135616,
+          "ece": 0.02149185735135619,
           "reliability": [
             {
               "lo": 0.5,
@@ -1261,7 +1261,7 @@
               "lo": 0.55,
               "hi": 0.6,
               "n": 778,
-              "meanPredicted": 0.5741514828474884,
+              "meanPredicted": 0.5741514828474885,
               "observed": 0.5539845758354756
             },
             {
@@ -1324,13 +1324,13 @@
         },
         "logLoss": {
           "estimate": 0.6839084748021325,
-          "lo": 0.67792370803215,
+          "lo": 0.6779237080321499,
           "hi": 0.6898366919028383
         },
         "vsMarket": {
           "estimate": 0.06591976687772026,
           "lo": 0.052714704804278055,
-          "hi": 0.07850788000407978
+          "hi": 0.0785078800040797
         }
       },
       {
@@ -1338,7 +1338,7 @@
         "label": "Model: results features",
         "metrics": {
           "n": 2735,
-          "logLoss": 0.6704296693016655,
+          "logLoss": 0.6704296693016654,
           "brier": 0.23888829067616532,
           "accuracy": 0.5912248628884826,
           "ece": 0.02177619189034379,
@@ -1422,8 +1422,8 @@
         },
         "vsMarket": {
           "estimate": 0.05244096137725448,
-          "lo": 0.03953972576390371,
-          "hi": 0.06495315994004311
+          "lo": 0.039539725763903875,
+          "hi": 0.06495315994004294
         }
       },
       {
@@ -1434,7 +1434,7 @@
           "logLoss": 0.6656808414654063,
           "brier": 0.23624252282415523,
           "accuracy": 0.6025594149908592,
-          "ece": 0.02428838753996813,
+          "ece": 0.02428838753996811,
           "reliability": [
             {
               "lo": 0.5,
@@ -1454,7 +1454,7 @@
               "lo": 0.6,
               "hi": 0.65,
               "n": 525,
-              "meanPredicted": 0.6243819726163057,
+              "meanPredicted": 0.6243819726163058,
               "observed": 0.6342857142857142
             },
             {
@@ -1534,7 +1534,7 @@
         "n": 433,
         "market": 0.6317854453703016,
         "elo": 0.6820918541116261,
-        "lr": 0.6766084645746442,
+        "lr": 0.676608464574644,
         "lrStats": 0.6696051108247553
       },
       {
@@ -1543,15 +1543,15 @@
         "market": 0.6285204789090746,
         "elo": 0.67356177647624,
         "lr": 0.6546404968450126,
-        "lrStats": 0.6665255211026377
+        "lrStats": 0.6665255211026376
       },
       {
         "year": 2017,
         "n": 408,
         "market": 0.614037528665668,
-        "elo": 0.6867907806419551,
-        "lr": 0.6762468258364777,
-        "lrStats": 0.6686920316212912
+        "elo": 0.686790780641955,
+        "lr": 0.6762468258364775,
+        "lrStats": 0.6686920316212911
       },
       {
         "year": 2018,
@@ -1574,8 +1574,8 @@
         "n": 84,
         "market": 0.6216501008775915,
         "elo": 0.692942972920729,
-        "lr": 0.6579412728330566,
-        "lrStats": 0.6395449492884878
+        "lr": 0.6579412728330563,
+        "lrStats": 0.6395449492884879
       }
     ],
     "stack": {
@@ -1681,9 +1681,9 @@
           "metrics": {
             "n": 2274,
             "logLoss": 0.664576119726489,
-            "brier": 0.23570303513496002,
+            "brier": 0.23570303513495997,
             "accuracy": 0.6064204045734388,
-            "ece": 0.02141568684236783,
+            "ece": 0.021415686842367818,
             "reliability": [
               {
                 "lo": 0.5,
@@ -1703,7 +1703,7 @@
                 "lo": 0.6,
                 "hi": 0.65,
                 "n": 426,
-                "meanPredicted": 0.6243105274073482,
+                "meanPredicted": 0.6243105274073483,
                 "observed": 0.6384976525821596
               },
               {
@@ -1724,7 +1724,7 @@
                 "lo": 0.75,
                 "hi": 0.8,
                 "n": 122,
-                "meanPredicted": 0.7716921157372862,
+                "meanPredicted": 0.7716921157372864,
                 "observed": 0.6721311475409836
               },
               {
@@ -1758,13 +1758,13 @@
             ]
           },
           "logLoss": {
-            "estimate": 0.664576119726488,
-            "lo": 0.6522995517552841,
+            "estimate": 0.6645761197264881,
+            "lo": 0.6522995517552842,
             "hi": 0.6781012065633418
           },
           "vsMarket": {
-            "estimate": 0.04345868289216964,
-            "lo": 0.03057771843142595,
+            "estimate": 0.043458682892169746,
+            "lo": 0.03057771843142615,
             "hi": 0.05678661145694296
           }
         },
@@ -1773,10 +1773,10 @@
           "label": "Market + model (walk-forward blend)",
           "metrics": {
             "n": 2274,
-            "logLoss": 0.619885919769806,
+            "logLoss": 0.6198859197698061,
             "brier": 0.21587982638651837,
             "accuracy": 0.6451187335092349,
-            "ece": 0.030775257301636563,
+            "ece": 0.030775257301636584,
             "reliability": [
               {
                 "lo": 0.5,
@@ -1803,7 +1803,7 @@
                 "lo": 0.65,
                 "hi": 0.7,
                 "n": 340,
-                "meanPredicted": 0.6748763464855388,
+                "meanPredicted": 0.6748763464855387,
                 "observed": 0.7058823529411765
               },
               {
@@ -1824,7 +1824,7 @@
                 "lo": 0.8,
                 "hi": 0.85,
                 "n": 125,
-                "meanPredicted": 0.8223821441936218,
+                "meanPredicted": 0.8223821441936219,
                 "observed": 0.808
               },
               {
@@ -1852,13 +1852,13 @@
           },
           "logLoss": {
             "estimate": 0.6198859197698059,
-            "lo": 0.6061341778690683,
+            "lo": 0.6061341778690682,
             "hi": 0.633688380861003
           },
           "vsMarket": {
             "estimate": -0.0012315170645124797,
             "lo": -0.0036123274568403466,
-            "hi": 0.001253456559853739
+            "hi": 0.0012534565598535381
           }
         }
       ],
@@ -1880,7 +1880,7 @@
     "attribution": "UFC Fights (2010-2020) with Betting Odds, OpenML dataset 43464, CC BY 4.0. The original uploader is not named in the OpenML metadata.",
     "md5": "5a25fab3ff4bd389d40ce432462e4443",
     "bytes": 545652,
-    "retrievedAt": "2026-10-25T16:32:50.293Z"
+    "retrievedAt": "2026-10-25T18:00:20.758Z"
   },
   "recentEvents": [
     {
@@ -1890,7 +1890,7 @@
         {
           "a": "SuYoung You",
           "b": "Cody Chovancek",
-          "probA": 0.5850705720737235,
+          "probA": 0.5850705720737234,
           "winner": "a",
           "correct": true
         },
@@ -1904,14 +1904,14 @@
         {
           "a": "Chad Anheliger",
           "b": "Steven Koslow",
-          "probA": 0.30838122360100484,
+          "probA": 0.3083812236010049,
           "winner": "b",
           "correct": true
         },
         {
           "a": "Mackenzie Stiller",
           "b": "Katlyn Cerminara",
-          "probA": 0.5823004033074924,
+          "probA": 0.5823004033074926,
           "winner": "b",
           "correct": false
         },
@@ -1925,7 +1925,7 @@
         {
           "a": "Nick Galanti",
           "b": "Julien Leblanc",
-          "probA": 0.5610632966278748,
+          "probA": 0.5610632966278749,
           "winner": "a",
           "correct": true
         },
@@ -1960,7 +1960,7 @@
         {
           "a": "Cristian Perez",
           "b": "Kyle Nelson",
-          "probA": 0.557505065923193,
+          "probA": 0.5575050659231932,
           "winner": "a",
           "correct": true
         },
@@ -1974,7 +1974,7 @@
         {
           "a": "Joaquin Buckley",
           "b": "Mike Malott",
-          "probA": 0.5649018902293295,
+          "probA": 0.5649018902293296,
           "winner": "b",
           "correct": false
         }
@@ -1989,21 +1989,21 @@
         {
           "a": "Daria Zhelezniakova",
           "b": "Alice Pereira",
-          "probA": 0.27821721786897347,
+          "probA": 0.2782172178689735,
           "winner": "b",
           "correct": true
         },
         {
           "a": "RJ Harris",
           "b": "Allen Frye Jr.",
-          "probA": 0.624961547266909,
+          "probA": 0.6249615472669091,
           "winner": "b",
           "correct": false
         },
         {
           "a": "Brendson Ribeiro",
           "b": "Felipe Franco",
-          "probA": 0.22120456078651465,
+          "probA": 0.22120456078651468,
           "winner": "a",
           "correct": false
         },
@@ -2038,14 +2038,14 @@
         {
           "a": "Andre Fili",
           "b": "Kai Kamaka III",
-          "probA": 0.5105454815890486,
+          "probA": 0.5105454815890487,
           "winner": "a",
           "correct": true
         },
         {
           "a": "Ketlen Souza",
           "b": "Loopy Godinez",
-          "probA": 0.4309636856143907,
+          "probA": 0.43096368561439063,
           "winner": "b",
           "correct": true
         },
@@ -2065,7 +2065,7 @@
         }
       ],
       "accuracy": 0.5454545454545454,
-      "logLoss": 0.7277157210996239
+      "logLoss": 0.7277157210996237
     },
     {
       "event": "UFC 332: Silva vs. Wang",
@@ -2074,28 +2074,28 @@
         {
           "a": "Court McGee",
           "b": "Eric Nolan",
-          "probA": 0.4080122736158857,
+          "probA": 0.40801227361588605,
           "winner": "b",
           "correct": true
         },
         {
           "a": "Ismail Naurdiev",
           "b": "Marvin Vettori",
-          "probA": 0.6041012792791703,
+          "probA": 0.6041012792791702,
           "winner": "a",
           "correct": true
         },
         {
           "a": "Alexander Hernandez",
           "b": "Rafael Dos Anjos",
-          "probA": 0.5992840591518093,
+          "probA": 0.5992840591518092,
           "winner": "a",
           "correct": true
         },
         {
           "a": "Bruce Whitehead",
           "b": "Jacobe Smith",
-          "probA": 0.2108750764237631,
+          "probA": 0.21087507642376316,
           "winner": "b",
           "correct": true
         },
@@ -2137,7 +2137,7 @@
         {
           "a": "Ateba Gautier",
           "b": "Roman Kopylov",
-          "probA": 0.7692218136812161,
+          "probA": 0.769221813681216,
           "winner": "b",
           "correct": false
         },
@@ -2151,7 +2151,7 @@
         {
           "a": "Esteban Ribovics",
           "b": "King Green",
-          "probA": 0.40303308157065804,
+          "probA": 0.40303308157065837,
           "winner": "a",
           "correct": false
         },
@@ -2180,28 +2180,28 @@
         {
           "a": "Vanessa Demopoulos",
           "b": "Yazmin Jauregui",
-          "probA": 0.19946494653919158,
+          "probA": 0.1994649465391916,
           "winner": "b",
           "correct": true
         },
         {
           "a": "John Castaneda",
           "b": "Alatengheili",
-          "probA": 0.6507440536255332,
+          "probA": 0.6507440536255334,
           "winner": "b",
           "correct": false
         },
         {
           "a": "Montel Jackson",
           "b": "Ricky Simon",
-          "probA": 0.7066620819113758,
+          "probA": 0.7066620819113757,
           "winner": "a",
           "correct": true
         },
         {
           "a": "Elves Brener",
           "b": "Josiah Harrell",
-          "probA": 0.6079983268612206,
+          "probA": 0.6079983268612207,
           "winner": "a",
           "correct": true
         },
@@ -2215,7 +2215,7 @@
         {
           "a": "Robert Bryczek",
           "b": "Rodolfo Vieira",
-          "probA": 0.43930599995601666,
+          "probA": 0.43930599995601655,
           "winner": "b",
           "correct": true
         },
@@ -2250,7 +2250,7 @@
         {
           "a": "Ailin Perez",
           "b": "Norma Dumont",
-          "probA": 0.5582549843423125,
+          "probA": 0.5582549843423124,
           "winner": "a",
           "correct": true
         },
@@ -2314,7 +2314,7 @@
         {
           "a": "Marlon Vera",
           "b": "Charles Jourdain",
-          "probA": 0.42196190668138794,
+          "probA": 0.42196190668138805,
           "winner": "a",
           "correct": false
         },
@@ -2335,7 +2335,7 @@
         {
           "a": "Dooho Choi",
           "b": "Patricio Pitbull",
-          "probA": 0.6530869608470169,
+          "probA": 0.6530869608470167,
           "winner": "b",
           "correct": false
         },
@@ -2355,7 +2355,7 @@
         }
       ],
       "accuracy": 0.6666666666666666,
-      "logLoss": 0.6793052327740837
+      "logLoss": 0.6793052327740835
     },
     {
       "event": "Noche UFC: Silva vs. Delgado",
@@ -2378,7 +2378,7 @@
         {
           "a": "Rongzhu",
           "b": "Rafa Garcia",
-          "probA": 0.38237447578282374,
+          "probA": 0.3823744757828237,
           "winner": "a",
           "correct": false
         },
@@ -2392,7 +2392,7 @@
         {
           "a": "Yousri Belgaroui",
           "b": "Djorden Santos",
-          "probA": 0.7924249011090971,
+          "probA": 0.7924249011090974,
           "winner": "a",
           "correct": true
         },
@@ -2413,7 +2413,7 @@
         {
           "a": "Dan Ige",
           "b": "David Martinez",
-          "probA": 0.3476584480784038,
+          "probA": 0.34765844807840385,
           "winner": "b",
           "correct": true
         },
@@ -2434,21 +2434,21 @@
         {
           "a": "Tommy McMillen",
           "b": "Marwan Rahiki",
-          "probA": 0.7896780589380689,
+          "probA": 0.789678058938069,
           "winner": "a",
           "correct": true
         },
         {
           "a": "Joseph Morales",
           "b": "Brandon Moreno",
-          "probA": 0.30426447606360907,
+          "probA": 0.304264476063609,
           "winner": "b",
           "correct": true
         },
         {
           "a": "Jean Silva",
           "b": "Jose Delgado",
-          "probA": 0.46875447907460166,
+          "probA": 0.46875447907460155,
           "winner": "a",
           "correct": false
         }
