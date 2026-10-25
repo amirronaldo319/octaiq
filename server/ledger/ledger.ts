@@ -65,6 +65,35 @@ export function entryFromPayload(payload: EventPayload, now: Date): LedgerEntry 
 
 const round4 = (n: number): number => Math.round(n * 10_000) / 10_000
 
+/** One saved forecast, trimmed for the public site: win probability of fighter A for each bout and why it was saved. */
+export interface LedgerHistoryEntry {
+  at: string
+  model: string
+  dataThrough?: string
+  cardVersion: number
+  /** Plain-language reason this version exists */
+  reason: string
+  probs: Record<string, number>
+}
+
+/** Why `next` was saved after `prev`, in words a visitor can read. */
+export function describeChange(prev: LedgerEntry | undefined, next: LedgerEntry): string {
+  if (!prev) return 'First forecast for this card'
+  const before = new Set(prev.bouts.map((b) => `${b.id}|${b.a}|${b.b}`))
+  if (before.size !== next.bouts.length || next.bouts.some((b) => !before.has(`${b.id}|${b.a}|${b.b}`))) return 'The card changed'
+  if (prev.model !== next.model) return `The model was updated (${next.model})`
+  if (prev.dataThrough !== next.dataThrough) return `New results were added (data through ${next.dataThrough ?? 'a later date'})`
+  return 'A small shift in the probabilities'
+}
+
+export function historyOf(ledger: Ledger): LedgerHistoryEntry[] {
+  return ledger.entries.map((e, i) => ({
+    at: e.recordedAt, model: e.model, dataThrough: e.dataThrough, cardVersion: e.cardVersion,
+    reason: describeChange(ledger.entries[i - 1], e),
+    probs: Object.fromEntries(e.bouts.map((b) => [b.id, b.probA])),
+  }))
+}
+
 export type RecordDecision = { record: true; reason: string } | { record: false; reason: string }
 
 /** Pure decision: should `next` be appended to a ledger that already holds `entries`? */

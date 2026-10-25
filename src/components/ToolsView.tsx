@@ -3,6 +3,9 @@ import type { PublishedLedger } from '../../server/lib/snapshot'
 import { withBase } from '../lib/fetchJson'
 import { parseOdds, removeMargin, type OddsFormat } from '../lib/oddsMath'
 import { score, type MyPick } from '../lib/picks'
+import { nextBouts, type Follows } from '../lib/follows'
+import { slugify } from '../lib/slug'
+import { useAllEvents } from '../lib/useAllEvents'
 import { useJson } from '../lib/useJson'
 
 const FORMATS: { id: OddsFormat; label: string; placeholder: string }[] = [
@@ -99,12 +102,90 @@ function MyPicks({ picks, onRemove }: { picks: Record<string, MyPick>; onRemove:
   )
 }
 
-export function ToolsView({ picks, onRemovePick }: { picks: Record<string, MyPick>; onRemovePick: (boutId: string) => void }) {
+interface FollowingProps {
+  follows: Follows
+  onUnfollow: (slug: string) => void
+  onRemoveBout: (boutId: string) => void
+  onOpenBout: (eventId: string, boutId: string) => void
+}
+
+const whenLocal = (iso: string): string => new Date(iso).toLocaleString(undefined, { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })
+
+/** Fighters and bouts the visitor follows, with each fighter's next bout across every card on the site. */
+function Following({ follows, onUnfollow, onRemoveBout, onOpenBout }: FollowingProps) {
+  const fighters = Object.entries(follows.fighters)
+  const saved = Object.values(follows.bouts)
+  const all = useAllEvents(fighters.length > 0)
+  const upcoming = all.status === 'ready' ? nextBouts(follows, all.events, slugify, Date.now()) : []
+  return (
+    <section className="panel tool" aria-label="Following">
+      <h2>Following</h2>
+      {fighters.length === 0 && saved.length === 0 ? (
+        <p className="empty">Nothing followed yet. Open a bout and choose “Follow” on a fighter or “Save this bout”. This stays in your browser only.</p>
+      ) : (
+        <>
+          {fighters.length > 0 && (
+            <ul className="my-picks">
+              {fighters.map(([slug, f]) => {
+                const next = upcoming.find((u) => slugify(u.fighter) === slug)
+                return (
+                  <li key={slug}>
+                    <span>
+                      <strong>{f.name}</strong>{' '}
+                      {all.status === 'loading' ? <small className="muted">checking the cards…</small> : next ? (
+                        <small className="muted">next: vs {next.opponent}, {whenLocal(next.start)} ({next.eventTitle})</small>
+                      ) : all.status === 'ready' ? <small className="muted">not on a card on this site right now</small> : null}
+                    </span>
+                    <span>{next && <button type="button" className="btn small" onClick={() => onOpenBout(next.eventId, next.boutId)}>Open bout</button>}</span>
+                    <button type="button" className="btn small" onClick={() => onUnfollow(slug)} aria-label={`Unfollow ${f.name}`}>Unfollow</button>
+                  </li>
+                )
+              })}
+            </ul>
+          )}
+          {saved.length > 0 && (
+            <>
+              <h3>Saved bouts</h3>
+              <ul className="my-picks">
+                {saved.sort((x, y) => y.at - x.at).map((b) => (
+                  <li key={b.boutId}>
+                    <span><strong>{b.a} vs {b.b}</strong> <small className="muted">{b.eventTitle}</small></span>
+                    <span><button type="button" className="btn small" onClick={() => onOpenBout(b.eventId, b.boutId)}>Open bout</button></span>
+                    <button type="button" className="btn small" onClick={() => onRemoveBout(b.boutId)} aria-label={`Remove saved bout ${b.a} vs ${b.b}`}>Remove</button>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+        </>
+      )}
+    </section>
+  )
+}
+
+export interface MoreLink {
+  id: string
+  label: string
+  note: string
+}
+
+export function ToolsView({ picks, onRemovePick, more, onGo, following }: { picks: Record<string, MyPick>; onRemovePick: (boutId: string) => void; more?: MoreLink[]; onGo?: (id: string) => void; following?: FollowingProps }) {
   return (
     <div className="tools">
       <header className="health-head"><h1>Tools</h1></header>
+      {following && <Following {...following} />}
       <MyPicks picks={picks} onRemove={onRemovePick} />
       <OddsCalculator />
+      {more && more.length > 0 && onGo && (
+        <section className="panel tool" aria-label="More pages">
+          <h2>More pages</h2>
+          <ul className="more-links">
+            {more.map((m) => (
+              <li key={m.id}><button type="button" className="btn" onClick={() => onGo(m.id)}>{m.label}</button> <span className="muted small">{m.note}</span></li>
+            ))}
+          </ul>
+        </section>
+      )}
     </div>
   )
 }

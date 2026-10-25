@@ -36,7 +36,7 @@ export interface FeatureRow {
   priorA: number
   priorB: number
   /** Bout context and outcome, for the goes-the-distance and method models */
-  ctx: { rounds: number | null; weightClass: string; method: MethodKind; result: ResultKind }
+  ctx: { rounds: number | null; weightClass: string; method: MethodKind; result: ResultKind; /** Days since each fighter's previous bout, null for a debut */ layoffDays?: [number | null, number | null] }
   /** Symmetric features: A plus B, so they describe how finish-prone the matchup is */
   dist: number[]
   /** Method features from each side's perspective as the winner: [A wins, B wins] */
@@ -95,16 +95,8 @@ const zeroRoll = (): Roll => ({ min: 0, sigL: 0, sigAbs: 0, sigAtt: 0, kdFor: 0,
 const fresh = (): State => ({ elo: 1500, n: 0, wins: 0, finishWins: 0, koWins: 0, koLosses: 0, subWins: 0, subLosses: 0, form: 0.5, oppEloSum: 0, activity: 0, totalMin: 0, lastLossDate: null, koRecent: 0, koDate: null, lastWc: null, eloWc: {}, lastDate: null, roll: zeroRoll() })
 const DAY = 86_400_000
 
-const CLASS_ORDER = ['strawweight', 'flyweight', 'bantamweight', 'featherweight', 'lightweight', 'welterweight', 'middleweight', 'light heavyweight', 'heavyweight']
-/** 1 (strawweight) to 9 (heavyweight) from a results-file weight class; null for catch weight, open weight and unknowns. */
-export function weightClassIndex(name: string): number | null {
-  const t = name.toLowerCase()
-  let found: number | null = null
-  CLASS_ORDER.forEach((c, i) => {
-    if (t.includes(c) && (found === null || c.length > CLASS_ORDER[found - 1].length)) found = i + 1
-  })
-  return found
-}
+export { weightClassIndex } from '../../src/engine/weightClass.ts'
+import { weightClassIndex } from '../../src/engine/weightClass.ts'
 const YEAR = 365.25 * DAY
 
 /** Pseudo-observations that pull a thin history toward the running league average. */
@@ -307,7 +299,10 @@ export function buildFeatureRows(
         x: [...fa.map((v, k) => v - fb[k]), ...clash],
         priorA: sa.n,
         priorB: sb.n,
-        ctx: { rounds: b.scheduledRounds ?? null, weightClass: b.weightClass, method: b.method, result: b.result },
+        ctx: {
+          rounds: b.scheduledRounds ?? null, weightClass: b.weightClass, method: b.method, result: b.result,
+          layoffDays: [sa.lastDate === null ? null : Math.round((b.date - sa.lastDate) / DAY), sb.lastDate === null ? null : Math.round((b.date - sb.lastDate) / DAY)],
+        },
         dist: symA.map((v, k) => v + symB[k]),
         mw: [methodVector(sa, sb, snapshot), methodVector(sb, sa, snapshot)],
       })

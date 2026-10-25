@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { EventPayload } from '../engine/eventTypes'
+import { resolveZone, TZ_OPTIONS } from '../lib/timezone'
 
 function useNow(intervalMs: number): number {
   const [now, setNow] = useState(() => Date.now())
@@ -32,14 +33,22 @@ export function venueTime(iso: string, tz: string): string {
   return tz === EASTERN ? timeIn(iso, tz) : `${timeIn(iso, tz)} (${timeIn(iso, EASTERN)})`
 }
 
+/** Time in the chosen zone. In the default "Venue time" mode the venue's time carries Eastern alongside. */
+export function timeFor(iso: string, choice: string, venueZone: string): string {
+  const tz = resolveZone(choice, venueZone)
+  return choice === 'venue' ? venueTime(iso, venueZone) : timeIn(iso, tz)
+}
+
 interface HeroProps {
   payload: EventPayload
   onAbout: () => void
   /** When betting prices were last collected, if the site has them */
   marketUpdated?: string
+  zoneChoice?: string
+  onZoneChoice?: (id: string) => void
 }
 
-export function Hero({ payload, onAbout, marketUpdated }: HeroProps) {
+export function Hero({ payload, onAbout, marketUpdated, zoneChoice = 'venue', onZoneChoice }: HeroProps) {
   const now = useNow(30_000)
   const { event } = payload
   const { series, headline } = splitTitle(event.title)
@@ -55,7 +64,15 @@ export function Hero({ payload, onAbout, marketUpdated }: HeroProps) {
         <h1 className="hero-title">{headline}</h1>
         <p className="hero-where">{event.venue}, {event.city}</p>
         <p className="hero-when">
-          {dayIn(event.mainCardStart, zone(event))}. Early start {venueTime(event.prelimsStart, zone(event))}. Main card {venueTime(event.mainCardStart, zone(event))}.
+          {dayIn(event.mainCardStart, resolveZone(zoneChoice, zone(event)))}. Early start {timeFor(event.prelimsStart, zoneChoice, zone(event))}. Main card {timeFor(event.mainCardStart, zoneChoice, zone(event))}.
+          {onZoneChoice && (
+            <label className="tz">
+              <span>Show times in</span>
+              <select value={zoneChoice} onChange={(e) => onZoneChoice(e.target.value)}>
+                {TZ_OPTIONS.map((o) => <option key={o.id} value={o.id}>{o.label}</option>)}
+              </select>
+            </label>
+          )}
         </p>
         <div className="hero-flags">
           {verified

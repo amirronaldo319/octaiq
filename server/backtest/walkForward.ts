@@ -1,4 +1,5 @@
 import type { Bout, FighterProfile } from './dataset.ts'
+import { weightClassKey } from './outcomes.ts'
 import { predictTrees, trainTrees } from './trees.ts'
 import { buildFeatureRows, EXPERIMENTAL_FEATURES, FEATURE_NAMES, STATS_FEATURES } from './features.ts'
 import { bootstrapLogLoss, logLossOne, metrics, type EventAgg, type Interval, type Metrics } from './metrics.ts'
@@ -25,6 +26,8 @@ export interface BacktestOptions {
   /** Also fit boosted trees and a logistic+trees ensemble, reported but never used for predictions unless adopted */
   trees: boolean
 }
+
+const DIVISIONS = ['Flyweight', 'Bantamweight', 'Featherweight', 'Lightweight', 'Welterweight', 'Middleweight', 'Light Heavyweight', 'Heavyweight'] as const
 
 export const DEFAULT_OPTIONS: BacktestOptions = {
   firstTestYear: 2014,
@@ -60,6 +63,9 @@ export interface Prediction {
   /** Scheduled rounds and whether the division is a women's one, for subgroup reporting */
   rounds?: number | null
   womens?: boolean
+  /** The longer of the two fighters' layoffs in days, and the weight-class key */
+  layoffDays?: number | null
+  division?: string | null
 }
 
 export interface ModelResult {
@@ -203,6 +209,8 @@ export function runBacktest(
       return {
         gbm, ens: gbm === null ? null : (lrStats + gbm) / 2,
         rounds: r.ctx.rounds, womens: /women/i.test(r.ctx.weightClass),
+        layoffDays: r.ctx.layoffDays ? Math.max(r.ctx.layoffDays[0] ?? 0, r.ctx.layoffDays[1] ?? 0) : null,
+        division: weightClassKey(r.ctx.weightClass),
         id: r.id, event: r.event, year, y: r.y, priorA: r.priorA, priorB: r.priorB,
         coin: 0.5, elo: eloProb(r.x[0]), lr,
         lrStats,
@@ -271,6 +279,9 @@ export function runBacktest(
     { label: "Women's divisions", keep: (p) => p.womens === true },
     { label: 'Big favourite (the stats model gives one side 70% or more)', keep: (p) => Math.max(p.lrStats, 1 - p.lrStats) >= 0.7 },
     { label: 'Close call (the stats model gives each side between 45% and 55%)', keep: (p) => Math.abs(p.lrStats - 0.5) <= 0.05 },
+    { label: 'Either fighter off for a year or more', keep: (p) => (p.layoffDays ?? 0) >= 365 },
+    { label: 'Both fighters fought within the last year', keep: (p) => p.layoffDays != null && p.layoffDays < 365 },
+    ...DIVISIONS.map((d) => ({ label: `Division: ${d}`, keep: (p: Prediction) => p.division === d })),
   ]
   const experienced = subsets.map((s) => {
     const sub = predictions.filter(s.keep)
@@ -281,7 +292,7 @@ export function runBacktest(
         return { id: d.id, n: m.n, logLoss: m.logLoss, accuracy: m.accuracy }
       }),
     }
-  })
+  }).filter((g) => (g.models[0]?.n ?? 0) >= 30)
 
   const calSub = predictions.filter((p) => p.lrCal !== null)
   let calibration: BacktestReport['calibration'] = null
@@ -307,7 +318,7 @@ export function runBacktest(
   const primary: 'lr' | 'lrStats' = statsAdopted ? 'lrStats' : 'lr'
   const pByBout = new Map(predictions.map((p) => [p.id, primary === 'lrStats' ? p.lrStats : p.lr]))
   const outcomes = opts.bootstrap > 0
-    ? evaluateOutcomes(rows, pByBout, { firstTestYear: opts.firstTestYear, ridge: opts.ridge, bootstrap: opts.bootstrap, seed: opts.seed })
+    ? evaluateOutcomes(rows, pByBout, { firstTestYear: opts.firstTestYear, ridge: opts.ridge, bootstrap: opts.bootstrap, seed: opts.seed, ...(opts.trees ? { columns: primary === 'lrStats' ? keepStats : keepResults } : {}) })
     : null
   const names = (keep: number[], w: number[]): { name: string; weight: number }[] =>
     keep.map((i, j) => ({ name: FEATURE_NAMES[i], weight: w[j] ?? NaN }))

@@ -245,6 +245,13 @@
           },
           "notes": [
             "Main event. Replaced Brian Ortega, who withdrew with a cut (CagesidePress, Sept 14 2026)."
+          ],
+          "news": [
+            {
+              "date": "2026-09-14",
+              "text": "Brian Ortega withdrew with a cut; Tom Nolan replaced him against Renato Moicano.",
+              "source": "CagesidePress"
+            }
           ]
         },
         {

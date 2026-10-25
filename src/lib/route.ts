@@ -10,6 +10,8 @@ export interface Route {
   boutId?: string
   /** An open fighter page (slug) */
   fighter?: string
+  /** A saved forecast version of the open bout, as a compact timestamp */
+  version?: string
   /** The two fighters on the Compare tab (slugs) */
   a?: string
   b?: string
@@ -38,12 +40,13 @@ export function parseHash(hash: string): Route {
   if (head !== 'event') return TABS.includes(head as Tab) && head !== 'event' ? { tab: head as Tab } : { tab: 'event' }
 
   const route: Route = { tab: 'event' }
-  if (rest[0] && SAFE.test(rest[0]) && rest[0] !== 'bout' && rest[0] !== 'fighter') route.eventId = rest.shift()
+  if (rest[0] && SAFE.test(rest[0]) && rest[0] !== 'bout' && rest[0] !== 'fighter' && rest[0] !== 'v') route.eventId = rest.shift()
   for (let i = 0; i + 1 < rest.length; i += 2) {
     const [key, value] = [rest[i], rest[i + 1]]
     if (!SAFE.test(value)) continue
     if (key === 'bout') route.boutId = value
     else if (key === 'fighter') route.fighter = value
+    else if (key === 'v') route.version = value
   }
   return route
 }
@@ -55,6 +58,7 @@ export function buildHash(r: Route): string {
   const segs = ['event']
   if (r.eventId) segs.push(encodeURIComponent(r.eventId))
   if (r.boutId) segs.push('bout', encodeURIComponent(r.boutId))
+  if (r.version) segs.push('v', encodeURIComponent(r.version))
   if (r.fighter) segs.push('fighter', encodeURIComponent(r.fighter))
   return segs.length === 1 ? '#/' : `#/${segs.join('/')}`
 }

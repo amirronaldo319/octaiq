@@ -50,10 +50,20 @@ export interface Fight {
   bout?: BoutInfo
 }
 
+export interface NewsItem {
+  /** YYYY-MM-DD publication date */
+  date: string
+  text: string
+  source: string
+  url?: string
+}
+
 export interface BoutInfo {
   order: number
   card: 'main' | 'prelim'
   notes: string[]
+  /** Dated, sourced news about the bout; only items with a source and a date are ever listed */
+  news?: NewsItem[]
   /** Where each side's stats came from, e.g. 'ufcalendar', 'csv', or null when missing */
   statsA: boolean
   statsB: boolean

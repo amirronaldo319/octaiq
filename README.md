@@ -14,9 +14,14 @@ The public site is a snapshot: no API keys, no live bookmaker quotes. Run it you
 | Bout detail | Model pick with a 90% range, a trust meter, accuracy against a coin flip and the market, goes-the-distance and method odds, verification notes, a shareable link per bout |
 | Fighter pages | UFC record, an Elo rating chart, recent-form statistics and the full fight history |
 | Betting market | A consensus probability with the margin removed, and a market/model toggle. Per-bookmaker quotes are never published |
-| Track record | An append-only ledger of predictions saved before each event, graded automatically once results appear, plus a replay of the last six events |
+| Track record | A public, versioned archive of forecasts saved before each event (stages: Published, Updated, Locked, Graded), graded automatically once results appear, plus a replay of the last six events |
 | Model health | Backtest results with confidence intervals, calibration, the comparison with betting prices, and the leak I found and fixed |
-| Why this pick | The three biggest factors for the pick and the two against, in plain words, plus how often past picks this confident have won |
+| Forecast history | Every saved version of a bout's forecast with the reason it was saved (card changed, new results, model updated), which one counts for grading, and links that open a specific saved version |
+| Layouts | Detailed cards, a compact table (probability, data quality and main factor shown separately), and a fight-night view in running order with start times in a time zone you choose |
+| Matchup context | Last five fights with opponent level, opponent-adjusted striking and takedowns, three- versus five-round record, layoff and weight-class changes, evidence-backed paths to victory (labelled as analysis, not a model input), what could change the forecast, and dated, sourced news |
+| Following | Follow fighters and save bouts (kept in your browser), with each followed fighter's next bout across all cards |
+| Reviews | After a card is graded, a plain-language look back: the misses, the biggest upset, and whether the result was luck or a real miss; recurring weaknesses across cards |
+| Why this pick | The groups of factors for the pick and against it (related ones added together), in plain words, plus how often past picks this confident have won |
 | Model vs market | Where the model and the betting consensus disagree most on the card |
 | Compare | Search about 900 recently active fighters and compare any two, with an Elo-only win chance |
 | Tools | An odds calculator (American, decimal, fractional; shows the bookmaker margin) and your own picks, kept only in your browser and scored against results |
@@ -31,7 +36,7 @@ Also: a light theme, offline support, link previews, deep links, keyboard and sc
 - **No leakage.** Features use only fights dated before the event; a bout's own result and statistics never reach its own features. Tests inject a deliberate leak to confirm they would catch it, and a noise-only world must score like a coin flip.
 - **Fixed adoption rule.** The rolling fight-statistics features are used only if their paired gain over the results-only model has a 95% interval entirely below zero.
 - **Honest comparison with the market.** On 2,735 past fights with betting prices, the market was more accurate than the model (log loss 0.618 against 0.664). Blending the model into the price added nothing demonstrable. Treat the model as context, not a betting edge.
-- **Public ledger.** `data/ledger/` holds what the model said before each event. Entries are never edited, nothing is recorded once an event starts, and the GitHub commit history is the timestamp.
+- **Public ledger.** `data/ledger/` holds what the model said before each event. A new version is added rather than an old one overwritten, nothing is recorded once an event starts, and the GitHub commit history gives each version its time. That is a public, versioned archive anyone can inspect, not a cryptographic seal. Every saved version, with the reason it was saved, is also shown on each bout page, and a link can point at a specific saved version.
 
 What it cannot see: styles, injuries, weigh-ins, camp news, and anything outside UFC results and per-minute fight statistics. The method model assumes winner and method are independent given the features. The ranges reflect how much the answer depends on which past fights were used, not everything the model cannot see.
 
@@ -90,9 +95,13 @@ OctaIQ's own code is MIT licensed ([LICENSE](LICENSE)). Data keeps its own terms
 - **Card information:** the official UFC event pages, read by an automated fetch, plus ESPN Deportes for records.
 - **Fonts:** Barlow and Barlow Condensed (SIL Open Font License), self-hosted.
 
+## Stages of a forecast
+
+Published (saved; a newer version can replace it until the event starts), Updated (replaced at least once), Locked (the event has started, so the saved forecast is final), Graded (results are in the open data and each pick has been scored). Percentages shown for one bout always add up, on the card, the bar and the method table.
+
 ## Tried and not adopted
 
-Recorded in the backtest so the null results stay visible: stance, weight-class moves, a per-weight-class Elo, age decline, time since a loss, recent knockouts, cage minutes and style-clash features (no gain over the default), boosted trees (clearly worse than the logistic model), and an average of the two (no significant gain). Opponent quality and recent activity were adopted for a small gain (log loss 0.6657 to 0.6639 on matched-price bouts).
+Recorded in the backtest so the null results stay visible: stance, weight-class moves, a per-weight-class Elo, age decline, time since a loss, recent knockouts, cage minutes and style-clash features (no gain over the default), boosted trees (clearly worse than the logistic model), and an average of the two (no significant gain). A direct model of all six winner-and-method outcomes (and a hybrid with the validated win probability) did not beat the simpler default with a clear interval, and round-by-round predictions are not shown because they have not been tested. Opponent quality and recent activity were adopted for a small gain (log loss 0.6657 to 0.6639 on matched-price bouts).
 
 ## Not done, on purpose
 

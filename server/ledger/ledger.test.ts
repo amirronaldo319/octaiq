@@ -203,3 +203,27 @@ describe('stable writes', () => {
     writeFileSync(path, 'x')
   })
 })
+
+describe('forecast history', () => {
+  const entry = (over: Partial<import('./ledger.ts').LedgerEntry> = {}): import('./ledger.ts').LedgerEntry => ({
+    recordedAt: '2026-10-25T10:00:00Z', model: 'm1', dataThrough: '2026-10-17', cardVersion: 1,
+    bouts: [{ id: 'e-1', a: 'A', b: 'B', probA: 0.6 }], ...over,
+  })
+
+  it('explains each saved version in words', async () => {
+    const { describeChange } = await import('./ledger.ts')
+    expect(describeChange(undefined, entry())).toBe('First forecast for this card')
+    expect(describeChange(entry(), entry({ bouts: [{ id: 'e-1', a: 'A', b: 'C', probA: 0.6 }] }))).toBe('The card changed')
+    expect(describeChange(entry(), entry({ model: 'm2' }))).toContain('model was updated')
+    expect(describeChange(entry(), entry({ dataThrough: '2026-10-24' }))).toContain('through 2026-10-24')
+    expect(describeChange(entry(), entry({ bouts: [{ id: 'e-1', a: 'A', b: 'B', probA: 0.61 }] }))).toBe('A small shift in the probabilities')
+  })
+
+  it('keeps only the win probabilities per version', async () => {
+    const { historyOf } = await import('./ledger.ts')
+    const h = historyOf({ eventId: 'e', title: 'T', lockedAt: 'x', mainCardStart: 'y', entries: [entry(), entry({ model: 'm2' })] })
+    expect(h).toHaveLength(2)
+    expect(h[1].probs).toEqual({ 'e-1': 0.6 })
+    expect(h[1].reason).toContain('model was updated')
+  })
+})

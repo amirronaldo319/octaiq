@@ -42,6 +42,7 @@ describe('buildHash', () => {
     { tab: 'record' },
     { tab: 'health' },
     { tab: 'bankroll' },
+    { tab: 'event', eventId: 'e', boutId: 'e-1', version: '20261025T173628975Z' },
     { tab: 'gaps' },
     { tab: 'tools' },
     { tab: 'compare' },

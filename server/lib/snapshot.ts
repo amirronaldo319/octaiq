@@ -3,7 +3,7 @@ import { resolve } from 'node:path'
 import type { EventIndex, EventPayload } from '../../src/engine/eventTypes.ts'
 import { buildCareers, type Career } from '../backtest/careers.ts'
 import { gradeLedger, summarizeLedgers, type GradedEvent, type LedgerSummary } from '../ledger/grade.ts'
-import { readAllLedgers } from '../ledger/ledger.ts'
+import { historyOf, readAllLedgers } from '../ledger/ledger.ts'
 import { createResultsModelService, loadAliases, loadDataset } from '../backtest/resultsModel.ts'
 import type { BacktestOutput } from '../backtest/types.ts'
 import { buildEventIndex, createEventCatalog, listEventFiles } from './eventService.ts'
@@ -120,6 +120,6 @@ export function buildPublishedLedger(root: string, now: Date, historyUrl: string
   const data = loadDataset(root)
   const events: GradedEvent[] = readAllLedgers(root)
     .sort((a, b) => Date.parse(a.mainCardStart) - Date.parse(b.mainCardStart))
-    .map((l) => gradeLedger(l, data?.bouts ?? [], now))
+    .map((l) => ({ ...gradeLedger(l, data?.bouts ?? [], now), history: historyOf(l) }))
   return { ...summarizeLedgers(events), historyUrl }
 }

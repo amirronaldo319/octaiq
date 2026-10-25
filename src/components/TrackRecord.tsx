@@ -4,6 +4,8 @@ import type { PublishedLedger } from '../../server/lib/snapshot'
 import type { GradedEvent } from '../../server/ledger/grade'
 import { withBase } from '../lib/fetchJson'
 import { useJson } from '../lib/useJson'
+import { stageOf, STAGES } from '../lib/lifecycle'
+import { bandsOf, reviewEvent, type ReviewBout } from '../lib/review'
 import { LineChart } from './LineChart'
 
 /** Running share of winners picked correctly, oldest event first. */
@@ -23,22 +25,37 @@ const pct = (n: number): string => `${Math.round(n * 100)}%`
 const when = (iso: string): string => new Date(iso).toLocaleString('en-US', { timeZone: 'America/New_York', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZoneName: 'short' })
 const dayOnly = (iso: string): string => new Date(iso).toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' })
 
-const STATUS: Record<GradedEvent['status'], string> = {
-  upcoming: 'Locked in, waiting for the fights',
-  'awaiting-results': 'Event is over, waiting for results to be published',
-  graded: 'Graded',
+
+/** A plain-language look back at one card. */
+function ReviewBox({ bouts }: { bouts: ReviewBout[] }) {
+  const review = reviewEvent(bouts)
+  if (!review) return null
+  return (
+    <div className="review" role="group" aria-label="Review of this card">
+      <h4>Looking back</h4>
+      <ul>{review.lines.map((l) => <li key={l}>{l}</li>)}</ul>
+    </div>
+  )
 }
 
+const liveBouts = (e: GradedEvent): ReviewBout[] =>
+  e.bouts.map((b) => ({ a: b.a, b: b.b, probA: b.probA, winner: b.result === 'a' || b.result === 'b' ? b.result : undefined }))
+
 function LiveEvent({ e }: { e: GradedEvent }) {
+  const stage = stageOf(e, Date.now())
   return (
     <section className="rec-event" aria-label={e.title}>
       <header>
         <h3>{e.title}</h3>
-        <span className={`chip-status s-${e.status}`}>{STATUS[e.status]}</span>
+        <span className={`chip-status s-${stage.stage}`}>{stage.label}</span>
       </header>
+      <ol className="stages" aria-label="Stages">
+        {STAGES.map((st) => <li key={st} className={st === stage.stage ? 'now' : STAGES.indexOf(st) < STAGES.indexOf(stage.stage) ? 'done' : ''} aria-current={st === stage.stage ? 'step' : undefined}>{st[0].toUpperCase() + st.slice(1)}</li>)}
+      </ol>
       <p className="muted small">
-        {e.scoredEntryAt ? `Picks saved ${when(e.scoredEntryAt)}` : 'No picks saved yet'}
-        {e.entries > 1 ? ` (the latest of ${e.entries} versions made before the event)` : ''}. Locked from {when(e.lockedAt)}.
+        {stage.detail}{' '}
+        {e.scoredEntryAt ? `Saved forecast: ${when(e.scoredEntryAt)}` : 'No forecast saved yet'}
+        {e.entries > 1 ? ` (the latest of ${e.entries} versions)` : ''}. Locks {when(e.lockedAt)}.
         {e.status === 'graded' && e.graded > 0 && <> <strong>{e.correct} of {e.graded} winners picked correctly.</strong></>}
       </p>
       <ul className="rec-bouts">
@@ -59,6 +76,7 @@ function LiveEvent({ e }: { e: GradedEvent }) {
           )
         })}
       </ul>
+      {stage.stage === 'graded' && <ReviewBox bouts={liveBouts(e)} />}
     </section>
   )
 }
@@ -73,6 +91,10 @@ export function TrackRecord() {
   const graded = ledger.status === 'ready' ? ledger.data.graded : 0
   const correct = ledger.status === 'ready' ? ledger.data.correct : 0
   const recent = backtest.status === 'ready' ? backtest.data.recentEvents : []
+  const { weaknesses } = bandsOf([
+    ...events.filter((e) => e.status === 'graded').map(liveBouts),
+    ...recent.map((e) => e.bouts.map((b) => ({ a: b.a, b: b.b, probA: b.probA, winner: b.winner }))),
+  ])
   const nextLock = events
     .filter((e) => Date.parse(e.lockedAt) > Date.now())
     .sort((a, b) => Date.parse(a.lockedAt) - Date.parse(b.lockedAt))[0]
@@ -82,8 +104,9 @@ export function TrackRecord() {
       <header className="health-head">
         <h1>Track record</h1>
         <p className="lead">
-          Predictions are saved before each event and can’t be edited afterwards: the file’s history is public on GitHub. Once the fights are
-          in the open results data, each pick is graded.
+          Forecasts are saved before each event in a public, versioned archive on GitHub: every version has a commit time, and a new version is added
+          rather than an old one overwritten. That is a public record anyone can inspect, not a cryptographic seal. Once the fights are in the open
+          results data, each saved forecast is graded.
           {ledger.status === 'ready' && (
             <> <a href={ledger.data.historyUrl} target="_blank" rel="noopener noreferrer">See the history</a>.</>
           )}
@@ -92,7 +115,7 @@ export function TrackRecord() {
 
       <div className="kpis">
         <div className="kpi">
-          <span>Saved before events</span>
+          <span>Forecasts saved</span>
           <strong>{saved}</strong>
           <em>picks across {events.filter((e) => e.scoredEntryAt).length} events</em>
         </div>
@@ -110,7 +133,15 @@ export function TrackRecord() {
         )}
       </div>
 
-      <h2 className="section-title">Recorded live</h2>
+      {weaknesses.length > 0 && (
+        <section className="panel" aria-label="Recurring weaknesses">
+          <h2>Where it keeps falling short</h2>
+          <ul>{weaknesses.map((w) => <li key={w}>{w}</li>)}</ul>
+          <p className="muted small">From the graded cards and the replay below. A pattern across many fights, not one bad night.</p>
+        </section>
+      )}
+
+      <h2 className="section-title">Saved before the fights</h2>
       {ledger.status === 'loading' && <p className="muted">Loading…</p>}
       {ledger.status === 'missing' && <p className="empty">No ledger is published yet. It starts when the first predictions are recorded.</p>}
       {events.map((e) => <LiveEvent key={e.eventId} e={e} />)}
@@ -150,6 +181,7 @@ export function TrackRecord() {
                     </li>
                   )
                 })}
+                <li className="rec-review"><ReviewBox bouts={e.bouts.map((b) => ({ a: b.a, b: b.b, probA: b.probA, winner: b.winner }))} /></li>
               </ul>
             )}
           </li>

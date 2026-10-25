@@ -189,9 +189,9 @@ describe('bout detail', () => {
     window.location.hash = '#/event/ufc-vegas-123/bout/ufc-vegas-123-1'
     render(<App />)
     await screen.findByRole('dialog')
-    await user.click(screen.getByRole('button', { name: /Tom Nolan: career and rating history/ }))
+    await user.click(screen.getByRole('button', { name: /Tom Nolan.*Career and rating history/ }))
     expect(window.location.hash).toBe('#/event/ufc-vegas-123/bout/ufc-vegas-123-1/fighter/tom-nolan')
-    const fighter = await screen.findByRole('article', { name: /Tom Nolan: career and rating history/ })
+    const fighter = await screen.findByRole('article', { name: /Tom Nolan/ })
     await waitFor(() => expect(within(fighter).getByRole('region', { name: 'Fight history' })).toBeTruthy())
     expect(within(fighter).getByRole('region', { name: 'Rating history' })).toBeTruthy()
     await user.click(within(fighter).getByRole('button', { name: 'Back to the bout' }))
@@ -313,7 +313,7 @@ describe('bout detail extras', () => {
     render(<App />)
     const dialog = await screen.findByRole('dialog')
     expect(await within(dialog).findByRole('region', { name: 'Why this pick' })).toBeTruthy()
-    expect(within(dialog).getByText('Younger')).toBeTruthy()
+    expect(within(dialog).getByText(/Age and reach: younger/)).toBeTruthy()
     const group = within(dialog).getByRole('group', { name: 'Your pick' })
     const first = within(group).getAllByRole('button')[0]
     await user.click(first)
@@ -417,6 +417,151 @@ describe('new pages', () => {
       const result = await axe.run(document.body, { rules: { 'color-contrast': { enabled: false }, region: { enabled: false } } })
       expect(result.violations.map((v) => `${hash} ${v.id}: ${v.help}`)).toEqual([])
       unmount()
+    }
+  })
+})
+
+describe('trust and context features', () => {
+  it('shows the matchup context: recent form with opponent level, what could change the forecast, and sourced news', async () => {
+    window.location.hash = '#/event/ufc-vegas-123/bout/ufc-vegas-123-1'
+    render(<App />)
+    const dialog = await screen.findByRole('dialog')
+    const context = await within(dialog).findByRole('region', { name: 'Matchup context' })
+    await waitFor(() => expect(within(context).getAllByRole('table').length).toBeGreaterThan(0))
+    expect(within(context).getAllByText(/Tougher|Similar|Easier/).length).toBeGreaterThan(0)
+    expect(within(context).getByText(/What could change this forecast/)).toBeTruthy()
+    expect(within(context).getByText('Injuries, weight-cut trouble, camp changes and late news are not in the model. Check for them close to fight night.')).toBeTruthy()
+    expect(within(context).getByText(/CagesidePress/)).toBeTruthy()
+    expect(within(context).getByText(/Analysis, not a model input/)).toBeTruthy()
+  })
+
+  it('lists every saved forecast with the reason, and opens a saved version from a link', async () => {
+    const user = userEvent.setup()
+    window.location.hash = '#/event/ufc-vegas-123/bout/ufc-vegas-123-1'
+    render(<App />)
+    const history = await screen.findByRole('region', { name: 'Forecast history' })
+    expect(within(history).getByText('First forecast for this card')).toBeTruthy()
+    expect(within(history).getByText(/The model was updated/)).toBeTruthy()
+    await user.click(within(history).getAllByRole('button', { name: 'View' })[1])
+    expect(window.location.hash).toContain('/v/2026')
+    expect(await screen.findByText(/You are looking at the forecast saved/)).toBeTruthy()
+    await user.click(screen.getByRole('button', { name: 'Back to current' }))
+    expect(window.location.hash).not.toContain('/v/')
+  })
+
+  it('method table adds up to the win chances on the bar', async () => {
+    window.location.hash = '#/event/ufc-vegas-123/bout/ufc-vegas-123-1'
+    render(<App />)
+    const dialog = await screen.findByRole('dialog')
+    const table = await within(dialog).findByRole('table', { name: 'Winner and method' })
+    const nums = (cells: HTMLElement[]): number[] => cells.map((c) => Number(c.textContent?.replace('%', '')))
+    const rows = within(table).getAllByRole('row').slice(1)
+    const body = rows.slice(0, 3).map((r) => nums(within(r).getAllByRole('cell')))
+    const foot = nums(within(rows[3]).getAllByRole('cell'))
+    expect(body.reduce((s, r) => s + r[1], 0)).toBe(foot[0])
+    expect(body.reduce((s, r) => s + r[2], 0)).toBe(foot[1])
+    expect(foot[0] + foot[1]).toBe(100)
+  })
+
+  it('compact layout lists the whole card with probability, data quality and main factor separately', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await headline()
+    await user.click(screen.getByRole('button', { name: 'Compact' }))
+    const region = screen.getByRole('region', { name: 'Fights, compact view' })
+    expect(within(region).getAllByRole('row')).toHaveLength(vegas.fights.length + 1)
+    expect(within(region).getByRole('columnheader', { name: 'Data quality' })).toBeTruthy()
+    expect(within(region).getAllByText(/Good|Fair|Limited/).length).toBeGreaterThan(0)
+    expect(within(region).getAllByText('Replacement opponent').length).toBeGreaterThan(0)
+    await user.click(within(region).getAllByRole('button', { name: /^Analysis/ })[0])
+    expect(await screen.findByRole('dialog')).toBeTruthy()
+  })
+
+  it('remembers the layout and the time zone in this browser', async () => {
+    const user = userEvent.setup()
+    const { unmount } = render(<App />)
+    await headline()
+    await user.click(screen.getByRole('button', { name: 'Compact' }))
+    await user.selectOptions(screen.getByLabelText('Show times in'), 'Europe/London')
+    unmount()
+    render(<App />)
+    await headline()
+    expect(screen.getByRole('button', { name: 'Compact' }).getAttribute('aria-pressed')).toBe('true')
+    expect((screen.getByLabelText('Show times in') as HTMLSelectElement).value).toBe('Europe/London')
+    expect(screen.getByText(/GMT|BST/)).toBeTruthy()
+  })
+
+  it('track record shows the forecast stage, and says it is a public archive rather than a seal', async () => {
+    window.location.hash = '#/record'
+    render(<App />)
+    await waitFor(() => expect(screen.getAllByRole('list', { name: 'Stages' }).length).toBeGreaterThan(0))
+    expect(screen.getAllByText('Published').length).toBeGreaterThan(0)
+    expect(screen.getByText(/not a cryptographic seal/)).toBeTruthy()
+    expect(screen.queryByText(/can.t be edited/)).toBeNull()
+  })
+
+  it('has a four-destination bar for phones', async () => {
+    render(<App />)
+    await headline()
+    const bar = screen.getByRole('navigation', { name: 'Main destinations' })
+    expect(within(bar).getAllByRole('button').map((b) => b.textContent)).toEqual(['Card', 'Record', 'Compare', 'Tools'])
+  })
+})
+
+describe('retention features', () => {
+  it('follows a fighter and shows their next bout on the Tools page', async () => {
+    const user = userEvent.setup()
+    window.location.hash = '#/event/ufc-vegas-123/bout/ufc-vegas-123-1'
+    const { unmount } = render(<App />)
+    const dialog = await screen.findByRole('dialog')
+    const group = within(dialog).getByRole('group', { name: 'Follow' })
+    const [first, , save] = within(group).getAllByRole('button')
+    await user.click(first)
+    expect(first.getAttribute('aria-pressed')).toBe('true')
+    await user.click(save)
+    unmount()
+    window.location.hash = '#/tools'
+    render(<App />)
+    const panel = await screen.findByRole('region', { name: 'Following' })
+    await waitFor(() => expect(within(panel).getByText(/next: vs/)).toBeTruthy())
+    expect(within(panel).getByText('Saved bouts')).toBeTruthy()
+    await user.click(within(panel).getAllByRole('button', { name: /^Unfollow/ })[0])
+    expect(within(panel).queryByText(/next: vs/)).toBeNull()
+  })
+
+  it('fight night view lists the card in running order with the start of each part', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await headline()
+    await user.click(screen.getByRole('button', { name: 'Fight night' }))
+    const night = screen.getByRole('region', { name: 'Fight night' })
+    expect(within(night).getByRole('heading', { name: /Prelims/ })).toBeTruthy()
+    expect(within(night).getByRole('heading', { name: /Main card/ })).toBeTruthy()
+    expect(within(night).getByRole('status').textContent).toMatch(/Results are not tracked live/)
+    // The main event is last: it is the last row of the last table.
+    const rows = within(night).getAllByRole('row').filter((r) => r.querySelector('th[scope="row"]'))
+    expect(rows).toHaveLength(vegas.fights.length)
+    expect(rows[rows.length - 1].textContent).toMatch(/Main event/)
+  })
+
+  it('the new pages and views have no detectable violations', async () => {
+    const user = userEvent.setup()
+    const { unmount } = render(<App />)
+    await headline()
+    for (const name of ['Compact', 'Fight night']) {
+      await user.click(screen.getByRole('button', { name }))
+      const result = await axe.run(document.body, { rules: { 'color-contrast': { enabled: false }, region: { enabled: false } } })
+      expect(result.violations.map((v) => `${name} ${v.id}: ${v.help}`)).toEqual([])
+    }
+    unmount()
+    for (const hash of ['#/health', '#/event/ufc-vegas-123/bout/ufc-vegas-123-1', '#/tools']) {
+      window.location.hash = hash
+      const view = render(<App />)
+      await waitFor(() => expect(document.querySelector('h1, [role="dialog"]')).toBeTruthy())
+      await new Promise((r) => setTimeout(r, 50))
+      const result = await axe.run(document.body, { rules: { 'color-contrast': { enabled: false }, region: { enabled: false } } })
+      expect(result.violations.map((v) => `${hash} ${v.id}: ${v.help}`)).toEqual([])
+      view.unmount()
     }
   })
 })

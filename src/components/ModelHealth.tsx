@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { BacktestOutput } from '../../server/backtest/types'
 import { getFirstJson, withBase } from '../lib/fetchJson'
+import { CalibrationExplainer, PerformanceSummary } from './PerformanceSummary'
 
 type State = { status: 'loading' } | { status: 'missing'; message: string } | { status: 'ready'; data: BacktestOutput }
 
@@ -112,11 +113,15 @@ export function ModelHealth() {
           <div className="kpi bad">
             <span>Gap to betting prices</span>
             <strong>+{f(state.data.market.models.find((m) => m.id === state.data.market?.primaryModel)?.vsMarket.estimate ?? NaN, 3)}</strong>
-            <em>Log loss behind the market, and it is statistically real</em>
+            <em>Log loss behind the market, and it is statistically real. Measured on {state.data.market.period} prices only: it has not been re-tested on current prices, which this site started saving recently.</em>
           </div>
         )}
       </div>
 
+      <PerformanceSummary backtest={state.data} />
+      <CalibrationExplainer backtest={state.data} />
+
+      <h2 className="section-title">The full technical detail</h2>
       <details className="fold panel">
         <summary>Full results table and method</summary>
         <div className="fold-body">
@@ -175,6 +180,15 @@ export function ModelHealth() {
             {r.treesVsStats.lo > 0 ? 'clearly worse than' : 'not clearly different from'} the logistic model (paired log-loss difference {f(r.treesVsStats.estimate)}{' '}
             [{f(r.treesVsStats.lo)}, {f(r.treesVsStats.hi)}]; positive is worse), and averaging the two changed log loss by {f(r.ensembleVsStats.estimate)}{' '}
             [{f(r.ensembleVsStats.lo)}, {f(r.ensembleVsStats.hi)}], which does not exclude zero. So the simpler logistic model stays.
+          </p>
+        )}
+        {r.outcomes?.jointDirect && r.outcomes.jointHybrid && (
+          <p className="small">
+            <strong>Method predictions, a direct model tried:</strong> instead of multiplying the win chance by a method model (which assumes the winner and the way
+            they win are independent), a model of all six outcomes together was tested on {r.outcomes.joint.n.toLocaleString()} fights. Against the default it changed log loss by{' '}
+            {f(r.outcomes.jointDirect.gain.estimate)} [{f(r.outcomes.jointDirect.gain.lo)}, {f(r.outcomes.jointDirect.gain.hi)}] on its own and {f(r.outcomes.jointHybrid.gain.estimate)}{' '}
+            [{f(r.outcomes.jointHybrid.gain.lo)}, {f(r.outcomes.jointHybrid.gain.hi)}] when paired with the validated win chance. Negative is better, and neither interval excludes zero,
+            so {r.outcomes.jointUsed === 'hybrid' ? 'the hybrid is used.' : 'the simpler default stays. Round-by-round predictions are not shown because they have not been tested.'}
           </p>
         )}
         {r.statsDecayValidation && (

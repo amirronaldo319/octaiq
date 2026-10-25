@@ -1,6 +1,6 @@
 import { devig, probToAmerican } from '../../src/engine/odds.ts'
 import type { CardChange, EventFile, EventSummary, Snapshot, SnapshotBout, Verification } from '../../src/engine/eventTypes.ts'
-import type { BookLine, Fight, Fighter } from '../../src/engine/types.ts'
+import type { BookLine, Fight, Fighter, NewsItem } from '../../src/engine/types.ts'
 import { pickDefaultEvent } from '../../src/engine/pickEvent.ts'
 import { buildNameIndex, sameName } from './names.ts'
 import { extractBooks, placeholderFighter, type HistoryStore, type OddsEvent } from './oddsApi.ts'
@@ -29,7 +29,17 @@ function validateBout(raw: unknown, where: string): SnapshotBout {
   return {
     order, card, weightClass, rounds, a: side(a), b: side(b),
     notes: Array.isArray(notes) ? notes.filter(isString) : [],
+    ...(Array.isArray(raw.news) && raw.news.length > 0 ? { news: raw.news.map((n, i) => parseNews(n, `${where} news ${i + 1}`)) } : {}),
   }
+}
+
+/** News is shown only with a publication date and a source; an item missing either fails loudly rather than appearing undated. */
+function parseNews(raw: unknown, where: string): NewsItem {
+  if (!isObject(raw) || !isString(raw.text) || !isString(raw.source) || !isString(raw.date) || !/^\d{4}-\d{2}-\d{2}$/.test(raw.date)) {
+    throw new Error(`${where}: needs text, source and a YYYY-MM-DD date`)
+  }
+  if (raw.url !== undefined && !(isString(raw.url) && /^https:\/\//.test(raw.url))) throw new Error(`${where}: url must be https`)
+  return { date: raw.date, text: raw.text, source: raw.source, ...(raw.url ? { url: raw.url as string } : {}) }
 }
 
 function parseVerification(raw: unknown): Verification | undefined {
@@ -178,7 +188,7 @@ export function buildEventFights({ file, snapshot, fighters, odds, history }: Bu
         history: market && fairA !== null ? history.record(`${file.event.id}:${market.event.id}`, probToAmerican(fairA)) : [],
         commenceTime: bout.card === 'main' ? file.event.mainCardStart : file.event.prelimsStart,
         statsMissing: !statsA || !statsB,
-        bout: { order: bout.order, card: bout.card, notes: bout.notes, statsA: Boolean(statsA), statsB: Boolean(statsB), hasOdds: books.length > 0 },
+        bout: { order: bout.order, card: bout.card, notes: bout.notes, ...(bout.news ? { news: bout.news } : {}), statsA: Boolean(statsA), statsB: Boolean(statsB), hasOdds: books.length > 0 },
       }
     })
 }

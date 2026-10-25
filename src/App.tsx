@@ -4,6 +4,7 @@ import { AboutData, Hero } from './components/Hero'
 import { BankrollView } from './components/BankrollView'
 import { BoutCard } from './components/BoutCard'
 import { BoutModal } from './components/BoutModal'
+import { CompactList } from './components/CompactList'
 import { CompareView } from './components/CompareView'
 import { GapsView } from './components/GapsView'
 import { ToolsView } from './components/ToolsView'
@@ -19,6 +20,8 @@ import { analyzeCard, findValue, type FightAnalysis, type SideAnalysis } from '.
 import { loadBets, saveBets, type Bet, type BetStatus } from './lib/bets'
 import { withBase } from './lib/fetchJson'
 import { fmtOdds } from './lib/format'
+import { FightNight, isFightDay } from './components/FightNight'
+import { loadFollows, saveFollows, toggleBout, toggleFighter, type Follows } from './lib/follows'
 import { loadPicks, savePicks, togglePick, type MyPick } from './lib/picks'
 import { makePickCard } from './lib/shareCard'
 import { probToAmerican } from './engine/odds'
@@ -27,10 +30,22 @@ import { buildHighlights, primaryView, SORT_LABELS, sortRows, type SortKey, type
 import { shareUrl, useRoute, type Tab } from './lib/route'
 import { slugify } from './lib/slug'
 import { useTheme } from './lib/theme'
+import { useScrollableTables } from './lib/scrollable'
+import { useZoneChoice } from './lib/timezone'
 import { useCard } from './lib/useCard'
 import { useJson } from './lib/useJson'
 
 type Filter = 'all' | 'main' | 'prelim'
+type Layout = 'detailed' | 'compact' | 'night'
+
+const loadLayout = (): Layout => {
+  try {
+    const v = localStorage.getItem('octaiq.layout')
+    return v === 'compact' || v === 'night' ? v : 'detailed'
+  } catch {
+    return 'detailed'
+  }
+}
 
 const FILTERS: { id: Filter; label: string }[] = [
   { id: 'all', label: 'All bouts' },
@@ -81,6 +96,13 @@ export function App() {
   const [filter, setFilter] = useState<Filter>('all')
   const [sortKey, setSortKey] = useState<SortKey>('order')
   const [mode, setMode] = useState<ViewMode>('market')
+  const [layout, setLayoutState] = useState<Layout>(loadLayout)
+  const setLayout = (l: Layout): void => {
+    setLayoutState(l)
+    try {
+      localStorage.setItem('octaiq.layout', l)
+    } catch { /* not remembered */ }
+  }
   const [aboutOpen, setAboutOpen] = useState(false)
   const [bets, setBets] = useState<Bet[]>(() => loadBets())
   const [legs, setLegs] = useState<ParlayEntry[]>([])
@@ -89,13 +111,16 @@ export function App() {
   const [minEdge, setMinEdge] = useState(0.03)
   const [kellyScale, setKellyScale] = useState(0.25)
   const [toast, setToast] = useState<string | null>(null)
+  useScrollableTables()
+  const [zoneChoice, setZoneChoice] = useZoneChoice()
+  const [follows, setFollows] = useState<Follows>(() => loadFollows())
   const [picks, setPicks] = useState<Record<string, MyPick>>(() => loadPicks())
   const [installEvent, setInstallEvent] = useState<{ prompt: () => Promise<void> } | null>(null)
 
   const event = card.source === 'event' ? card.event : null
   const isStatic = event?.static === true
   const results = event?.resultsModel
-  const careers = useJson<Record<string, Career>>(route.fighter ? [withBase('data/fighters.json')] : null, isCareers)
+  const careers = useJson<Record<string, Career>>(route.fighter || route.boutId ? [withBase('data/fighters.json')] : null, isCareers)
   const marketState = useJson<MarketFile>([withBase('data/market.json')], isMarketFile)
   const marketFile = marketState.status === 'ready' ? marketState.data : undefined
   const hasMarket = Boolean(card.eventId && marketFile && Object.keys(marketFile.events[card.eventId] ?? {}).length > 0)
@@ -148,6 +173,7 @@ export function App() {
 
   useEffect(() => saveBets(bets), [bets])
   useEffect(() => savePicks(picks), [picks])
+  useEffect(() => saveFollows(follows), [follows])
   useEffect(() => {
     const onPrompt = (e: Event): void => {
       e.preventDefault()
@@ -162,7 +188,7 @@ export function App() {
     return () => clearTimeout(id)
   }, [toast])
 
-  const eventRoute = (extra: { boutId?: string; fighter?: string } = {}) => ({ tab: 'event' as const, eventId: currentEventId ?? undefined, ...extra })
+  const eventRoute = (extra: { boutId?: string; fighter?: string; version?: string } = {}) => ({ tab: 'event' as const, eventId: currentEventId ?? undefined, ...extra })
   const openBout = (id: string): void => go(eventRoute({ boutId: id }))
   const closeAll = (): void => go(eventRoute())
   const openFighter = (slug: string): void => go(eventRoute({ boutId: route.boutId, fighter: slug }))
@@ -300,17 +326,31 @@ export function App() {
           card.loading ? <Skeleton /> : (
             <>
               {event && <EventPicker events={card.events} selectedId={card.eventId} onSelect={(id) => go({ tab: 'event', eventId: id })} />}
-              {event && <Hero payload={event} onAbout={goAbout} marketUpdated={hasMarket ? marketFile?.generatedAt : undefined} />}
+              {event && <Hero payload={event} onAbout={goAbout} marketUpdated={hasMarket ? marketFile?.generatedAt : undefined} zoneChoice={zoneChoice} onZoneChoice={setZoneChoice} />}
               {event && <AboutData payload={event} open={aboutOpen} onToggle={setAboutOpen} marketAttribution={hasMarket ? marketFile?.attribution : undefined} />}
               {!event && <h1 className="plain-title">{card.source === 'demo' ? 'Demo fight card' : 'Live fight card'}</h1>}
 
               {event && <Highlights items={highlights} onOpen={openBout} />}
 
-              {featured && filter !== 'prelim' && (
+              {event && layout !== 'night' && isFightDay(event, Date.now()) && (
+                <p className="banner live" role="status">
+                  <span>It’s fight day. The card is easier to follow in running order.</span>
+                  <button type="button" className="btn small" onClick={() => setLayout('night')}>Switch to Fight night</button>
+                </p>
+              )}
+
+              {featured && filter !== 'prelim' && layout === 'detailed' && (
                 <BoutCard analysis={featured.an} view={featured.view} results={featured.r} market={featured.m} featured onOpen={openBout} />
               )}
 
               <div className="toolbar">
+                <div className="chips" role="group" aria-label="Card layout">
+                  {(['detailed', 'compact', 'night'] as const).map((l) => (
+                    <button key={l} type="button" className={`chip ${layout === l ? 'on' : ''}`} aria-pressed={layout === l} onClick={() => setLayout(l)}>
+                      {l === 'detailed' ? 'Detailed' : l === 'compact' ? 'Compact' : 'Fight night'}
+                    </button>
+                  ))}
+                </div>
                 <div className="chips" role="group" aria-label="Filter bouts">
                   {FILTERS.map((f) => (
                     <button key={f.id} type="button" className={`chip ${filter === f.id ? 'on' : ''}`} aria-pressed={filter === f.id} onClick={() => setFilter(f.id)}>
@@ -336,8 +376,15 @@ export function App() {
                 </label>
               </div>
 
-              {visible.length === 0 ? (
+              {layout === 'night' && event ? (
+                <FightNight payload={event} items={rows.map((x) => ({ an: x.an, view: x.view, r: x.r, m: x.m }))} zoneChoice={zoneChoice} onOpen={openBout} />
+              ) : visible.length === 0 && !(layout === 'compact' && featured && filter !== 'prelim') ? (
                 <p className="empty">No bouts match this filter.</p>
+              ) : layout === 'compact' ? (
+                <CompactList
+                  items={[...(featured && filter !== 'prelim' ? [featured] : []), ...visible].map((x) => ({ an: x.an, view: x.view, r: x.r, m: x.m }))}
+                  onOpen={openBout}
+                />
               ) : (
                 <div className="grid">
                   {visible.map((x) => <BoutCard key={x.an.fight.id} analysis={x.an} view={x.view} results={x.r} market={x.m} onOpen={openBout} />)}
@@ -350,7 +397,24 @@ export function App() {
         {tab === 'record' && <TrackRecord />}
         {tab === 'gaps' && <GapsView rows={gapRows} hasMarket={hasMarket} onOpen={openBout} />}
         {tab === 'compare' && <CompareView a={route.a} b={route.b} onChange={(a, b) => go({ tab: 'compare', a, b })} />}
-        {tab === 'tools' && <ToolsView picks={picks} onRemovePick={(id) => setPicks((prev) => { const next = { ...prev }; delete next[id]; return next })} />}
+        {tab === 'tools' && (
+          <ToolsView
+            picks={picks}
+            onRemovePick={(id) => setPicks((prev) => { const next = { ...prev }; delete next[id]; return next })}
+            more={[
+              { id: 'gaps', label: 'Model vs market', note: 'Where the model and the betting consensus disagree most.' },
+              { id: 'health', label: 'Model health', note: 'How well the model has done on past fights.' },
+              ...tabs.filter((t) => ['value', 'parlay', 'bankroll'].includes(t.id)).map((t) => ({ id: t.id, label: t.label, note: '' })),
+            ]}
+            onGo={(id) => go({ tab: id as Tab })}
+            following={{
+              follows,
+              onUnfollow: (slug) => setFollows((f) => toggleFighter(f, slug, slug)),
+              onRemoveBout: (id) => setFollows((f) => ({ ...f, bouts: Object.fromEntries(Object.entries(f.bouts).filter(([k]) => k !== id)) })),
+              onOpenBout: (eventId, boutId) => go({ tab: 'event', eventId, boutId }),
+            }}
+          />
+        )}
         {tab === 'health' && <ModelHealth />}
 
         {tab === 'value' && (
@@ -389,9 +453,17 @@ export function App() {
         <BoutModal title={`${opened.fight.a.name} versus ${opened.fight.b.name}`} onClose={closeAll}>
           <FightDetail analysis={opened} view={openedRow.view} results={openedRow.r} resultsMeta={results} market={openedRow.m} marketUpdated={marketFile?.generatedAt} isStatic={isStatic}
             onFighter={openFighter} onShare={copyLink} onBet={logBet} onAddLeg={addLeg}
-            eventId={card.eventId} myPick={picks[opened.fight.id]?.side} onPick={pickBout} onSaveImage={saveImage} onAddFairLeg={isStatic && openedRow.m ? addFairLeg : undefined} />
+            followedA={Boolean(follows.fighters[slugify(opened.fight.a.name)])} followedB={Boolean(follows.fighters[slugify(opened.fight.b.name)])} boutSaved={Boolean(follows.bouts[opened.fight.id])} onFollow={(side) => setFollows((f) => toggleFighter(f, slugify(side === 'a' ? opened.fight.a.name : opened.fight.b.name), side === 'a' ? opened.fight.a.name : opened.fight.b.name))} onSaveBout={() => setFollows((f) => toggleBout(f, { boutId: opened.fight.id, eventId: card.eventId ?? '', eventTitle: event?.event.title ?? '', a: opened.fight.a.name, b: opened.fight.b.name, at: Date.now() }))} eventId={card.eventId} careers={careers.status === 'ready' ? { status: 'ready', data: careers.data } : { status: careers.status === 'missing' ? 'missing' : 'loading' }} eventDate={event?.event.mainCardStart} version={route.version} onVersion={(v) => go(eventRoute({ boutId: route.boutId, version: v }))} myPick={picks[opened.fight.id]?.side} onPick={pickBout} onSaveImage={saveImage} onAddFairLeg={isStatic && openedRow.m ? addFairLeg : undefined} />
         </BoutModal>
       )}
+      <nav className="bottom-nav" aria-label="Main destinations">
+        {([['event', 'Card'], ['record', 'Record'], ['compare', 'Compare'], ['tools', 'Tools']] as const).map(([id, label]) => (
+          <button key={id} type="button" className={tab === id ? 'active' : ''} aria-current={tab === id ? 'page' : undefined}
+            onClick={() => go(id === 'event' ? eventRoute() : { tab: id })}>
+            {label}
+          </button>
+        ))}
+      </nav>
       <div className="toast" role="status" aria-live="polite">{toast}</div>
     </div>
   )

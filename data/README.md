@@ -29,3 +29,9 @@ Set `UFCALENDAR_API_KEY` to fetch them from the UFCalendar API automatically (se
 for any fighter it lists, so use it for corrections and for fields the API cannot supply, such as `cardio`.
 
 UFCStats.com has no public API and sits behind a JavaScript bot check, so this project does not scrape it.
+
+## Fighter portraits
+
+`public/data/photos.json` maps a fighter's slug (for example `jon-jones`) to `{ "url", "credit", "licence", "sourceUrl" }`, all four required and both URLs `https`.
+It ships empty on purpose. Add an entry only after confirming the image is licensed for this use and is of that person; the credit and licence are shown on hover.
+Initials in an octagon are the fallback.

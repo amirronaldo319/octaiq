@@ -74,10 +74,94 @@ test.describe('the public site', () => {
   test('has no accessibility violations on the main pages, in both themes', async ({ page }) => {
     for (const theme of ['dark', 'light']) {
       await page.addInitScript((t) => localStorage.setItem('octaiq.theme', t), theme)
-      for (const hash of ['#/', '#/record', '#/tools', '#/gaps']) {
+      for (const hash of ['#/', '#/record', '#/tools', '#/gaps', '#/health', '#/compare/jon-jones/islam-makhachev', '#/event/ufc-vegas-123/bout/ufc-vegas-123-1']) {
         await page.goto(`/${hash}`)
         await page.waitForLoadState('networkidle')
+        await page.locator('h1, [role="dialog"]').first().waitFor()
+        await page.waitForTimeout(400)
         expect(await violations(page), `${theme} ${hash}`).toEqual([])
+      }
+    }
+  })
+
+  test('Back and Forward move between the card, a bout and a saved forecast', async ({ page }) => {
+    await page.goto('/')
+    await page.getByRole('button', { name: /Open details\.$/ }).first().click()
+    await expect(page.getByRole('dialog')).toBeVisible()
+    const boutUrl = page.url()
+    await page.getByRole('button', { name: 'View' }).first().click()
+    await expect(page).toHaveURL(/\/v\//)
+    await page.goBack()
+    await expect(page).toHaveURL(boutUrl)
+    await page.goBack()
+    await expect(page.getByRole('dialog')).toBeHidden()
+    await page.goForward()
+    await expect(page.getByRole('dialog')).toBeVisible()
+  })
+
+  test('a dialog traps focus and returns it when closed', async ({ page }) => {
+    await page.goto('/')
+    const opener = page.getByRole('button', { name: /Open details\.$/ }).first()
+    await opener.focus()
+    await page.keyboard.press('Enter')
+    const dialog = page.getByRole('dialog')
+    await expect(dialog).toBeVisible()
+    for (let i = 0; i < 12; i++) await page.keyboard.press('Tab')
+    expect(await page.evaluate(() => Boolean(document.activeElement?.closest('[role="dialog"]')))).toBe(true)
+    await page.keyboard.press('Escape')
+    await expect(dialog).toBeHidden()
+  })
+
+  test('compact layout fits the whole card in one table, and the choice is remembered', async ({ page }) => {
+    await page.goto('/')
+    await page.getByRole('button', { name: 'Compact' }).click()
+    const rows = page.getByRole('region', { name: 'Fights, compact view' }).getByRole('row')
+    expect(await rows.count()).toBeGreaterThan(6)
+    await page.reload()
+    await expect(page.getByRole('button', { name: 'Compact' })).toHaveAttribute('aria-pressed', 'true')
+  })
+
+  test('the matchup breakdown loads fighter histories', async ({ page }) => {
+    await page.goto('/')
+    await page.getByRole('button', { name: /Open details\.$/ }).first().click()
+    const context = page.getByRole('region', { name: 'Matchup context' })
+    await expect(context.getByRole('table').first()).toBeVisible()
+    await expect(context.getByText(/What could change this forecast/)).toBeVisible()
+  })
+
+  test('navigation: a bar at the bottom on phones, the top bar on desktops', async ({ page, isMobile }) => {
+    await page.goto('/')
+    const bottom = page.getByRole('navigation', { name: 'Main destinations' })
+    const top = page.getByRole('navigation', { name: 'Sections' })
+    if (isMobile) {
+      await expect(bottom).toBeVisible()
+      await expect(top).toBeHidden()
+      await bottom.getByRole('button', { name: 'Record' }).click()
+      await expect(page.getByRole('heading', { level: 1, name: 'Track record' })).toBeVisible()
+    } else {
+      await expect(top).toBeVisible()
+      await expect(bottom).toBeHidden()
+    }
+  })
+
+  test('more of the card is visible without scrolling on a desktop', async ({ page, isMobile }) => {
+    test.skip(isMobile, 'desktop only')
+    await page.goto('/')
+    await page.getByRole('button', { name: 'Compact' }).click()
+    const viewport = page.viewportSize()?.height ?? 800
+    const fifthRow = page.getByRole('region', { name: 'Fights, compact view' }).getByRole('row').nth(5)
+    const box = await fifthRow.boundingBox()
+    expect(box?.y ?? Infinity).toBeLessThan(viewport)
+  })
+
+  test('compact and fight-night views pass the accessibility audit in both themes', async ({ page }) => {
+    for (const theme of ['dark', 'light']) {
+      await page.addInitScript((t) => localStorage.setItem('octaiq.theme', t), theme)
+      for (const view of ['Compact', 'Fight night']) {
+        await page.goto('/')
+        await page.getByRole('button', { name: view }).click()
+        await page.waitForTimeout(300)
+        expect(await violations(page), `${theme} ${view}`).toEqual([])
       }
     }
   })

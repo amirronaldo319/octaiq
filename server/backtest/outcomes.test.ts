@@ -177,6 +177,39 @@ describe('career timelines', () => {
   })
 })
 
+describe('career context for the matchup breakdown', () => {
+  const day = (n: number): number => Date.UTC(2020, 0, 1) + n * 30 * DAY
+  const mk = (id: string, n: number, a: string, b: string, stats?: { a: SideStats; b: SideStats; minutes: number }): Bout => ({
+    id, event: `E${n}`, date: day(n), a, b, nameA: a, nameB: b, result: 'a', method: 'dec', weightClass: 'Lightweight Bout', scheduledRounds: 3, ...(stats ? { stats } : {}),
+  })
+
+  it("records the opponent's rating going into each fight and the scheduled rounds", () => {
+    const bouts = [mk('1', 0, 'p', 'q'), mk('2', 1, 'p', 'r')]
+    const c = buildCareers(bouts, ['p'], { eloK: 32 }).p
+    // Newest first: against r (still 1500 before the fight), then against q (1500).
+    expect(c.timeline.map((t) => t.oppElo)).toEqual([1500, 1500])
+    const second = buildCareers([...bouts, mk('3', 2, 'q', 'p')], ['p'], { eloK: 32 }).p
+    // q lost to p, so q's rating before facing p again is below 1500.
+    expect(second.timeline[0].oppElo).toBeLessThan(1500)
+    expect(c.timeline.every((t) => t.rounds === 3)).toBe(true)
+  })
+
+  it("compares a performance with what the opponent's earlier opponents managed against them", () => {
+    const st = (landedA: number, landedB: number) => ({ a: side(landedA), b: side(landedB), minutes: 15 })
+    // q has absorbed 30 strikes in each of two 15-minute fights: 2 per minute. Then p lands 60 on q in 15 minutes: 4 per minute.
+    const bouts = [mk('1', 0, 'x', 'q', st(30, 5)), mk('2', 1, 'y', 'q', st(30, 5)), mk('3', 2, 'p', 'q', st(60, 10))]
+    const row = buildCareers(bouts, ['p'], { eloK: 32 }).p.timeline[0]
+    expect(row.sigPerMin).toBe(4)
+    expect(row.oppUsualSigAbsorbed).toBe(2)
+  })
+
+  it('leaves the comparison blank when the opponent has too little history', () => {
+    const row = buildCareers([mk('1', 0, 'p', 'q', { a: side(30), b: side(5), minutes: 15 })], ['p'], { eloK: 32 }).p.timeline[0]
+    expect(row.sigPerMin).toBe(2)
+    expect(row.oppUsualSigAbsorbed).toBeNull()
+  })
+})
+
 describe('recent event grading', () => {
   const bouts = world({ finisherSignal: 1, seed: 31, years: 4, eventsPerYear: 6 })
   const preds: Prediction[] = bouts.map((b) => ({

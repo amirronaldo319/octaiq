@@ -1,6 +1,6 @@
 import type { Bout } from '../backtest/dataset.ts'
 import { normalizeName } from '../lib/names.ts'
-import type { Ledger, LedgerBout, LedgerEntry } from './ledger.ts'
+import type { Ledger, LedgerBout, LedgerEntry, LedgerHistoryEntry } from './ledger.ts'
 
 export interface GradedBout extends LedgerBout {
   /** Filled in once the fight is in the results data */
@@ -25,6 +25,8 @@ export interface GradedEvent {
   correct: number
   logLoss: number | null
   status: 'upcoming' | 'awaiting-results' | 'graded'
+  /** Every saved forecast, oldest first (public site only) */
+  history?: LedgerHistoryEntry[]
 }
 
 const tokenKey = (n: string): string => normalizeName(n).split(' ').filter(Boolean).sort().join(' ')

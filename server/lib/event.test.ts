@@ -58,6 +58,27 @@ describe('event file parsing', () => {
   })
 })
 
+describe('dated, sourced news', () => {
+  const withNews = (news: unknown): unknown => {
+    const raw = JSON.parse(JSON.stringify(realFile())) as { snapshots: { bouts: Record<string, unknown>[] }[] }
+    raw.snapshots[0].bouts[0].news = news
+    return raw
+  }
+  const good = { date: '2026-09-14', text: 'A withdrew.', source: 'CagesidePress' }
+
+  it('keeps news that has a date and a source', () => {
+    const f = parseEventFile(withNews([{ ...good, url: 'https://example.org/a' }]))
+    expect(f.snapshots[0].bouts[0].news).toEqual([{ ...good, url: 'https://example.org/a' }])
+  })
+
+  it('refuses undated or unsourced news and non-https links, so nothing unverifiable can appear', () => {
+    expect(() => parseEventFile(withNews([{ text: 'x', source: 's' }]))).toThrow(/YYYY-MM-DD/)
+    expect(() => parseEventFile(withNews([{ date: '14 Sept', text: 'x', source: 's' }]))).toThrow(/YYYY-MM-DD/)
+    expect(() => parseEventFile(withNews([{ date: '2026-09-14', text: 'x' }]))).toThrow(/source/)
+    expect(() => parseEventFile(withNews([{ ...good, url: 'http://example.org' }]))).toThrow(/https/)
+  })
+})
+
 describe('card diffs', () => {
   it('reports added, removed and opponent changes', () => {
     const v1 = snap(1, [bout(1, 'A', 'B'), bout(2, 'C', 'D'), bout(3, 'E', 'F')])

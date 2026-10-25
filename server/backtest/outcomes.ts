@@ -1,5 +1,6 @@
 import type { FeatureRow } from './features.ts'
 import { bootstrapLogLoss, logLossOne, type EventAgg, type Interval } from './metrics.ts'
+import { hybridJoint, predictDirect, trainDirect } from './jointDirect.ts'
 import { predictLogistic, trainLogistic, type LogisticModel } from './models.ts'
 
 /**
@@ -123,6 +124,11 @@ export interface OutcomeReport {
   distance: OutcomeMetric
   koShare: OutcomeMetric
   joint: OutcomeMetric
+  /** The direct six-outcome model and the hybrid (validated win probability with the direct model's split by winner), each scored against the independent joint above */
+  jointDirect?: OutcomeMetric
+  jointHybrid?: OutcomeMetric
+  /** Which joint the site uses: the hybrid only when its paired interval against the independent one is entirely below zero */
+  jointUsed: 'independent' | 'hybrid'
   note: string
 }
 
@@ -165,11 +171,13 @@ function summarize(items: readonly Scored[], iterations: number, seed: number): 
 export function evaluateOutcomes(
   rows: readonly FeatureRow[],
   pA: ReadonlyMap<string, number>,
-  opts: { firstTestYear: number; ridge: number; bootstrap: number; seed: number },
+  opts: { firstTestYear: number; ridge: number; bootstrap: number; seed: number; /** Feature columns for the direct model; omit to skip it */ columns?: readonly number[] },
 ): OutcomeReport | null {
   const dist: Scored[] = []
   const ko: Scored[] = []
   const joint: Scored[] = []
+  const direct: Scored[] = []
+  const hybrid: Scored[] = []
   const years = [...new Set(rows.map((r) => yearOf(r.date)))].filter((y) => y >= opts.firstTestYear).sort((a, b) => a - b)
 
   for (const year of years) {
@@ -177,6 +185,7 @@ export function evaluateOutcomes(
     const test = rows.filter((r) => yearOf(r.date) === year)
     if (train.filter(isDistanceRow).length < 300 || train.filter(isFinishWinRow).length < 200) continue
     const models = trainOutcomeModels(train, opts.ridge)
+    const directModel = opts.columns ? trainDirect(train, opts.columns) : null
 
     for (const r of test) {
       const probs = predictOutcomeProbs(models, r)
@@ -199,6 +208,14 @@ export function evaluateOutcomes(
           bKo: 0.5 * prior.ko, bSub: 0.5 * prior.sub, bDec: 0.5 * prior.dec,
         }
         const argmax = (d: JointProbs): string => (Object.entries(d) as [string, number][]).reduce((a, b) => (b[1] > a[1] ? b : a))[0]
+        if (directModel && opts.columns) {
+          const d = predictDirect(directModel, r, opts.columns)
+          const h = hybridJoint(pWin, d)
+          const own = -Math.log(Math.max(1e-6, j[key]))
+          const argmaxOf = (x: JointProbs): string => (Object.entries(x) as [string, number][]).reduce((a, b) => (b[1] > a[1] ? b : a))[0]
+          direct.push({ event: `${year}|${r.event}`, model: -Math.log(Math.max(1e-6, d[key])), base: own, correct: argmaxOf(d) === key, baseCorrect: argmaxOf(j) === key })
+          hybrid.push({ event: `${year}|${r.event}`, model: -Math.log(Math.max(1e-6, h[key])), base: own, correct: argmaxOf(h) === key, baseCorrect: argmaxOf(j) === key })
+        }
         joint.push({
           event: `${year}|${r.event}`,
           model: -Math.log(Math.max(1e-6, j[key])),
@@ -215,6 +232,8 @@ export function evaluateOutcomes(
     distance: summarize(dist, opts.bootstrap, opts.seed + 11),
     koShare: summarize(ko, opts.bootstrap, opts.seed + 12),
     joint: summarize(joint, opts.bootstrap, opts.seed + 13),
-    note: 'The joint distribution multiplies the win probability by the method model, assuming winner and method are independent given the features.',
+    ...(direct.length > 100 ? { jointDirect: summarize(direct, opts.bootstrap, opts.seed + 14), jointHybrid: summarize(hybrid, opts.bootstrap, opts.seed + 15) } : {}),
+    jointUsed: hybrid.length > 100 && opts.bootstrap > 0 && summarize(hybrid, opts.bootstrap, opts.seed + 15).gain.hi < 0 ? 'hybrid' : 'independent',
+    note: 'The default joint distribution multiplies the win probability by the method model, assuming winner and method are independent given the features. A direct six-outcome model is tested against it each time and used only if it is clearly better.',
   }
 }

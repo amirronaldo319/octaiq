@@ -1,4 +1,4 @@
-import type { Fight } from './types'
+import type { NewsItem, Fight } from './types'
 
 export interface EventMeta {
   id: string
@@ -22,6 +22,7 @@ export interface SnapshotBout {
   a: { name: string; record: string; rank?: number }
   b: { name: string; record: string; rank?: number }
   notes: string[]
+  news?: NewsItem[]
 }
 
 export interface Verification {
@@ -91,7 +92,7 @@ export interface ResultsModelBout {
   /** Elo rating gap, A minus B */
   eloDiff: number
   /** The main reasons behind the forecast: the biggest factors for the pick and against it */
-  why?: { pick: 'a' | 'b'; for: { text: string; strength: number }[]; against: { text: string; strength: number }[] }
+  why?: { pick: 'a' | 'b'; for: { text: string; strength: number }[]; against: { text: string; strength: number }[]; details?: { family: string; text: string; strength: number }[] }
 }
 
 /** The backtested, results-only model. Distinct from the hand-weighted baseline that uses striking stats. */

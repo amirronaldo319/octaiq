@@ -1,14 +1,18 @@
 import type { OutcomeCheck, ResultsModel, ResultsModelBout } from '../engine/eventTypes'
 import type { Fighter, Method } from '../engine/types'
+import type { Career } from '../../server/backtest/careers'
 import type { FightAnalysis, SideAnalysis } from '../lib/analysis'
 import { fmtOdds, fmtPct, fmtSignedPct } from '../lib/format'
 import { agreementLabel, buildNarrative } from '../lib/narrative'
 import { accuracyStrip, leanOf, trustFor, type PrimaryView } from '../lib/primary'
 import { gapPoints, type MarketBout } from '../lib/market'
+import { apportion, pctPair } from '../lib/rounding'
 import { slugify } from '../lib/slug'
 import { Avatar } from './Avatar'
 import { LineChart } from './LineChart'
+import { ForecastHistory } from './ForecastHistory'
 import { HitRate } from './HitRate'
+import { Matchup } from './Matchup'
 import { PriceMovement } from './PriceMovement'
 import { TugBar } from './TugBar'
 import { WhyPick } from './WhyPick'
@@ -32,6 +36,17 @@ interface FightDetailProps {
   onSaveImage?: () => void
   /** Add a side to the parlay at the market's fair (margin-free) price */
   onAddFairLeg?: (side: 'a' | 'b') => void
+  /** A saved forecast version opened from a link, and a way to open or close one */
+  version?: string
+  onVersion?: (id: string | undefined) => void
+  /** Following: which of these fighters and this bout the visitor follows */
+  followedA?: boolean
+  followedB?: boolean
+  boutSaved?: boolean
+  onFollow?: (side: 'a' | 'b') => void
+  onSaveBout?: () => void
+  careers?: { status: 'loading' | 'ready' | 'missing'; data?: Record<string, Career> }
+  eventDate?: string
 }
 
 const METHODS: Method[] = ['KO/TKO', 'Submission', 'Decision']
@@ -64,7 +79,6 @@ function Prediction({ analysis, view, results, meta }: { analysis: FightAnalysis
   }
   const lean = leanOf(view.probA)
   const favored = lean.side === 'a' ? fight.a : fight.b
-  const favoredProb = lean.side === 'a' ? view.probA : view.probB
   const trust = trustFor(results)
   const strip = accuracyStrip(meta)
   const bt = meta?.backtest
@@ -79,8 +93,8 @@ function Prediction({ analysis, view, results, meta }: { analysis: FightAnalysis
       </div>
 
       <div className="pred-split">
-        <div className="pred-side a"><span>{fight.a.name}</span><strong>{pct0(view.probA)}</strong></div>
-        <div className="pred-side b"><span>{fight.b.name}</span><strong>{pct0(view.probB)}</strong></div>
+        <div className="pred-side a"><span>{fight.a.name}</span><strong>{pctPair(view.probA)[0]}%</strong></div>
+        <div className="pred-side b"><span>{fight.b.name}</span><strong>{pctPair(view.probA)[1]}%</strong></div>
       </div>
       <TugBar nameA={fight.a.name} nameB={fight.b.name} probA={view.probA} size="lg" lo={view.source === 'validated' ? results?.probLo : undefined} hi={view.source === 'validated' ? results?.probHi : undefined} />
       {view.source === 'validated' && results?.probLo !== undefined && results.probHi !== undefined && (
@@ -94,7 +108,7 @@ function Prediction({ analysis, view, results, meta }: { analysis: FightAnalysis
         <strong>{lean.label}{lean.label === 'Toss-up' ? '' : `: ${favored.name}`}.</strong>{' '}
         {lean.label === 'Toss-up'
           ? 'The model sees almost nothing between them.'
-          : `The model gives ${favored.name} ${pct0(favoredProb)}, ${Math.round(lean.points)} points above an even split.`}
+          : `The model gives ${favored.name} ${pctPair(view.probA)[lean.side === 'a' ? 0 : 1]}%, ${pctPair(view.probA)[lean.side === 'a' ? 0 : 1] - 50} points above an even split.`}
       </p>
 
       {view.source === 'validated' && <HitRate pickProb={Math.max(view.probA, view.probB)} />}
@@ -130,7 +144,7 @@ function Prediction({ analysis, view, results, meta }: { analysis: FightAnalysis
           ))}
           <p className="muted small">
             Measured on {strip.n.toLocaleString()} fights from {strip.period}{strip.market !== null ? ' that have betting prices' : ''}. Each was predicted using only what was known before it.
-            {strip.market !== null && ' The market was more accurate, so treat this as context, not a betting signal.'}
+            {strip.market !== null && ` The market was more accurate in that period (${strip.period}). It has not been re-tested on current prices, so treat this as context, not a betting signal.`}
           </p>
         </div>
       )}
@@ -155,8 +169,8 @@ function MarketPanel({ analysis, results, market, updated, meta, onAddFairLeg }:
         <span className="pred-source">{market.books} bookmaker{market.books === 1 ? '' : 's'}{updated ? `, updated ${new Date(updated).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}` : ''}</span>
       </div>
       <div className="pred-split">
-        <div className="pred-side a"><span>{fight.a.name}</span><strong>{pct0(market.pA)}</strong></div>
-        <div className="pred-side b"><span>{fight.b.name}</span><strong>{pct0(1 - market.pA)}</strong></div>
+        <div className="pred-side a"><span>{fight.a.name}</span><strong>{pctPair(market.pA)[0]}%</strong></div>
+        <div className="pred-side b"><span>{fight.b.name}</span><strong>{pctPair(market.pA)[1]}%</strong></div>
       </div>
       <TugBar nameA={fight.a.name} nameB={fight.b.name} probA={market.pA} size="lg" lo={market.pLo} hi={market.pHi} />
       <p className="range-note">
@@ -193,10 +207,15 @@ function Outcomes({ analysis, results, meta }: { analysis: FightAnalysis; result
   if (!results?.joint || results.distance === undefined) return null
   const { fight } = analysis
   const j = results.joint
+  // Whole numbers that add up: each fighter's three methods sum to that fighter's win chance on the bar above.
+  const [totalA, totalB] = pctPair(results.probA)
+  const [aKo, aSub, aDec] = apportion([j.aKo, j.aSub, j.aDec], totalA)
+  const [bKo, bSub, bDec] = apportion([j.bKo, j.bSub, j.bDec], totalB)
+  const [dist, finish] = pctPair(results.distance)
   const rows: { label: string; a: number; b: number }[] = [
-    { label: 'Knockout or TKO', a: j.aKo, b: j.bKo },
-    { label: 'Submission', a: j.aSub, b: j.bSub },
-    { label: 'Decision', a: j.aDec, b: j.bDec },
+    { label: 'Knockout or TKO', a: aKo, b: bKo },
+    { label: 'Submission', a: aSub, b: bSub },
+    { label: 'Decision', a: aDec, b: bDec },
   ]
   const top = Math.max(...rows.flatMap((r) => [r.a, r.b]))
   const oc = meta?.outcomes
@@ -204,23 +223,24 @@ function Outcomes({ analysis, results, meta }: { analysis: FightAnalysis; result
     <section className="outcomes" aria-label="How it could end">
       <h3>How it could end</h3>
       <div className="distance">
-        <div><strong>{pctOf(results.distance)}</strong><span>goes the distance</span></div>
-        <div><strong>{pctOf(1 - results.distance)}</strong><span>ends in a finish</span></div>
+        <div><strong>{dist}%</strong><span>goes the distance</span></div>
+        <div><strong>{finish}%</strong><span>ends in a finish</span></div>
       </div>
-      <table className="tbl">
+      <table className="tbl" aria-label="Winner and method">
         <thead><tr><th>Winner and method</th><th>{fight.a.name}</th><th>{fight.b.name}</th></tr></thead>
         <tbody>
           {rows.map((r) => (
             <tr key={r.label}>
               <td>{r.label}</td>
-              <td className={r.a === top ? 'best' : ''}>{pctOf(r.a)}</td>
-              <td className={r.b === top ? 'best' : ''}>{pctOf(r.b)}</td>
+              <td className={r.a === top ? 'best' : ''}>{r.a}%</td>
+              <td className={r.b === top ? 'best' : ''}>{r.b}%</td>
             </tr>
           ))}
         </tbody>
+        <tfoot><tr><th scope="row">Wins in total</th><td>{totalA}%</td><td>{totalB}%</td></tr></tfoot>
       </table>
       <p className="muted small">
-        A single most likely outcome is rarely likely on its own: even the top row here is {pctOf(top)}.
+        A single most likely outcome is rarely likely on its own: even the top row here is {top}%.
         {oc ? ` ${oc.note}` : ''}
       </p>
       {oc && (
@@ -405,7 +425,7 @@ function DeepDive({ analysis, isStatic, onBet, onAddLeg }: Pick<FightDetailProps
   )
 }
 
-export function FightDetail({ analysis, view, results, resultsMeta, market, marketUpdated, isStatic, onFighter, onShare, onBet, onAddLeg, eventId, myPick, onPick, onSaveImage, onAddFairLeg }: FightDetailProps) {
+export function FightDetail({ analysis, view, results, resultsMeta, market, marketUpdated, isStatic, onFighter, onShare, onBet, onAddLeg, eventId, myPick, onPick, onSaveImage, onAddFairLeg, version, onVersion, careers, eventDate, followedA, followedB, boutSaved, onFollow, onSaveBout }: FightDetailProps) {
   const { fight } = analysis
   const notes = fight.bout?.notes ?? []
   return (
@@ -421,11 +441,12 @@ export function FightDetail({ analysis, view, results, resultsMeta, market, mark
           {([['a', fight.a], ['b', fight.b]] as const).map(([corner, f], i) => (
             <div key={corner} className="detail-fighter">
               {i === 1 && <span className="detail-vs">vs</span>}
-              <button type="button" className={`detail-name ${corner}`} onClick={() => onFighter(slugify(f.name))} aria-label={`${f.name}: career and rating history`}>
+              <button type="button" className={`detail-name ${corner}`} onClick={() => onFighter(slugify(f.name))}>
                 <Avatar name={f.name} corner={corner} size="lg" />
                 <span>
                   <span className="fname">{f.name}</span>
                   <span className="detail-rec">{f.rank ? `Ranked #${f.rank}, ` : ''}{f.record}</span>
+                  <span className="sr-only">. Career and rating history</span>
                 </span>
               </button>
             </div>
@@ -436,6 +457,14 @@ export function FightDetail({ analysis, view, results, resultsMeta, market, mark
           {onSaveImage && <button type="button" className="share" onClick={onSaveImage}>Save a pick image</button>}
           <button type="button" className="share" onClick={() => window.print()}>Print</button>
         </div>
+        {onFollow && onSaveBout && (
+          <div className="your-pick" role="group" aria-label="Follow">
+            <span>Follow</span>
+            <button type="button" className={`chip ${followedA ? 'on' : ''}`} aria-pressed={followedA} onClick={() => onFollow('a')}>{fight.a.name}</button>
+            <button type="button" className={`chip ${followedB ? 'on' : ''}`} aria-pressed={followedB} onClick={() => onFollow('b')}>{fight.b.name}</button>
+            <button type="button" className={`chip ${boutSaved ? 'on' : ''}`} aria-pressed={boutSaved} onClick={onSaveBout}>Save this bout</button>
+          </div>
+        )}
         {onPick && (
           <div className="your-pick" role="group" aria-label="Your pick">
             <span>Your pick</span>
@@ -449,9 +478,11 @@ export function FightDetail({ analysis, view, results, resultsMeta, market, mark
       {market && <MarketPanel analysis={analysis} results={results} market={market} updated={marketUpdated} meta={resultsMeta} onAddFairLeg={onAddFairLeg} />}
       {market && eventId && <PriceMovement eventId={eventId} fightId={fight.id} nameA={fight.a.name} />}
       <Prediction analysis={analysis} view={view.source === 'market' && results ? { source: 'validated', probA: results.probA, probB: results.probB } : view} results={results} meta={resultsMeta} />
+      {eventId && onVersion && <ForecastHistory eventId={eventId} fightId={fight.id} nameA={fight.a.name} nameB={fight.b.name} currentProbA={results?.probA} version={version} onVersion={onVersion} />}
       {results?.why && <WhyPick why={results.why} nameA={fight.a.name} nameB={fight.b.name} />}
       <Outcomes analysis={analysis} results={results} meta={resultsMeta} />
       <Facts analysis={analysis} results={results} />
+      {careers && eventDate && <Matchup fight={fight} eventDate={eventDate} careers={careers} results={results} market={market} />}
 
       {notes.length > 0 && (
         <section className="notes" aria-label="Worth checking">

@@ -12,6 +12,16 @@ export interface CareerRow {
   weightClass: string
   /** Elo rating after this fight */
   eloAfter: number
+  /** The opponent's rating going into the fight, so form can be read against who it came against */
+  oppElo: number
+  /** Scheduled rounds (3 or 5) when known */
+  rounds: number | null
+  /** Significant strikes landed per minute, and what that opponent's earlier opponents landed on them per minute */
+  sigPerMin?: number
+  oppUsualSigAbsorbed?: number | null
+  /** Takedowns landed per 15 minutes, and what that opponent usually gave up per 15 */
+  tdPer15?: number
+  oppUsualTdAbsorbed?: number | null
 }
 
 export interface RecentForm {
@@ -80,6 +90,22 @@ function recentForm(key: string, bouts: readonly Bout[], count: number): RecentF
   }
 }
 
+const MIN_HISTORY_MINUTES = 15
+
+/** A fighter's output in one bout next to what that opponent's earlier opponents usually managed against them. */
+function adjusted(b: Bout, side: 'a' | 'b', cum: ReadonlyMap<string, { min: number; sigAbs: number; tdAbs: number }>): Pick<CareerRow, 'sigPerMin' | 'oppUsualSigAbsorbed' | 'tdPer15' | 'oppUsualTdAbsorbed'> {
+  if (!b.stats || b.stats.minutes <= 0) return {}
+  const own = side === 'a' ? b.stats.a : b.stats.b
+  const oppUsual = cum.get(side === 'a' ? b.b : b.a)
+  const known = oppUsual !== undefined && oppUsual.min >= MIN_HISTORY_MINUTES
+  return {
+    sigPerMin: round2(own.sigLanded / b.stats.minutes),
+    oppUsualSigAbsorbed: known ? round2(oppUsual.sigAbs / oppUsual.min) : null,
+    tdPer15: round2((own.tdLanded / b.stats.minutes) * 15),
+    oppUsualTdAbsorbed: known ? round2((oppUsual.tdAbs / oppUsual.min) * 15) : null,
+  }
+}
+
 /**
  * Career timelines and Elo curves for the named fighters. Elo uses the same update as the prediction
  * features: same-day results are applied together, so a fighter's rating never reflects a result that
@@ -107,6 +133,8 @@ export function buildCareers(
   }
 
   const elo = new Map<string, number>()
+  /** Running totals of what each fighter has absorbed, to judge a performance against the opponent's usual */
+  const cum = new Map<string, { min: number; sigAbs: number; tdAbs: number }>()
   const get = (k: string): number => elo.get(k) ?? 1500
   let i = 0
   while (i < sorted.length) {
@@ -114,6 +142,8 @@ export function buildCareers(
     while (j < sorted.length && sorted[j].date === sorted[i].date) j++
     const group = sorted.slice(i, j)
     const updates: [string, number][] = []
+    const pre = new Map<string, [number, number]>()
+    for (const b of group) pre.set(b.id, [get(b.a), get(b.b)])
     for (const b of group) {
       if (b.result === 'nc') continue
       const [ea, eb] = [get(b.a), get(b.b)]
@@ -131,7 +161,12 @@ export function buildCareers(
         const opponent = side === 'a' ? b.nameB : b.nameA
         const result: CareerRow['result'] = b.result === 'nc' ? 'NC' : b.result === 'draw' ? 'D' : b.result === side ? 'W' : 'L'
         const after = get(key)
-        c.timeline.push({ date: day(b.date), event: b.event, opponent, result, method: METHOD_LABEL[b.method], weightClass: b.weightClass, eloAfter: round1(after) })
+        const [preA, preB] = pre.get(b.id) as [number, number]
+        const usual = adjusted(b, side, cum)
+        c.timeline.push({
+          date: day(b.date), event: b.event, opponent, result, method: METHOD_LABEL[b.method], weightClass: b.weightClass, eloAfter: round1(after),
+          oppElo: round1(side === 'a' ? preB : preA), rounds: b.scheduledRounds ?? null, ...usual,
+        })
         c.eloSeries.push({ date: day(b.date), elo: round1(after) })
         c.fights++
         if (result === 'W') {
@@ -142,6 +177,13 @@ export function buildCareers(
         } else if (result === 'L') c.losses++
         else if (result === 'D') c.draws++
         else c.noContests++
+      }
+    }
+    for (const b of group) {
+      if (!b.stats) continue
+      for (const [key, opp] of [[b.a, b.stats.b], [b.b, b.stats.a]] as const) {
+        const c = cum.get(key) ?? { min: 0, sigAbs: 0, tdAbs: 0 }
+        cum.set(key, { min: c.min + b.stats.minutes, sigAbs: c.sigAbs + opp.sigLanded, tdAbs: c.tdAbs + opp.tdLanded })
       }
     }
     i = j

@@ -41,9 +41,24 @@ export function WhyPick({ why, nameA, nameB }: WhyPickProps) {
         <Factors title="Pushing the other way" items={why.against} tone="against" />
       </div>
       <p className="muted small">
-        Bar length is how hard each factor pushes the forecast. The factors overlap (a fighter with a high Elo usually has a good record too), so read
-        this as a rough guide to the model, not a recipe.
+        Bar length is how hard each group of factors pushes the forecast. These are patterns the model found in past results, not proven causes.
+        Related factors are added together because they overlap: a fighter with a high Elo usually has a good record and tougher past opponents too,
+        so their separate weights can even point in odd directions.
       </p>
+      {why.details && why.details.length > 0 && (
+        <details className="fold inline-fold">
+          <summary>Every factor behind these groups</summary>
+          <table className="tbl">
+            <thead><tr><th>Factor</th><th>Group</th><th>Push on the pick</th></tr></thead>
+            <tbody>
+              {why.details.map((d) => (
+                <tr key={d.text}><td>{d.text}</td><td>{d.family}</td><td className={d.strength >= 0 ? 'pos' : 'neg'}>{d.strength >= 0 ? 'For' : 'Against'} ({Math.abs(d.strength).toFixed(2)})</td></tr>
+              ))}
+            </tbody>
+          </table>
+          <p className="muted small">A factor that seems to contradict another (for example “less UFC experience” helping while “weaker past opposition” hurts) is the model sorting out overlapping inputs. Only the group totals above are reliable.</p>
+        </details>
+      )}
     </section>
   )
 }
