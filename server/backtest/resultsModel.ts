@@ -101,7 +101,7 @@ export function createResultsModelService(root: string): ResultsModelService {
                 const own = out.market.models.find((m) => m.id === out.market?.primaryModel)
                 const mk = out.market.models[0]
                 return own
-                  ? { period: out.market.period, n: out.market.n, marketLogLoss: mk.logLoss.estimate, modelLogLoss: own.logLoss.estimate, gapLo: own.vsMarket.lo, gap: own.vsMarket.estimate, gapHi: own.vsMarket.hi, blendGain: out.market.stack ? out.market.stack.models[2].vsMarket : undefined }
+                  ? { period: out.market.period, n: out.market.n, marketAccuracy: mk.metrics.accuracy, modelAccuracy: own.metrics.accuracy, marketLogLoss: mk.logLoss.estimate, modelLogLoss: own.logLoss.estimate, gapLo: own.vsMarket.lo, gap: own.vsMarket.estimate, gapHi: own.vsMarket.hi, blendGain: out.market.stack ? out.market.stack.models[2].vsMarket : undefined }
                   : undefined
               })()
             : undefined,

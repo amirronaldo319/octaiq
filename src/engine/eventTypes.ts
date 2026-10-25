@@ -81,6 +81,9 @@ export interface ResultsModel {
       n: number
       marketLogLoss: number
       modelLogLoss: number
+      /** Share of winners called correctly, on the same priced bouts */
+      marketAccuracy?: number
+      modelAccuracy?: number
       /** Model minus market log loss with 95% interval; positive means worse than the market */
       gap: number
       gapLo: number

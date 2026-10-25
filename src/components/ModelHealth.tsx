@@ -5,6 +5,7 @@ import { getFirstJson, withBase } from '../lib/fetchJson'
 type State = { status: 'loading' } | { status: 'missing'; message: string } | { status: 'ready'; data: BacktestOutput }
 
 const f = (n: number, d = 4): string => (Number.isFinite(n) ? n.toFixed(d) : '–')
+const pctOf = (n: number | undefined): string => (n === undefined || !Number.isFinite(n) ? '–' : `${(n * 100).toFixed(1)}%`)
 const ci = (e: number, lo: number, hi: number): string => `${f(e)} [${f(lo)}, ${f(hi)}]`
 
 function Reliability({ bins }: { bins: BacktestOutput['report']['models'][number]['metrics']['reliability'] }) {
@@ -83,8 +84,43 @@ export function ModelHealth() {
   const lr = r.models.find((m) => m.id === (r.primary ?? 'lr'))
   return (
     <section aria-label="Model health" className="health">
-      <div className="panel">
-        <h2>Walk-forward backtest · {r.primary === 'lrStats' ? 'results + rolling fight statistics' : 'results-only'} model</h2>
+      <header className="health-head">
+        <h1>Model health</h1>
+        <p className="lead">
+          How the model did on {r.rows.testScored.toLocaleString()} past fights ({r.rows.testPeriod}), each predicted using only what was known before it.
+          {state.data.market && ' Against betting prices, the market was more accurate.'}
+        </p>
+      </header>
+
+      <div className="kpis">
+        <div className="kpi">
+          <span>Picks the winner</span>
+          <strong>{pctOf(lr?.metrics.accuracy)}</strong>
+          <em>Coin flip 50%{state.data.market ? `. On the ${state.data.market.n.toLocaleString()} fights with prices: model ${pctOf(state.data.market.models.find((m) => m.id === state.data.market?.primaryModel)?.metrics.accuracy)}, betting market ${pctOf(state.data.market.models[0].metrics.accuracy)}` : ''}</em>
+        </div>
+        <div className="kpi">
+          <span>Log loss, lower is better</span>
+          <strong>{f(lr?.logLoss.estimate ?? NaN, 3)}</strong>
+          <em>Coin flip {f(r.models[0].metrics.logLoss, 3)}. Elo {f(r.models[1].metrics.logLoss, 3)}</em>
+        </div>
+        <div className="kpi">
+          <span>Probabilities match reality</span>
+          <strong>{f((lr?.metrics.ece ?? NaN) * 100, 1)} pts</strong>
+          <em>Average calibration error</em>
+        </div>
+        {state.data.market && (
+          <div className="kpi bad">
+            <span>Gap to betting prices</span>
+            <strong>+{f(state.data.market.models.find((m) => m.id === state.data.market?.primaryModel)?.vsMarket.estimate ?? NaN, 3)}</strong>
+            <em>Log loss behind the market, and it is statistically real</em>
+          </div>
+        )}
+      </div>
+
+      <details className="fold panel">
+        <summary>Full results table and method</summary>
+        <div className="fold-body">
+        <h2>Walk-forward backtest, {r.primary === 'lrStats' ? 'results plus rolling fight statistics' : 'results only'}</h2>
         <p className="muted small">
           Generated {new Date(state.data.generatedAt).toLocaleString()}. Each year is scored by a model trained only on earlier years.
           Intervals are 95% event-level bootstrap. Dataset: <a href={dataset.source} target="_blank" rel="noopener noreferrer">{dataset.source}</a> ({dataset.license}),
@@ -122,7 +158,8 @@ export function ModelHealth() {
           Elo K = {r.eloK}, chosen on {r.options.firstTestYear - r.options.validationYears}–{r.options.firstTestYear - 1} only. Test period {r.rows.testPeriod}.
           Draws and no-contests ({r.rows.excludedDrawOrNoContest}) are not scored.
         </p>
-      </div>
+        </div>
+      </details>
 
       {state.data.market ? (
         <div className="panel market-panel">
@@ -163,24 +200,29 @@ export function ModelHealth() {
         </div>
       )}
 
-      <div className="grid-2">
-        <div className="panel">
-          <h3>Calibration (logistic)</h3>
+      <details className="fold panel">
+        <summary>Calibration and stability charts</summary>
+        <div className="fold-body grid-2">
+        <div>
+          <h3>Calibration</h3>
           {lr && <Reliability bins={lr.metrics.reliability} />}
           <p className="muted small">
             Points near the diagonal mean stated probabilities match observed win rates. Bins with fewer than 20 bouts are hidden.
             {r.calibration && ` Temperature scaling changed log loss by ${f(r.calibration.diff.estimate)} [${f(r.calibration.diff.lo)}, ${f(r.calibration.diff.hi)}], so the raw probabilities are used.`}
           </p>
         </div>
-        <div className="panel">
+        <div>
           <h3>Stability by year</h3>
           <YearChart rows={r.byYear} />
-          <p className="muted small">Single years hold only ~450–500 bouts, so year-to-year swings are partly noise.</p>
+          <p className="muted small">Single years hold only about 450 to 500 bouts, so year-to-year swings are partly noise.</p>
         </div>
-      </div>
+        </div>
+      </details>
 
-      <div className="grid-2">
-        <div className="panel">
+      <details className="fold panel">
+        <summary>Which inputs matter, and the leak I found and fixed</summary>
+        <div className="fold-body grid-2">
+        <div>
           <h3>Ablations</h3>
           <table className="tbl">
             <thead><tr><th>Feature set</th><th>Log loss</th><th>Acc.</th></tr></thead>
@@ -191,8 +233,8 @@ export function ModelHealth() {
             </tbody>
           </table>
         </div>
-        <div className="panel">
-          <h3>Leakage found and fixed</h3>
+        <div>
+          <h3>Leak found and fixed</h3>
           <p className="small">
             An early run used flags for “fighter profile has no date of birth / reach”. Those come from today’s profile pages, and fighters cut
             after a few losses tend to have sparse pages, so the flags leak future career length. They produced implausibly strong early years
@@ -200,19 +242,20 @@ export function ModelHealth() {
           </p>
           <p className="small muted">Remaining risk: missing age or reach is imputed as “no difference”, which can still carry a faint presence signal.</p>
         </div>
-      </div>
+        </div>
+      </details>
 
-      <div className="panel">
-        <h3>What this does not show</h3>
-        <ul className="reasons">
+      <details className="fold panel">
+        <summary>What this does not show</summary>
+        <ul className="reasons fold-body">
           <li>Beating a coin flip or Elo is the easy test. The market comparison above is the hard one, and the market wins; its prices cover only 2014 to March 2020 and the source does not say which bookmaker or whether they are closing lines.</li>
           <li>Features are fight results and rolling per-minute statistics from earlier fights, not adjusted for opponent quality. Styles, injuries, weigh-ins and camp news are not used. The statistics gain appears mainly for experienced fighters; it is small for newcomers.</li>
           <li>Fighters are matched by name. {ingest.ambiguousNames} profile rows share a name with someone else and were ignored; {ingest.droppedNoEvent} result rows had no event date and were dropped.</li>
           <li>Only UFC bouts are included, so “debut” means UFC debut, not pro debut.</li>
           <li>The hand-weighted baseline shown on fight pages is a different model and has not been backtested.</li>
-          <li>Fight statistics are post-fight records: they are used only for later bouts, and tests confirm a bout\'s own statistics never enter its own features.</li>
+          <li>Fight statistics are post-fight records: they are used only for later bouts, and tests confirm a bout’s own statistics never enter its own features.</li>
         </ul>
-      </div>
+      </details>
     </section>
   )
 }

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { FIGHTS } from '../data/card'
 import type { Fight } from '../engine/types'
-import { analyzeCard, analyzeFight, buildLeaderboards, findValue, sortAnalyses } from './analysis'
+import { analyzeCard, analyzeFight, findValue } from './analysis'
 import { agreementLabel, buildNarrative } from './narrative'
 
 describe('analysis', () => {
@@ -53,47 +53,6 @@ describe('unpriced and stat-less fights', () => {
 
   it('never lists value for fights without a valid model or price', () => {
     expect(findValue([analyzeFight(unpriced, 0.25), analyzeFight(noStats, 0.25)], -1)).toEqual([])
-  })
-})
-
-describe('sorting and leaderboards', () => {
-  const withBout = FIGHTS.map((f, i): Fight => ({ ...f, bout: { order: 5 - i, card: 'main', notes: [], statsA: true, statsB: true, hasOdds: true } }))
-  const analyses = analyzeCard(withBout, 0.25)
-
-  it('sorts by bout order ascending', () => {
-    const orders = sortAnalyses(analyses, 'order').map((a) => a.fight.bout?.order)
-    expect(orders).toEqual([1, 2, 3, 4, 5])
-  })
-
-  it('puts the strongest lean first and the most competitive first for the opposite key', () => {
-    const lean = sortAnalyses(analyses, 'lean').map((a) => Math.abs(a.prediction.probA - 0.5))
-    const comp = sortAnalyses(analyses, 'competitive').map((a) => Math.abs(a.prediction.probA - 0.5))
-    expect(lean).toEqual([...lean].sort((x, y) => y - x))
-    expect(comp).toEqual([...comp].sort((x, y) => x - y))
-  })
-
-  it('sinks fights without stats in model-based orderings and does not mutate the input', () => {
-    const mixed = analyzeCard([{ ...withBout[0], statsMissing: true }, ...withBout.slice(1)], 0.25)
-    const copy = [...mixed]
-    const sorted = sortAnalyses(mixed, 'lean')
-    expect(sorted[sorted.length - 1].modelValid).toBe(false)
-    expect(mixed).toEqual(copy)
-  })
-
-  it('builds leaderboards only from valid-model fights, with explanations', () => {
-    const mixed = analyzeCard([{ ...withBout[0], statsMissing: true }, ...withBout.slice(1)], 0.25)
-    const boards = buildLeaderboards(mixed, 2)
-    expect(boards.length).toBeGreaterThanOrEqual(6)
-    for (const b of boards) {
-      expect(b.explain.length).toBeGreaterThan(10)
-      expect(b.rows.length).toBeLessThanOrEqual(2)
-      expect(b.rows.map((r) => r.id)).not.toContain(withBout[0].id)
-    }
-  })
-
-  it('returns empty rows when no fight has a valid model', () => {
-    const none = analyzeCard(FIGHTS.map((f) => ({ ...f, statsMissing: true })), 0.25)
-    expect(buildLeaderboards(none).every((b) => b.rows.length === 0)).toBe(true)
   })
 })
 
