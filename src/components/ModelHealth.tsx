@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { BacktestOutput } from '../../server/backtest/types'
+import { getFirstJson, withBase } from '../lib/fetchJson'
 
 type State = { status: 'loading' } | { status: 'missing'; message: string } | { status: 'ready'; data: BacktestOutput }
 
@@ -53,14 +54,17 @@ export function ModelHealth() {
   const [state, setState] = useState<State>({ status: 'loading' })
   useEffect(() => {
     const controller = new AbortController()
-    fetch('/api/backtest', { signal: controller.signal })
-      .then(async (res) => {
-        const body: unknown = await res.json()
-        if (!res.ok) setState({ status: 'missing', message: (body as { error?: string }).error ?? 'No backtest report yet.' })
-        else setState({ status: 'ready', data: body as BacktestOutput })
+    getFirstJson(
+      [withBase('api/backtest'), withBase('data/backtest.json')],
+      (b) => typeof b === 'object' && b !== null && 'report' in b,
+      controller.signal,
+    )
+      .then((found) => {
+        if (found) setState({ status: 'ready', data: found.result.body as BacktestOutput })
+        else setState({ status: 'missing', message: 'No backtest report yet.' })
       })
       .catch((err: unknown) => {
-        if ((err as Error).name !== 'AbortError') setState({ status: 'missing', message: 'The OctaIQ server is not running.' })
+        if ((err as Error).name !== 'AbortError') setState({ status: 'missing', message: 'Could not load the backtest report.' })
       })
     return () => controller.abort()
   }, [])

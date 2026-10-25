@@ -195,3 +195,5 @@ code { font-family: var(--mono); font-size: 0.85em; background: var(--surface-2)
 .health a { color: #36d4e7; }
 .market-panel { border-color: rgba(244, 185, 66, 0.35); }
 .market-panel tr.best td { color: var(--pos); }
+.eh-static { grid-column: 1 / -1; background: rgba(54, 212, 231, 0.07); border: 1px solid rgba(54, 212, 231, 0.3); border-radius: 8px; padding: 8px 12px; font-size: 0.83rem; margin: 0; }
+.eh-static a { color: #36d4e7; }

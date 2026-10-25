@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { FIGHTS } from '../data/card'
 import type { EventPayload } from '../engine/eventTypes'
 import type { Fight } from '../engine/types'
+import { getFirstJson, getJson, withBase } from './fetchJson'
 
 export type DataSource = 'demo' | 'live' | 'event'
 
@@ -37,11 +38,6 @@ function isEventPayload(v: unknown): v is EventPayload {
   return typeof v === 'object' && v !== null && Array.isArray(e.fights) && typeof e.event === 'object' && e.event !== null
 }
 
-async function getJson(url: string, signal: AbortSignal): Promise<{ ok: boolean; status: number; body: unknown }> {
-  const res = await fetch(url, { signal })
-  return { ok: res.ok, status: res.status, body: await res.json().catch(() => null) }
-}
-
 type Loaded = Omit<CardState, 'reload' | 'loading'>
 
 /** Loads the tracked event, then the live odds card, then demo data, in that order. */
@@ -56,11 +52,16 @@ export function useCard(): CardState {
     const demo = (notice: string): Loaded => ({ fights: FIGHTS, source: 'demo', notice, meta: null, event: null })
 
     async function load(): Promise<Loaded> {
-      const ev = await getJson('/api/event', controller.signal)
-      if (ev.ok && isEventPayload(ev.body) && ev.body.fights.length > 0) {
-        return { fights: ev.body.fights, source: 'event', notice: null, meta: null, event: ev.body }
+      // Prefer the live server; on static hosting fall back to the published snapshot.
+      const ev = await getFirstJson(
+        [withBase('api/event'), withBase('data/event.json')],
+        (b) => isEventPayload(b) && b.fights.length > 0,
+        controller.signal,
+      )
+      if (ev && isEventPayload(ev.result.body)) {
+        return { fights: ev.result.body.fights, source: 'event', notice: null, meta: null, event: ev.result.body }
       }
-      const card = await getJson('/api/card', controller.signal)
+      const card = await getJson(withBase('api/card'), controller.signal)
       if (card.ok && isApiCard(card.body) && card.body.fights.length > 0) {
         return { fights: card.body.fights, source: 'live', notice: null, meta: card.body, event: null }
       }

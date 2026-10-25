@@ -42,6 +42,14 @@ export function EventHeader({ payload }: { payload: EventPayload }) {
         <span>Main card in</span>
         <strong>{countdown(event.mainCardStart, now)}</strong>
       </div>
+      {payload.static && (
+        <p className="eh-static" role="note">
+          <strong>Public snapshot.</strong> Live odds and licensed fighter statistics are not included here, so only the card and the
+          backtested model are shown. To see prices and the full model, run OctaIQ yourself with your own API keys
+          (<a href="https://github.com/amirronaldo319/octaiq" target="_blank" rel="noopener noreferrer">source and setup</a>).
+          Snapshot generated {new Date(payload.generatedAt).toLocaleString()}.
+        </p>
+      )}
       <dl className="eh-status">
         <div><dt>Card snapshot</dt>
           <dd>v{snapshot.version} · {new Date(snapshot.capturedAt).toLocaleDateString()} · <span className="warn-text">unverified vs ufc.com</span></dd></div>

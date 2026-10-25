@@ -1,0 +1,1833 @@
+{
+  "generatedAt": "2026-10-25T16:32:50.379Z",
+  "dataset": {
+    "source": "https://github.com/Greco1899/scrape_ufc_stats",
+    "license": "GPL-3.0 (repository LICENSE file)",
+    "upstream": "ufcstats.com (scraped by the repository author)",
+    "retrievedAt": "2026-10-25T16:24:33.426Z",
+    "files": [
+      {
+        "name": "ufc_event_details.csv",
+        "url": "https://raw.githubusercontent.com/Greco1899/scrape_ufc_stats/main/ufc_event_details.csv",
+        "bytes": 102765,
+        "sha256": "beb80dd902d44446399bf1753c650beed2cbc0af2cb791848796a238313a247e"
+      },
+      {
+        "name": "ufc_fight_results.csv",
+        "url": "https://raw.githubusercontent.com/Greco1899/scrape_ufc_stats/main/ufc_fight_results.csv",
+        "bytes": 2107396,
+        "sha256": "da1d46420a13419f1afa28653e9b08c7aa1173005138e5f87fe7dea904cd98e2"
+      },
+      {
+        "name": "ufc_fighter_tott.csv",
+        "url": "https://raw.githubusercontent.com/Greco1899/scrape_ufc_stats/main/ufc_fighter_tott.csv",
+        "bytes": 508399,
+        "sha256": "3296e67941f984cd5484488226e5a5d94de3249c63fe289fbc66d98546311ea1"
+      },
+      {
+        "name": "ufc_fight_stats.csv",
+        "url": "https://raw.githubusercontent.com/Greco1899/scrape_ufc_stats/main/ufc_fight_stats.csv",
+        "bytes": 7671898,
+        "sha256": "bdbb8cd050ccf0a3ee329bf16d361e87997853ab21703682f720fe7aa013767b"
+      },
+      {
+        "name": "LICENSE",
+        "url": "https://raw.githubusercontent.com/Greco1899/scrape_ufc_stats/main/LICENSE",
+        "bytes": 35149,
+        "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+      }
+    ]
+  },
+  "ingest": {
+    "rowsRead": 8975,
+    "bouts": 8948,
+    "droppedNoEvent": 27,
+    "droppedBadBout": 0,
+    "droppedBadOutcome": 0,
+    "results": {
+      "a": 4365,
+      "b": 4427,
+      "draw": 66,
+      "nc": 90
+    },
+    "fighterProfiles": 4620,
+    "ambiguousNames": 18,
+    "firstDate": "1994-03-11",
+    "lastDate": "2026-10-17",
+    "statsCoverage": {
+      "boutsWithStats": 8927,
+      "statsRowsSkipped": 42,
+      "statsBoutsUnmatched": 27
+    }
+  },
+  "report": {
+    "options": {
+      "firstTestYear": 2014,
+      "validationYears": 6,
+      "eloKCandidates": [
+        16,
+        24,
+        32,
+        48,
+        64,
+        96,
+        128
+      ],
+      "statsDecayCandidates": [
+        1,
+        0.9,
+        0.8,
+        0.7
+      ],
+      "excludeFeatures": [
+        "ageMissing",
+        "reachMissing"
+      ],
+      "ridge": 5,
+      "minCalibrationRows": 800,
+      "bootstrap": 1000,
+      "seed": 20261025
+    },
+    "eloK": 64,
+    "eloKValidation": [
+      {
+        "k": 16,
+        "logLoss": 0.687818871079074
+      },
+      {
+        "k": 24,
+        "logLoss": 0.6860955958745016
+      },
+      {
+        "k": 32,
+        "logLoss": 0.6848328572882619
+      },
+      {
+        "k": 48,
+        "logLoss": 0.6833978256166638
+      },
+      {
+        "k": 64,
+        "logLoss": 0.6831149377419204
+      },
+      {
+        "k": 96,
+        "logLoss": 0.6852122946668752
+      },
+      {
+        "k": 128,
+        "logLoss": 0.6901878113599644
+      }
+    ],
+    "statsDecay": 0.9,
+    "statsDecayValidation": [
+      {
+        "decay": 1,
+        "logLoss": 0.7093083276988669
+      },
+      {
+        "decay": 0.9,
+        "logLoss": 0.7083568343753128
+      },
+      {
+        "decay": 0.8,
+        "logLoss": 0.709132182168587
+      },
+      {
+        "decay": 0.7,
+        "logLoss": 0.7107586318136643
+      }
+    ],
+    "rows": {
+      "total": 8948,
+      "scoredDecisive": 8792,
+      "excludedDrawOrNoContest": 156,
+      "testScored": 6288,
+      "testPeriod": "2014-2026"
+    },
+    "models": [
+      {
+        "id": "coin",
+        "label": "Coin flip (0.5)",
+        "metrics": {
+          "n": 6288,
+          "logLoss": 0.6931471805600175,
+          "brier": 0.25,
+          "accuracy": 0.5,
+          "ece": 0.003975826972010155,
+          "reliability": [
+            {
+              "lo": 0.5,
+              "hi": 0.55,
+              "n": 6288,
+              "meanPredicted": 0.5,
+              "observed": 0.49602417302798985
+            },
+            {
+              "lo": 0.55,
+              "hi": 0.6,
+              "n": 0,
+              "meanPredicted": null,
+              "observed": null
+            },
+            {
+              "lo": 0.6,
+              "hi": 0.65,
+              "n": 0,
+              "meanPredicted": null,
+              "observed": null
+            },
+            {
+              "lo": 0.65,
+              "hi": 0.7,
+              "n": 0,
+              "meanPredicted": null,
+              "observed": null
+            },
+            {
+              "lo": 0.7,
+              "hi": 0.75,
+              "n": 0,
+              "meanPredicted": null,
+              "observed": null
+            },
+            {
+              "lo": 0.75,
+              "hi": 0.8,
+              "n": 0,
+              "meanPredicted": null,
+              "observed": null
+            },
+            {
+              "lo": 0.8,
+              "hi": 0.85,
+              "n": 0,
+              "meanPredicted": null,
+              "observed": null
+            },
+            {
+              "lo": 0.85,
+              "hi": 0.9,
+              "n": 0,
+              "meanPredicted": null,
+              "observed": null
+            },
+            {
+              "lo": 0.9,
+              "hi": 0.95,
+              "n": 0,
+              "meanPredicted": null,
+              "observed": null
+            },
+            {
+              "lo": 0.95,
+              "hi": 1,
+              "n": 0,
+              "meanPredicted": null,
+              "observed": null
+            }
+          ]
+        },
+        "logLoss": {
+          "estimate": 0.6931471805599452,
+          "lo": 0.6931471805599434,
+          "hi": 0.6931471805599451
+        },
+        "logLossVsElo": {
+          "estimate": 0.01143694928730956,
+          "lo": 0.007507252487440478,
+          "hi": 0.015326512899006182
+        }
+      },
+      {
+        "id": "elo",
+        "label": "Elo only",
+        "metrics": {
+          "n": 6288,
+          "logLoss": 0.681710231272636,
+          "brier": 0.24436918359175772,
+          "accuracy": 0.5576494910941476,
+          "ece": 0.010295623496366299,
+          "reliability": [
+            {
+              "lo": 0.5,
+              "hi": 0.55,
+              "n": 3089,
+              "meanPredicted": 0.5236052122303374,
+              "observed": 0.5179669796050502
+            },
+            {
+              "lo": 0.55,
+              "hi": 0.6,
+              "n": 1829,
+              "meanPredicted": 0.5734334392615507,
+              "observed": 0.5647895024603609
+            },
+            {
+              "lo": 0.6,
+              "hi": 0.65,
+              "n": 857,
+              "meanPredicted": 0.6227493385716752,
+              "observed": 0.6044340723453909
+            },
+            {
+              "lo": 0.65,
+              "hi": 0.7,
+              "n": 356,
+              "meanPredicted": 0.6705844543104205,
+              "observed": 0.6432584269662921
+            },
+            {
+              "lo": 0.7,
+              "hi": 0.75,
+              "n": 100,
+              "meanPredicted": 0.7211889775475865,
+              "observed": 0.7
+            },
+            {
+              "lo": 0.75,
+              "hi": 0.8,
+              "n": 45,
+              "meanPredicted": 0.7715423326719998,
+              "observed": 0.7333333333333333
+            },
+            {
+              "lo": 0.8,
+              "hi": 0.85,
+              "n": 11,
+              "meanPredicted": 0.8067172613229079,
+              "observed": 1
+            },
+            {
+              "lo": 0.85,
+              "hi": 0.9,
+              "n": 1,
+              "meanPredicted": 0.8760421846189542,
+              "observed": 1
+            },
+            {
+              "lo": 0.9,
+              "hi": 0.95,
+              "n": 0,
+              "meanPredicted": null,
+              "observed": null
+            },
+            {
+              "lo": 0.95,
+              "hi": 1,
+              "n": 0,
+              "meanPredicted": null,
+              "observed": null
+            }
+          ]
+        },
+        "logLoss": {
+          "estimate": 0.6817102312726356,
+          "lo": 0.677849782339306,
+          "hi": 0.6856446543337202
+        },
+        "logLossVsElo": {
+          "estimate": 0,
+          "lo": 0,
+          "hi": 0
+        }
+      },
+      {
+        "id": "lr",
+        "label": "Logistic regression (results features)",
+        "metrics": {
+          "n": 6288,
+          "logLoss": 0.6619662696735548,
+          "brier": 0.2348333359038788,
+          "accuracy": 0.6045642493638677,
+          "ece": 0.010518291967066317,
+          "reliability": [
+            {
+              "lo": 0.5,
+              "hi": 0.55,
+              "n": 1994,
+              "meanPredicted": 0.5247094092986018,
+              "observed": 0.5270812437311936
+            },
+            {
+              "lo": 0.55,
+              "hi": 0.6,
+              "n": 1626,
+              "meanPredicted": 0.5742057750015086,
+              "observed": 0.6039360393603936
+            },
+            {
+              "lo": 0.6,
+              "hi": 0.65,
+              "n": 1236,
+              "meanPredicted": 0.6242461670943439,
+              "observed": 0.6229773462783171
+            },
+            {
+              "lo": 0.65,
+              "hi": 0.7,
+              "n": 795,
+              "meanPredicted": 0.6726328348973704,
+              "observed": 0.6679245283018868
+            },
+            {
+              "lo": 0.7,
+              "hi": 0.75,
+              "n": 416,
+              "meanPredicted": 0.7214895947703995,
+              "observed": 0.7067307692307693
+            },
+            {
+              "lo": 0.75,
+              "hi": 0.8,
+              "n": 162,
+              "meanPredicted": 0.7704849151428568,
+              "observed": 0.7716049382716049
+            },
+            {
+              "lo": 0.8,
+              "hi": 0.85,
+              "n": 52,
+              "meanPredicted": 0.8177456155238143,
+              "observed": 0.8076923076923077
+            },
+            {
+              "lo": 0.85,
+              "hi": 0.9,
+              "n": 6,
+              "meanPredicted": 0.8617164860159052,
+              "observed": 1
+            },
+            {
+              "lo": 0.9,
+              "hi": 0.95,
+              "n": 1,
+              "meanPredicted": 0.9167823517269715,
+              "observed": 1
+            },
+            {
+              "lo": 0.95,
+              "hi": 1,
+              "n": 0,
+              "meanPredicted": null,
+              "observed": null
+            }
+          ]
+        },
+        "logLoss": {
+          "estimate": 0.6619662696735561,
+          "lo": 0.6562790047673863,
+          "hi": 0.667907076931338
+        },
+        "logLossVsElo": {
+          "estimate": -0.019743961599079495,
+          "lo": -0.024663183137715074,
+          "hi": -0.014749011893325094
+        }
+      },
+      {
+        "id": "lrStats",
+        "label": "Logistic regression (results + rolling fight stats)",
+        "metrics": {
+          "n": 6288,
+          "logLoss": 0.6545528717732708,
+          "brier": 0.23122906738520257,
+          "accuracy": 0.6163326972010178,
+          "ece": 0.010672989546334008,
+          "reliability": [
+            {
+              "lo": 0.5,
+              "hi": 0.55,
+              "n": 1589,
+              "meanPredicted": 0.5247131295400578,
+              "observed": 0.5317809943360604
+            },
+            {
+              "lo": 0.55,
+              "hi": 0.6,
+              "n": 1473,
+              "meanPredicted": 0.5745200645528301,
+              "observed": 0.5743380855397149
+            },
+            {
+              "lo": 0.6,
+              "hi": 0.65,
+              "n": 1187,
+              "meanPredicted": 0.6239105400712716,
+              "observed": 0.6293176074136478
+            },
+            {
+              "lo": 0.65,
+              "hi": 0.7,
+              "n": 935,
+              "meanPredicted": 0.6734330748846645,
+              "observed": 0.6844919786096256
+            },
+            {
+              "lo": 0.7,
+              "hi": 0.75,
+              "n": 573,
+              "meanPredicted": 0.7222745296071319,
+              "observed": 0.6945898778359512
+            },
+            {
+              "lo": 0.75,
+              "hi": 0.8,
+              "n": 321,
+              "meanPredicted": 0.7720055285797411,
+              "observed": 0.7133956386292835
+            },
+            {
+              "lo": 0.8,
+              "hi": 0.85,
+              "n": 158,
+              "meanPredicted": 0.8204200980589408,
+              "observed": 0.8164556962025317
+            },
+            {
+              "lo": 0.85,
+              "hi": 0.9,
+              "n": 44,
+              "meanPredicted": 0.8692575509816418,
+              "observed": 0.7954545454545454
+            },
+            {
+              "lo": 0.9,
+              "hi": 0.95,
+              "n": 8,
+              "meanPredicted": 0.9129767783067112,
+              "observed": 0.875
+            },
+            {
+              "lo": 0.95,
+              "hi": 1,
+              "n": 0,
+              "meanPredicted": null,
+              "observed": null
+            }
+          ]
+        },
+        "logLoss": {
+          "estimate": 0.6545528717732704,
+          "lo": 0.6475306194107406,
+          "hi": 0.6613712984282422
+        },
+        "logLossVsElo": {
+          "estimate": -0.027157359499365222,
+          "lo": -0.03327600933523642,
+          "hi": -0.02097329330207736
+        }
+      }
+    ],
+    "statsVsResults": {
+      "estimate": -0.007413397900285726,
+      "lo": -0.011594383268884383,
+      "hi": -0.003603289472447598
+    },
+    "statsAdopted": true,
+    "primary": "lrStats",
+    "byYear": [
+      {
+        "year": 2014,
+        "n": 494,
+        "coinLogLoss": 0.6931471805599468,
+        "eloLogLoss": 0.672203397244786,
+        "lrLogLoss": 0.6725665070668867,
+        "lrStatsLogLoss": 0.6744240364664648
+      },
+      {
+        "year": 2015,
+        "n": 464,
+        "coinLogLoss": 0.6931471805599468,
+        "eloLogLoss": 0.6821365842269834,
+        "lrLogLoss": 0.6773586895054088,
+        "lrStatsLogLoss": 0.6689227084235455
+      },
+      {
+        "year": 2016,
+        "n": 483,
+        "coinLogLoss": 0.6931471805599468,
+        "eloLogLoss": 0.6724812133748432,
+        "lrLogLoss": 0.653322457443427,
+        "lrStatsLogLoss": 0.6606487765235137
+      },
+      {
+        "year": 2017,
+        "n": 446,
+        "coinLogLoss": 0.6931471805599468,
+        "eloLogLoss": 0.6839228697374539,
+        "lrLogLoss": 0.6739081983406872,
+        "lrStatsLogLoss": 0.6641348550745902
+      },
+      {
+        "year": 2018,
+        "n": 469,
+        "coinLogLoss": 0.6931471805599468,
+        "eloLogLoss": 0.6828985985158414,
+        "lrLogLoss": 0.6646810776868044,
+        "lrStatsLogLoss": 0.6503377058747271
+      },
+      {
+        "year": 2019,
+        "n": 506,
+        "coinLogLoss": 0.6931471805599468,
+        "eloLogLoss": 0.7014632216378909,
+        "lrLogLoss": 0.6823046184811715,
+        "lrStatsLogLoss": 0.6696940671315664
+      },
+      {
+        "year": 2020,
+        "n": 444,
+        "coinLogLoss": 0.6931471805599468,
+        "eloLogLoss": 0.6777936694374539,
+        "lrLogLoss": 0.6562658922669089,
+        "lrStatsLogLoss": 0.6529284639514421
+      },
+      {
+        "year": 2021,
+        "n": 497,
+        "coinLogLoss": 0.6931471805599468,
+        "eloLogLoss": 0.6814029444731429,
+        "lrLogLoss": 0.6623225891047638,
+        "lrStatsLogLoss": 0.6489834075957694
+      },
+      {
+        "year": 2022,
+        "n": 506,
+        "coinLogLoss": 0.6931471805599468,
+        "eloLogLoss": 0.6779286750535006,
+        "lrLogLoss": 0.656467085018592,
+        "lrStatsLogLoss": 0.6540606506669907
+      },
+      {
+        "year": 2023,
+        "n": 504,
+        "coinLogLoss": 0.6931471805599468,
+        "eloLogLoss": 0.684443083380577,
+        "lrLogLoss": 0.657655666077512,
+        "lrStatsLogLoss": 0.6521071946819418
+      },
+      {
+        "year": 2024,
+        "n": 513,
+        "coinLogLoss": 0.6931471805599468,
+        "eloLogLoss": 0.680776218210134,
+        "lrLogLoss": 0.6538493014199219,
+        "lrStatsLogLoss": 0.6336089523851589
+      },
+      {
+        "year": 2025,
+        "n": 513,
+        "coinLogLoss": 0.6931471805599468,
+        "eloLogLoss": 0.6790145034253876,
+        "lrLogLoss": 0.6430865788885151,
+        "lrStatsLogLoss": 0.6328021954600718
+      },
+      {
+        "year": 2026,
+        "n": 449,
+        "coinLogLoss": 0.6931471805599468,
+        "eloLogLoss": 0.6855115939268243,
+        "lrLogLoss": 0.6532003590685608,
+        "lrStatsLogLoss": 0.6489557567217896
+      }
+    ],
+    "experienced": [
+      {
+        "label": "Both fighters have 3+ prior UFC bouts",
+        "models": [
+          {
+            "id": "coin",
+            "n": 3131,
+            "logLoss": 0.6931471805599165,
+            "accuracy": 0.5
+          },
+          {
+            "id": "elo",
+            "n": 3131,
+            "logLoss": 0.6817348426501392,
+            "accuracy": 0.5544554455445545
+          },
+          {
+            "id": "lr",
+            "n": 3131,
+            "logLoss": 0.6601910466620912,
+            "accuracy": 0.607793037368253
+          },
+          {
+            "id": "lrStats",
+            "n": 3131,
+            "logLoss": 0.648246419784927,
+            "accuracy": 0.6256786969019482
+          }
+        ]
+      },
+      {
+        "label": "At least one fighter has fewer than 3 prior UFC bouts",
+        "models": [
+          {
+            "id": "coin",
+            "n": 3157,
+            "logLoss": 0.6931471805599182,
+            "accuracy": 0.5
+          },
+          {
+            "id": "elo",
+            "n": 3157,
+            "logLoss": 0.6816858225862338,
+            "accuracy": 0.5608172315489389
+          },
+          {
+            "id": "lr",
+            "n": 3157,
+            "logLoss": 0.6637268725398522,
+            "accuracy": 0.6013620525815648
+          },
+          {
+            "id": "lrStats",
+            "n": 3157,
+            "logLoss": 0.6608073859245226,
+            "accuracy": 0.6070636680392778
+          }
+        ]
+      }
+    ],
+    "calibration": {
+      "rows": 5330,
+      "lrLogLoss": 0.659643830635228,
+      "calibratedLogLoss": 0.6601977545278496,
+      "diff": {
+        "estimate": 0.0005539238926215492,
+        "lo": -0.00020021638165746282,
+        "hi": 0.0013180332248455093
+      },
+      "temperatures": [
+        0.7604773898896087,
+        0.8725670595700963,
+        0.8667104195614026,
+        0.8892110652701928,
+        0.8551917758843998,
+        0.8942702038248094,
+        0.9175486797093058,
+        0.9435538977567317,
+        0.9572887926353766,
+        0.9801835373583176,
+        1.010425913320306
+      ]
+    },
+    "folds": [
+      {
+        "year": 2014,
+        "trainRows": 2504,
+        "trainEnd": "2013-12-28",
+        "testRows": 494,
+        "calibrationTemperature": null
+      },
+      {
+        "year": 2015,
+        "trainRows": 2998,
+        "trainEnd": "2014-12-20",
+        "testRows": 464,
+        "calibrationTemperature": null
+      },
+      {
+        "year": 2016,
+        "trainRows": 3462,
+        "trainEnd": "2015-12-19",
+        "testRows": 483,
+        "calibrationTemperature": 0.7604773898896087
+      },
+      {
+        "year": 2017,
+        "trainRows": 3945,
+        "trainEnd": "2016-12-30",
+        "testRows": 446,
+        "calibrationTemperature": 0.8725670595700963
+      },
+      {
+        "year": 2018,
+        "trainRows": 4391,
+        "trainEnd": "2017-12-30",
+        "testRows": 469,
+        "calibrationTemperature": 0.8667104195614026
+      },
+      {
+        "year": 2019,
+        "trainRows": 4860,
+        "trainEnd": "2018-12-29",
+        "testRows": 506,
+        "calibrationTemperature": 0.8892110652701928
+      },
+      {
+        "year": 2020,
+        "trainRows": 5366,
+        "trainEnd": "2019-12-21",
+        "testRows": 444,
+        "calibrationTemperature": 0.8551917758843998
+      },
+      {
+        "year": 2021,
+        "trainRows": 5810,
+        "trainEnd": "2020-12-19",
+        "testRows": 497,
+        "calibrationTemperature": 0.8942702038248094
+      },
+      {
+        "year": 2022,
+        "trainRows": 6307,
+        "trainEnd": "2021-12-18",
+        "testRows": 506,
+        "calibrationTemperature": 0.9175486797093058
+      },
+      {
+        "year": 2023,
+        "trainRows": 6813,
+        "trainEnd": "2022-12-17",
+        "testRows": 504,
+        "calibrationTemperature": 0.9435538977567317
+      },
+      {
+        "year": 2024,
+        "trainRows": 7317,
+        "trainEnd": "2023-12-16",
+        "testRows": 513,
+        "calibrationTemperature": 0.9572887926353766
+      },
+      {
+        "year": 2025,
+        "trainRows": 7830,
+        "trainEnd": "2024-12-14",
+        "testRows": 513,
+        "calibrationTemperature": 0.9801835373583176
+      },
+      {
+        "year": 2026,
+        "trainRows": 8343,
+        "trainEnd": "2025-12-13",
+        "testRows": 449,
+        "calibrationTemperature": 1.010425913320306
+      }
+    ],
+    "featureWeights": [
+      {
+        "name": "elo",
+        "weight": 2.0783209546605166
+      },
+      {
+        "name": "experience",
+        "weight": -0.050291594981637065
+      },
+      {
+        "name": "winRate",
+        "weight": -1.5240651140964683
+      },
+      {
+        "name": "finishRate",
+        "weight": 0.948278035561267
+      },
+      {
+        "name": "koLossRate",
+        "weight": -0.6938682970842799
+      },
+      {
+        "name": "subLossRate",
+        "weight": -1.0392160745291181
+      },
+      {
+        "name": "form",
+        "weight": -0.43068369887318836
+      },
+      {
+        "name": "layoff",
+        "weight": -0.08647885071615442
+      },
+      {
+        "name": "age",
+        "weight": -0.5975421331877804
+      },
+      {
+        "name": "reach",
+        "weight": 0.17469672627281888
+      },
+      {
+        "name": "debut",
+        "weight": -0.5435925808114083
+      },
+      {
+        "name": "sigDiff",
+        "weight": 0.15141269962760354
+      },
+      {
+        "name": "sigLanded",
+        "weight": 0.007410309958539842
+      },
+      {
+        "name": "sigAbsorbed",
+        "weight": -0.10138458560633398
+      },
+      {
+        "name": "sigAcc",
+        "weight": 0.30986839977669645
+      },
+      {
+        "name": "tdRate",
+        "weight": 0.0781852753087576
+      },
+      {
+        "name": "tdDef",
+        "weight": 0.5197304288821368
+      },
+      {
+        "name": "subRate",
+        "weight": -0.056113535947572186
+      },
+      {
+        "name": "ctrlNet",
+        "weight": 0.47193972393225364
+      },
+      {
+        "name": "kdFor",
+        "weight": -0.002865261000993272
+      },
+      {
+        "name": "kdAgainst",
+        "weight": -0.2754531861832768
+      }
+    ]
+  },
+  "predictionCount": 6288,
+  "ablations": [
+    {
+      "label": "Results + rolling fight stats",
+      "excluded": [
+        "ageMissing",
+        "reachMissing"
+      ],
+      "n": 6288,
+      "logLoss": 0.6545528717732708,
+      "accuracy": 0.6163326972010178,
+      "brier": 0.23122906738520257,
+      "note": "The stats model. Adopted only if it beats results-only beyond noise."
+    },
+    {
+      "label": "Results only",
+      "excluded": [
+        "ageMissing",
+        "reachMissing"
+      ],
+      "n": 6288,
+      "logLoss": 0.6619662696735548,
+      "accuracy": 0.6045642493638677,
+      "brier": 0.2348333359038788,
+      "note": "The previous primary model."
+    },
+    {
+      "label": "Stats + Elo, no other results features",
+      "excluded": [
+        "winRate",
+        "finishRate",
+        "koLossRate",
+        "subLossRate",
+        "form",
+        "layoff",
+        "age",
+        "reach",
+        "debut",
+        "ageMissing",
+        "reachMissing"
+      ],
+      "n": 6288,
+      "logLoss": 0.6705275522094017,
+      "accuracy": 0.5873886768447837,
+      "brier": 0.23888548206068658,
+      "note": "Shows how much the fight statistics carry on their own."
+    },
+    {
+      "label": "Results + stats, plus missing-profile flags",
+      "excluded": [],
+      "n": 6288,
+      "logLoss": 0.6516573970320583,
+      "accuracy": 0.6260337150127226,
+      "brier": 0.22847977974114916,
+      "note": "Known leak: profile completeness today reflects future career length. Shown only for comparison."
+    },
+    {
+      "label": "Results only, no age or reach",
+      "excluded": [
+        "age",
+        "reach",
+        "ageMissing",
+        "reachMissing"
+      ],
+      "n": 6288,
+      "logLoss": 0.6736092402556049,
+      "accuracy": 0.5774491094147582,
+      "brier": 0.24043838036611437,
+      "note": "Needs no fighter-profile snapshot at all."
+    },
+    {
+      "label": "Elo + experience only",
+      "excluded": [
+        "winRate",
+        "finishRate",
+        "koLossRate",
+        "subLossRate",
+        "form",
+        "layoff",
+        "age",
+        "reach",
+        "debut",
+        "ageMissing",
+        "reachMissing"
+      ],
+      "n": 6288,
+      "logLoss": 0.6819520862673949,
+      "accuracy": 0.5600349872773537,
+      "brier": 0.24448603394059604,
+      "note": "Smallest feature set."
+    }
+  ],
+  "market": {
+    "match": {
+      "records": 4240,
+      "matched": 3909,
+      "matchedExactDate": 3909,
+      "matchedOffByOneDay": 0,
+      "unmatched": 258,
+      "ambiguous": 0,
+      "winnerDisagreements": 1,
+      "drawsSkipped": 73
+    },
+    "period": "2014-2020",
+    "n": 2735,
+    "averageOverround": 1.0334310793278842,
+    "models": [
+      {
+        "id": "market",
+        "label": "Betting market (de-vigged price)",
+        "metrics": {
+          "n": 2735,
+          "logLoss": 0.6179887079244062,
+          "brier": 0.21503667162172366,
+          "accuracy": 0.6440585009140768,
+          "ece": 0.02721603905057037,
+          "reliability": [
+            {
+              "lo": 0.5,
+              "hi": 0.55,
+              "n": 417,
+              "meanPredicted": 0.5228020165201658,
+              "observed": 0.49640287769784175
+            },
+            {
+              "lo": 0.55,
+              "hi": 0.6,
+              "n": 570,
+              "meanPredicted": 0.5751938026818384,
+              "observed": 0.5473684210526316
+            },
+            {
+              "lo": 0.6,
+              "hi": 0.65,
+              "n": 459,
+              "meanPredicted": 0.6228564281437998,
+              "observed": 0.5686274509803921
+            },
+            {
+              "lo": 0.65,
+              "hi": 0.7,
+              "n": 400,
+              "meanPredicted": 0.6734752637282948,
+              "observed": 0.675
+            },
+            {
+              "lo": 0.7,
+              "hi": 0.75,
+              "n": 359,
+              "meanPredicted": 0.7247494104258828,
+              "observed": 0.7353760445682451
+            },
+            {
+              "lo": 0.75,
+              "hi": 0.8,
+              "n": 265,
+              "meanPredicted": 0.7744530798263912,
+              "observed": 0.8037735849056604
+            },
+            {
+              "lo": 0.8,
+              "hi": 0.85,
+              "n": 182,
+              "meanPredicted": 0.8237878948425421,
+              "observed": 0.8736263736263736
+            },
+            {
+              "lo": 0.85,
+              "hi": 0.9,
+              "n": 74,
+              "meanPredicted": 0.8702568635544354,
+              "observed": 0.8783783783783784
+            },
+            {
+              "lo": 0.9,
+              "hi": 0.95,
+              "n": 9,
+              "meanPredicted": 0.9100585977418637,
+              "observed": 1
+            },
+            {
+              "lo": 0.95,
+              "hi": 1,
+              "n": 0,
+              "meanPredicted": null,
+              "observed": null
+            }
+          ]
+        },
+        "logLoss": {
+          "estimate": 0.6179887079244122,
+          "lo": 0.6046026911991923,
+          "hi": 0.631571953663604
+        },
+        "vsMarket": {
+          "estimate": 0,
+          "lo": 0,
+          "hi": 0
+        }
+      },
+      {
+        "id": "coin",
+        "label": "Coin flip (0.5)",
+        "metrics": {
+          "n": 2735,
+          "logLoss": 0.6931471805599057,
+          "brier": 0.25,
+          "accuracy": 0.5,
+          "ece": 0.001279707495429605,
+          "reliability": [
+            {
+              "lo": 0.5,
+              "hi": 0.55,
+              "n": 2735,
+              "meanPredicted": 0.5,
+              "observed": 0.5012797074954296
+            },
+            {
+              "lo": 0.55,
+              "hi": 0.6,
+              "n": 0,
+              "meanPredicted": null,
+              "observed": null
+            },
+            {
+              "lo": 0.6,
+              "hi": 0.65,
+              "n": 0,
+              "meanPredicted": null,
+              "observed": null
+            },
+            {
+              "lo": 0.65,
+              "hi": 0.7,
+              "n": 0,
+              "meanPredicted": null,
+              "observed": null
+            },
+            {
+              "lo": 0.7,
+              "hi": 0.75,
+              "n": 0,
+              "meanPredicted": null,
+              "observed": null
+            },
+            {
+              "lo": 0.75,
+              "hi": 0.8,
+              "n": 0,
+              "meanPredicted": null,
+              "observed": null
+            },
+            {
+              "lo": 0.8,
+              "hi": 0.85,
+              "n": 0,
+              "meanPredicted": null,
+              "observed": null
+            },
+            {
+              "lo": 0.85,
+              "hi": 0.9,
+              "n": 0,
+              "meanPredicted": null,
+              "observed": null
+            },
+            {
+              "lo": 0.9,
+              "hi": 0.95,
+              "n": 0,
+              "meanPredicted": null,
+              "observed": null
+            },
+            {
+              "lo": 0.95,
+              "hi": 1,
+              "n": 0,
+              "meanPredicted": null,
+              "observed": null
+            }
+          ]
+        },
+        "logLoss": {
+          "estimate": 0.6931471805599454,
+          "lo": 0.6931471805599446,
+          "hi": 0.6931471805599457
+        },
+        "vsMarket": {
+          "estimate": 0.07515847263553316,
+          "lo": 0.06165368489773097,
+          "hi": 0.08855153094160388
+        }
+      },
+      {
+        "id": "elo",
+        "label": "Elo only",
+        "metrics": {
+          "n": 2735,
+          "logLoss": 0.6839084748021288,
+          "brier": 0.24549178330747978,
+          "accuracy": 0.5506398537477148,
+          "ece": 0.02149185735135616,
+          "reliability": [
+            {
+              "lo": 0.5,
+              "hi": 0.55,
+              "n": 1376,
+              "meanPredicted": 0.5232537712901011,
+              "observed": 0.5145348837209303
+            },
+            {
+              "lo": 0.55,
+              "hi": 0.6,
+              "n": 778,
+              "meanPredicted": 0.5741514828474884,
+              "observed": 0.5539845758354756
+            },
+            {
+              "lo": 0.6,
+              "hi": 0.65,
+              "n": 360,
+              "meanPredicted": 0.6219229501204866,
+              "observed": 0.5555555555555556
+            },
+            {
+              "lo": 0.65,
+              "hi": 0.7,
+              "n": 149,
+              "meanPredicted": 0.6698082763846567,
+              "observed": 0.6912751677852349
+            },
+            {
+              "lo": 0.7,
+              "hi": 0.75,
+              "n": 42,
+              "meanPredicted": 0.7237048477058854,
+              "observed": 0.6666666666666666
+            },
+            {
+              "lo": 0.75,
+              "hi": 0.8,
+              "n": 25,
+              "meanPredicted": 0.7718259233823292,
+              "observed": 0.8
+            },
+            {
+              "lo": 0.8,
+              "hi": 0.85,
+              "n": 4,
+              "meanPredicted": 0.8053888227743206,
+              "observed": 1
+            },
+            {
+              "lo": 0.85,
+              "hi": 0.9,
+              "n": 1,
+              "meanPredicted": 0.8760421846189542,
+              "observed": 1
+            },
+            {
+              "lo": 0.9,
+              "hi": 0.95,
+              "n": 0,
+              "meanPredicted": null,
+              "observed": null
+            },
+            {
+              "lo": 0.95,
+              "hi": 1,
+              "n": 0,
+              "meanPredicted": null,
+              "observed": null
+            }
+          ]
+        },
+        "logLoss": {
+          "estimate": 0.6839084748021325,
+          "lo": 0.67792370803215,
+          "hi": 0.6898366919028383
+        },
+        "vsMarket": {
+          "estimate": 0.06591976687772026,
+          "lo": 0.052714704804278055,
+          "hi": 0.07850788000407978
+        }
+      },
+      {
+        "id": "lr",
+        "label": "Model: results features",
+        "metrics": {
+          "n": 2735,
+          "logLoss": 0.6704296693016655,
+          "brier": 0.23888829067616532,
+          "accuracy": 0.5912248628884826,
+          "ece": 0.02177619189034379,
+          "reliability": [
+            {
+              "lo": 0.5,
+              "hi": 0.55,
+              "n": 872,
+              "meanPredicted": 0.5247117949177121,
+              "observed": 0.5229357798165137
+            },
+            {
+              "lo": 0.55,
+              "hi": 0.6,
+              "n": 695,
+              "meanPredicted": 0.5747289304179082,
+              "observed": 0.6014388489208633
+            },
+            {
+              "lo": 0.6,
+              "hi": 0.65,
+              "n": 535,
+              "meanPredicted": 0.6244202958788811,
+              "observed": 0.5906542056074766
+            },
+            {
+              "lo": 0.65,
+              "hi": 0.7,
+              "n": 336,
+              "meanPredicted": 0.6719519560403897,
+              "observed": 0.6517857142857143
+            },
+            {
+              "lo": 0.7,
+              "hi": 0.75,
+              "n": 196,
+              "meanPredicted": 0.7204848662055302,
+              "observed": 0.673469387755102
+            },
+            {
+              "lo": 0.75,
+              "hi": 0.8,
+              "n": 70,
+              "meanPredicted": 0.7689318169486985,
+              "observed": 0.7285714285714285
+            },
+            {
+              "lo": 0.8,
+              "hi": 0.85,
+              "n": 24,
+              "meanPredicted": 0.8188296280270277,
+              "observed": 0.75
+            },
+            {
+              "lo": 0.85,
+              "hi": 0.9,
+              "n": 6,
+              "meanPredicted": 0.8617164860159052,
+              "observed": 1
+            },
+            {
+              "lo": 0.9,
+              "hi": 0.95,
+              "n": 1,
+              "meanPredicted": 0.9167823517269715,
+              "observed": 1
+            },
+            {
+              "lo": 0.95,
+              "hi": 1,
+              "n": 0,
+              "meanPredicted": null,
+              "observed": null
+            }
+          ]
+        },
+        "logLoss": {
+          "estimate": 0.6704296693016667,
+          "lo": 0.6614386156780476,
+          "hi": 0.6796083457684473
+        },
+        "vsMarket": {
+          "estimate": 0.05244096137725448,
+          "lo": 0.03953972576390371,
+          "hi": 0.06495315994004311
+        }
+      },
+      {
+        "id": "lrStats",
+        "label": "Model: results + rolling fight stats",
+        "metrics": {
+          "n": 2735,
+          "logLoss": 0.6656808414654063,
+          "brier": 0.23624252282415523,
+          "accuracy": 0.6025594149908592,
+          "ece": 0.02428838753996813,
+          "reliability": [
+            {
+              "lo": 0.5,
+              "hi": 0.55,
+              "n": 660,
+              "meanPredicted": 0.5252489435578483,
+              "observed": 0.5272727272727272
+            },
+            {
+              "lo": 0.55,
+              "hi": 0.6,
+              "n": 645,
+              "meanPredicted": 0.5744711079694415,
+              "observed": 0.5519379844961241
+            },
+            {
+              "lo": 0.6,
+              "hi": 0.65,
+              "n": 525,
+              "meanPredicted": 0.6243819726163057,
+              "observed": 0.6342857142857142
+            },
+            {
+              "lo": 0.65,
+              "hi": 0.7,
+              "n": 421,
+              "meanPredicted": 0.6733178886183359,
+              "observed": 0.6793349168646081
+            },
+            {
+              "lo": 0.7,
+              "hi": 0.75,
+              "n": 245,
+              "meanPredicted": 0.7221143438405014,
+              "observed": 0.6285714285714286
+            },
+            {
+              "lo": 0.75,
+              "hi": 0.8,
+              "n": 143,
+              "meanPredicted": 0.7721358839206618,
+              "observed": 0.6783216783216783
+            },
+            {
+              "lo": 0.8,
+              "hi": 0.85,
+              "n": 66,
+              "meanPredicted": 0.8203457409196744,
+              "observed": 0.7727272727272727
+            },
+            {
+              "lo": 0.85,
+              "hi": 0.9,
+              "n": 23,
+              "meanPredicted": 0.8672514176429026,
+              "observed": 0.7391304347826086
+            },
+            {
+              "lo": 0.9,
+              "hi": 0.95,
+              "n": 7,
+              "meanPredicted": 0.9147853733600273,
+              "observed": 0.8571428571428571
+            },
+            {
+              "lo": 0.95,
+              "hi": 1,
+              "n": 0,
+              "meanPredicted": null,
+              "observed": null
+            }
+          ]
+        },
+        "logLoss": {
+          "estimate": 0.6656808414654063,
+          "lo": 0.6535831929385605,
+          "hi": 0.6769324945344751
+        },
+        "vsMarket": {
+          "estimate": 0.04769213354099405,
+          "lo": 0.03313363464633332,
+          "hi": 0.061495781766157
+        }
+      }
+    ],
+    "byYear": [
+      {
+        "year": 2014,
+        "n": 461,
+        "market": 0.6025554551237042,
+        "elo": 0.6715176254374086,
+        "lr": 0.6701977659278856,
+        "lrStats": 0.6711301630148625
+      },
+      {
+        "year": 2015,
+        "n": 433,
+        "market": 0.6317854453703016,
+        "elo": 0.6820918541116261,
+        "lr": 0.6766084645746442,
+        "lrStats": 0.6696051108247553
+      },
+      {
+        "year": 2016,
+        "n": 449,
+        "market": 0.6285204789090746,
+        "elo": 0.67356177647624,
+        "lr": 0.6546404968450126,
+        "lrStats": 0.6665255211026377
+      },
+      {
+        "year": 2017,
+        "n": 408,
+        "market": 0.614037528665668,
+        "elo": 0.6867907806419551,
+        "lr": 0.6762468258364777,
+        "lrStats": 0.6686920316212912
+      },
+      {
+        "year": 2018,
+        "n": 440,
+        "market": 0.5995630185658044,
+        "elo": 0.6829669616702517,
+        "lr": 0.6628105238776145,
+        "lrStats": 0.6510622109711206
+      },
+      {
+        "year": 2019,
+        "n": 460,
+        "market": 0.6306491524944831,
+        "elo": 0.704829850927936,
+        "lr": 0.6846663583427417,
+        "lrStats": 0.6717861452756919
+      },
+      {
+        "year": 2020,
+        "n": 84,
+        "market": 0.6216501008775915,
+        "elo": 0.692942972920729,
+        "lr": 0.6579412728330566,
+        "lrStats": 0.6395449492884878
+      }
+    ],
+    "stack": {
+      "period": "2015-2020",
+      "n": 2274,
+      "models": [
+        {
+          "id": "market",
+          "label": "Betting market",
+          "metrics": {
+            "n": 2274,
+            "logLoss": 0.6211174368343145,
+            "brier": 0.21652189049780476,
+            "accuracy": 0.637203166226913,
+            "ece": 0.03253531843048779,
+            "reliability": [
+              {
+                "lo": 0.5,
+                "hi": 0.55,
+                "n": 375,
+                "meanPredicted": 0.5225785206441883,
+                "observed": 0.49066666666666664
+              },
+              {
+                "lo": 0.55,
+                "hi": 0.6,
+                "n": 487,
+                "meanPredicted": 0.5744633149487731,
+                "observed": 0.5400410677618069
+              },
+              {
+                "lo": 0.6,
+                "hi": 0.65,
+                "n": 394,
+                "meanPredicted": 0.622386277835475,
+                "observed": 0.565989847715736
+              },
+              {
+                "lo": 0.65,
+                "hi": 0.7,
+                "n": 327,
+                "meanPredicted": 0.6732520550324081,
+                "observed": 0.6850152905198776
+              },
+              {
+                "lo": 0.7,
+                "hi": 0.75,
+                "n": 273,
+                "meanPredicted": 0.7241105312830887,
+                "observed": 0.7362637362637363
+              },
+              {
+                "lo": 0.75,
+                "hi": 0.8,
+                "n": 223,
+                "meanPredicted": 0.7737841179960108,
+                "observed": 0.8071748878923767
+              },
+              {
+                "lo": 0.8,
+                "hi": 0.85,
+                "n": 136,
+                "meanPredicted": 0.8236278939387018,
+                "observed": 0.8676470588235294
+              },
+              {
+                "lo": 0.85,
+                "hi": 0.9,
+                "n": 53,
+                "meanPredicted": 0.869746814795729,
+                "observed": 0.9056603773584906
+              },
+              {
+                "lo": 0.9,
+                "hi": 0.95,
+                "n": 6,
+                "meanPredicted": 0.9110048115071513,
+                "observed": 1
+              },
+              {
+                "lo": 0.95,
+                "hi": 1,
+                "n": 0,
+                "meanPredicted": null,
+                "observed": null
+              }
+            ]
+          },
+          "logLoss": {
+            "estimate": 0.6211174368343184,
+            "lo": 0.606921483564904,
+            "hi": 0.6346633018167998
+          },
+          "vsMarket": {
+            "estimate": 0,
+            "lo": 0,
+            "hi": 0
+          }
+        },
+        {
+          "id": "model",
+          "label": "Model alone",
+          "metrics": {
+            "n": 2274,
+            "logLoss": 0.664576119726489,
+            "brier": 0.23570303513496002,
+            "accuracy": 0.6064204045734388,
+            "ece": 0.02141568684236783,
+            "reliability": [
+              {
+                "lo": 0.5,
+                "hi": 0.55,
+                "n": 555,
+                "meanPredicted": 0.5255672147656955,
+                "observed": 0.527927927927928
+              },
+              {
+                "lo": 0.55,
+                "hi": 0.6,
+                "n": 544,
+                "meanPredicted": 0.5747930411077963,
+                "observed": 0.5661764705882353
+              },
+              {
+                "lo": 0.6,
+                "hi": 0.65,
+                "n": 426,
+                "meanPredicted": 0.6243105274073482,
+                "observed": 0.6384976525821596
+              },
+              {
+                "lo": 0.65,
+                "hi": 0.7,
+                "n": 351,
+                "meanPredicted": 0.6731009175138736,
+                "observed": 0.6780626780626781
+              },
+              {
+                "lo": 0.7,
+                "hi": 0.75,
+                "n": 201,
+                "meanPredicted": 0.7224812274577108,
+                "observed": 0.6368159203980099
+              },
+              {
+                "lo": 0.75,
+                "hi": 0.8,
+                "n": 122,
+                "meanPredicted": 0.7716921157372862,
+                "observed": 0.6721311475409836
+              },
+              {
+                "lo": 0.8,
+                "hi": 0.85,
+                "n": 53,
+                "meanPredicted": 0.8195781863137905,
+                "observed": 0.7924528301886793
+              },
+              {
+                "lo": 0.85,
+                "hi": 0.9,
+                "n": 17,
+                "meanPredicted": 0.8643906761747912,
+                "observed": 0.6470588235294118
+              },
+              {
+                "lo": 0.9,
+                "hi": 0.95,
+                "n": 5,
+                "meanPredicted": 0.9162163547573975,
+                "observed": 1
+              },
+              {
+                "lo": 0.95,
+                "hi": 1,
+                "n": 0,
+                "meanPredicted": null,
+                "observed": null
+              }
+            ]
+          },
+          "logLoss": {
+            "estimate": 0.664576119726488,
+            "lo": 0.6522995517552841,
+            "hi": 0.6781012065633418
+          },
+          "vsMarket": {
+            "estimate": 0.04345868289216964,
+            "lo": 0.03057771843142595,
+            "hi": 0.05678661145694296
+          }
+        },
+        {
+          "id": "stack",
+          "label": "Market + model (walk-forward blend)",
+          "metrics": {
+            "n": 2274,
+            "logLoss": 0.619885919769806,
+            "brier": 0.21587982638651837,
+            "accuracy": 0.6451187335092349,
+            "ece": 0.030775257301636563,
+            "reliability": [
+              {
+                "lo": 0.5,
+                "hi": 0.55,
+                "n": 408,
+                "meanPredicted": 0.5256552234829565,
+                "observed": 0.5147058823529411
+              },
+              {
+                "lo": 0.55,
+                "hi": 0.6,
+                "n": 450,
+                "meanPredicted": 0.5764364134805217,
+                "observed": 0.5622222222222222
+              },
+              {
+                "lo": 0.6,
+                "hi": 0.65,
+                "n": 394,
+                "meanPredicted": 0.6242910996845644,
+                "observed": 0.5558375634517766
+              },
+              {
+                "lo": 0.65,
+                "hi": 0.7,
+                "n": 340,
+                "meanPredicted": 0.6748763464855388,
+                "observed": 0.7058823529411765
+              },
+              {
+                "lo": 0.7,
+                "hi": 0.75,
+                "n": 260,
+                "meanPredicted": 0.722974645001227,
+                "observed": 0.7307692307692307
+              },
+              {
+                "lo": 0.75,
+                "hi": 0.8,
+                "n": 231,
+                "meanPredicted": 0.7749809819338491,
+                "observed": 0.8268398268398268
+              },
+              {
+                "lo": 0.8,
+                "hi": 0.85,
+                "n": 125,
+                "meanPredicted": 0.8223821441936218,
+                "observed": 0.808
+              },
+              {
+                "lo": 0.85,
+                "hi": 0.9,
+                "n": 58,
+                "meanPredicted": 0.8700176991334225,
+                "observed": 0.9655172413793104
+              },
+              {
+                "lo": 0.9,
+                "hi": 0.95,
+                "n": 8,
+                "meanPredicted": 0.9079694298224099,
+                "observed": 0.875
+              },
+              {
+                "lo": 0.95,
+                "hi": 1,
+                "n": 0,
+                "meanPredicted": null,
+                "observed": null
+              }
+            ]
+          },
+          "logLoss": {
+            "estimate": 0.6198859197698059,
+            "lo": 0.6061341778690683,
+            "hi": 0.633688380861003
+          },
+          "vsMarket": {
+            "estimate": -0.0012315170645124797,
+            "lo": -0.0036123274568403466,
+            "hi": 0.001253456559853739
+          }
+        }
+      ],
+      "marketWeight": 0.9502128752368921,
+      "modelWeight": 0.20585177781909397
+    },
+    "primaryModel": "lrStats",
+    "verdict": "On 2735 bouts with prices (2014-2020), the model's log loss 0.6657 is worse than the market's 0.6180 (gap +0.0477, 95% CI 0.0331 to 0.0615; positive means worse). Blending the model into the price changed log loss by -0.0012 [-0.0036, 0.0013] versus the price alone, so the model does not demonstrably add information beyond the price.",
+    "caveats": [
+      "The dataset does not say which bookmaker, or whether the price is opening, closing or best-available. Treat it as an as-recorded market price, not a verified closing line.",
+      "Coverage ends March 2020 and only 2014 onward overlaps the model test years, so the comparison does not cover the last six years.",
+      "A model that matches the market on log loss still cannot profit after the margin; beating the market needs a consistent, significant gap in the model’s favour.",
+      "Matching is by date and fighter name; bouts that could not be matched are excluded, which may bias the sample toward well-known fighters."
+    ]
+  },
+  "oddsDataset": {
+    "source": "https://www.openml.org/d/43464",
+    "license": "CC BY 4.0 (as labelled on OpenML)",
+    "attribution": "UFC Fights (2010-2020) with Betting Odds, OpenML dataset 43464, CC BY 4.0. The original uploader is not named in the OpenML metadata.",
+    "md5": "5a25fab3ff4bd389d40ce432462e4443",
+    "bytes": 545652,
+    "retrievedAt": "2026-10-25T16:32:50.293Z"
+  }
+}

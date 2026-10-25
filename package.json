@@ -12,7 +12,8 @@
     "preview": "vite preview",
     "check-keys": "node --env-file-if-exists=.env server/check.ts",
     "fetch-data": "node server/backtest/run.ts --fetch --fetch-only",
-    "backtest": "node server/backtest/run.ts"
+    "backtest": "node server/backtest/run.ts",
+    "snapshot": "node server/snapshot.ts"
   },
   "dependencies": {
     "react": "^18.3.1",

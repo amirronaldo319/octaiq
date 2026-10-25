@@ -99,5 +99,7 @@ export interface EventPayload {
   odds: { status: 'live' | 'unavailable'; reason?: string; fetchedAt?: string; quotaRemaining?: string; stale?: boolean }
   stats: { status: 'available' | 'partial' | 'none'; missing: string[]; warnings: string[] }
   resultsModel: ResultsModel
+  /** True for the public website snapshot: no live odds or licensed stats */
+  static?: boolean
   generatedAt: string
 }

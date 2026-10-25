@@ -82,3 +82,9 @@ That license covers this repository only. Data the app downloads or calls keeps 
 - **The Odds API** and **UFCalendar** are used with your own keys and are subject to their terms (for example, UFCalendar forbids redistributing its data and forbids use for regulated betting operations).
 
 OctaIQ is a research tool, not betting advice. See the Model health tab: on past fights the bundled models were less accurate than betting prices.
+
+## Public website
+
+A static snapshot is published to GitHub Pages by `.github/workflows/pages.yml` on every push to `main`: https://amirronaldo319.github.io/octaiq/
+
+The snapshot has the event card, the backtested model's predictions and the Model health tab. It has **no live odds and no licensed fighter statistics**, and no API keys are involved. To refresh it after changing the card or re-running the backtest: `npm run backtest && npm run snapshot`, then commit `public/data/`. For prices and the full model, run the app locally with your own keys.
