@@ -1,0 +1,9 @@
+node_modules
+dist
+.env
+data/fighters.csv
+data/odds-history.json
+data/fighter-cache.json
+data/raw/
+data/reports/
+.claude/

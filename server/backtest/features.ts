@@ -1,0 +1,244 @@
+import type { Bout, FighterProfile, MethodKind, SideStats } from './dataset.ts'
+
+export const RESULT_FEATURES = [
+  'elo', 'experience', 'winRate', 'finishRate', 'koLossRate', 'subLossRate', 'form',
+  'layoff', 'age', 'reach', 'debut', 'ageMissing', 'reachMissing',
+] as const
+
+/** Rolling striking and grappling features built from earlier fights' statistics. */
+export const STATS_FEATURES = [
+  'sigDiff', 'sigLanded', 'sigAbsorbed', 'sigAcc', 'tdRate', 'tdDef', 'subRate', 'ctrlNet', 'kdFor', 'kdAgainst',
+] as const
+
+export const FEATURE_NAMES = [...RESULT_FEATURES, ...STATS_FEATURES] as const
+
+export interface FeatureRow {
+  id: string
+  event: string
+  date: number
+  /** 1 when A won, 0 when B won, null for draws and no-contests (never used for training or scoring) */
+  y: 0 | 1 | null
+  /** Antisymmetric features: value(A) - value(B). Swapping the fighters negates the vector. */
+  x: number[]
+  /** Prior UFC bouts for each fighter, used for subgroup reporting */
+  priorA: number
+  priorB: number
+}
+
+/** Decayed running totals of a fighter's earlier fights. */
+interface Roll {
+  min: number
+  sigL: number
+  sigAbs: number
+  sigAtt: number
+  kdFor: number
+  kdAg: number
+  tdL: number
+  tdAtt: number
+  oppTdL: number
+  oppTdAtt: number
+  sub: number
+  ctrlFor: number
+  ctrlAg: number
+}
+
+interface State {
+  elo: number
+  n: number
+  wins: number
+  finishWins: number
+  koLosses: number
+  subLosses: number
+  form: number
+  lastDate: number | null
+  roll: Roll
+}
+
+const zeroRoll = (): Roll => ({ min: 0, sigL: 0, sigAbs: 0, sigAtt: 0, kdFor: 0, kdAg: 0, tdL: 0, tdAtt: 0, oppTdL: 0, oppTdAtt: 0, sub: 0, ctrlFor: 0, ctrlAg: 0 })
+const fresh = (): State => ({ elo: 1500, n: 0, wins: 0, finishWins: 0, koLosses: 0, subLosses: 0, form: 0.5, lastDate: null, roll: zeroRoll() })
+const DAY = 86_400_000
+const YEAR = 365.25 * DAY
+
+/** Pseudo-observations that pull a thin history toward the running league average. */
+const K_MIN = 15
+const K_STRIKES = 30
+const K_TD = 6
+
+function addStats(prev: Roll, own: SideStats, opp: SideStats, minutes: number, decay: number): Roll {
+  const r = { ...prev }
+  for (const k of Object.keys(r) as (keyof Roll)[]) r[k] *= decay
+  r.min += minutes
+  r.sigL += own.sigLanded
+  r.sigAbs += opp.sigLanded
+  r.sigAtt += own.sigAttempted
+  r.kdFor += own.knockdowns
+  r.kdAg += opp.knockdowns
+  r.tdL += own.tdLanded
+  r.tdAtt += own.tdAttempted
+  r.oppTdL += opp.tdLanded
+  r.oppTdAtt += opp.tdAttempted
+  r.sub += own.subAttempts
+  r.ctrlFor += own.ctrlSeconds
+  r.ctrlAg += opp.ctrlSeconds
+  return r
+}
+
+/** League-wide running averages, used as the shrinkage target. Constants apply until data accumulates. */
+interface Global {
+  min: number
+  sigL: number
+  sigAtt: number
+  tdL: number
+  tdAtt: number
+  sub: number
+  kd: number
+}
+const zeroGlobal = (): Global => ({ min: 0, sigL: 0, sigAtt: 0, tdL: 0, tdAtt: 0, sub: 0, kd: 0 })
+
+function describeStats(r: Roll, g: Global): number[] {
+  const perMin = g.min > 200 ? g.sigL / g.min : 3.2
+  const acc = g.sigAtt > 500 ? g.sigL / g.sigAtt : 0.45
+  const tdSuccess = g.tdAtt > 100 ? g.tdL / g.tdAtt : 0.4
+  const tdPerMin = g.min > 200 ? g.tdL / g.min : 0.08
+  const subPerMin = g.min > 200 ? g.sub / g.min : 0.03
+  const kdPerMin = g.min > 200 ? g.kd / g.min : 0.012
+  const rate = (count: number, prior: number): number => (count + prior * K_MIN) / (r.min + K_MIN)
+
+  const landed = rate(r.sigL, perMin)
+  const absorbed = rate(r.sigAbs, perMin)
+  return [
+    landed - absorbed,
+    landed,
+    absorbed,
+    (r.sigL + acc * K_STRIKES) / (r.sigAtt + K_STRIKES),
+    rate(r.tdL, tdPerMin) * 15,
+    1 - (r.oppTdL + tdSuccess * K_TD) / (r.oppTdAtt + K_TD),
+    rate(r.sub, subPerMin) * 15,
+    (r.ctrlFor - r.ctrlAg) / 60 / (r.min + K_MIN),
+    rate(r.kdFor, kdPerMin) * 15,
+    rate(r.kdAg, kdPerMin) * 15,
+  ]
+}
+
+function describe(s: State, p: FighterProfile | undefined, date: number, g: Global): number[] {
+  const age = p?.dob != null ? (date - p.dob) / YEAR : null
+  const reach = p?.reachCm ?? null
+  const layoffDays = s.lastDate === null ? 0 : Math.min((date - s.lastDate) / DAY, 1095)
+  return [
+    (s.elo - 1500) / 400,
+    Math.log1p(s.n),
+    (s.wins + 2) / (s.n + 4),
+    (s.finishWins + 1) / (s.n + 4),
+    s.koLosses / (s.n + 4),
+    s.subLosses / (s.n + 4),
+    s.form,
+    Math.log1p(layoffDays / 30),
+    age === null ? 0 : (age - 30) / 10,
+    reach === null ? 0 : (reach - 180) / 10,
+    s.n === 0 ? 1 : 0,
+    age === null ? 1 : 0,
+    reach === null ? 1 : 0,
+    ...describeStats(s.roll, g),
+  ]
+}
+
+const scoreOf = (result: 'a' | 'b' | 'draw', side: 'a' | 'b'): number => (result === 'draw' ? 0.5 : result === side ? 1 : 0)
+const expected = (eloSelf: number, eloOpp: number): number => 1 / (1 + 10 ** ((eloOpp - eloSelf) / 400))
+
+function update(
+  s: State, opp: State, score: number, kElo: number, won: boolean, lost: boolean,
+  method: MethodKind, date: number, roll: Roll,
+): State {
+  const exp = expected(s.elo, opp.elo)
+  return {
+    elo: s.elo + kElo * (score - exp),
+    n: s.n + 1,
+    wins: s.wins + (won ? 1 : 0),
+    finishWins: s.finishWins + (won && (method === 'ko' || method === 'sub') ? 1 : 0),
+    koLosses: s.koLosses + (lost && method === 'ko' ? 1 : 0),
+    subLosses: s.subLosses + (lost && method === 'sub' ? 1 : 0),
+    form: 0.7 * s.form + 0.3 * score,
+    lastDate: date,
+    roll,
+  }
+}
+
+export interface FeatureOptions {
+  eloK: number
+  /** Per-fight multiplier applied to older statistics (1 = no decay, 0.8 = fast decay). Default 0.9. */
+  statsDecay?: number
+}
+
+/**
+ * Builds one feature row per bout in chronological order. Every feature for a bout is computed from
+ * state that existed BEFORE that event date: outcomes and fight statistics are applied only after all
+ * bouts on the same date have been featurised, so nothing from the bout itself or from later bouts
+ * (including its own post-fight statistics) can leak in.
+ */
+export function buildFeatureRows(
+  bouts: readonly Bout[],
+  profiles: ReadonlyMap<string, FighterProfile>,
+  opts: FeatureOptions,
+): FeatureRow[] {
+  const decay = opts.statsDecay ?? 0.9
+  const states = new Map<string, State>()
+  const get = (key: string): State => states.get(key) ?? fresh()
+  const global = zeroGlobal()
+  const rows: FeatureRow[] = []
+
+  let i = 0
+  while (i < bouts.length) {
+    let j = i
+    while (j < bouts.length && bouts[j].date === bouts[i].date) j++
+    const group = bouts.slice(i, j)
+    const snapshot = { ...global }
+
+    for (const b of group) {
+      const sa = get(b.a)
+      const sb = get(b.b)
+      const fa = describe(sa, profiles.get(b.a), b.date, snapshot)
+      const fb = describe(sb, profiles.get(b.b), b.date, snapshot)
+      rows.push({
+        id: b.id,
+        event: b.event,
+        date: b.date,
+        y: b.result === 'a' ? 1 : b.result === 'b' ? 0 : null,
+        x: fa.map((v, k) => v - fb[k]),
+        priorA: sa.n,
+        priorB: sb.n,
+      })
+    }
+
+    // Apply results and statistics after the whole date has been featurised.
+    const pending: [string, State][] = []
+    for (const b of group) {
+      const sa = get(b.a)
+      const sb = get(b.b)
+      const rollA = b.stats ? addStats(sa.roll, b.stats.a, b.stats.b, b.stats.minutes, decay) : sa.roll
+      const rollB = b.stats ? addStats(sb.roll, b.stats.b, b.stats.a, b.stats.minutes, decay) : sb.roll
+      if (b.stats) {
+        global.min += b.stats.minutes
+        global.sigL += b.stats.a.sigLanded + b.stats.b.sigLanded
+        global.sigAtt += b.stats.a.sigAttempted + b.stats.b.sigAttempted
+        global.tdL += b.stats.a.tdLanded + b.stats.b.tdLanded
+        global.tdAtt += b.stats.a.tdAttempted + b.stats.b.tdAttempted
+        global.sub += b.stats.a.subAttempts + b.stats.b.subAttempts
+        global.kd += b.stats.a.knockdowns + b.stats.b.knockdowns
+      }
+      if (b.result === 'nc') {
+        // A no-contest still happened: keep its statistics but leave ratings and records alone.
+        if (b.stats) {
+          pending.push([b.a, { ...sa, roll: rollA }])
+          pending.push([b.b, { ...sb, roll: rollB }])
+        }
+        continue
+      }
+      const res = b.result
+      pending.push([b.a, update(sa, sb, scoreOf(res, 'a'), opts.eloK, res === 'a', res === 'b', b.method, b.date, rollA)])
+      pending.push([b.b, update(sb, sa, scoreOf(res, 'b'), opts.eloK, res === 'b', res === 'a', b.method, b.date, rollB)])
+    }
+    for (const [key, st] of pending) states.set(key, st)
+    i = j
+  }
+  return rows
+}
