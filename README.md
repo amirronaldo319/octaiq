@@ -25,7 +25,7 @@ Also: a light theme, offline support, link previews, deep links, keyboard and sc
 - **Walk-forward testing.** Each year from 2014 is predicted by a model trained only on earlier years. Intervals are 95% event-level bootstrap.
 - **No leakage.** Features use only fights dated before the event; a bout's own result and statistics never reach its own features. Tests inject a deliberate leak to confirm they would catch it, and a noise-only world must score like a coin flip.
 - **Fixed adoption rule.** The rolling fight-statistics features are used only if their paired gain over the results-only model has a 95% interval entirely below zero.
-- **Honest comparison with the market.** On 2,735 past fights with betting prices, the market was more accurate than the model (log loss 0.618 against 0.666). Blending the model into the price added nothing demonstrable. Treat the model as context, not a betting edge.
+- **Honest comparison with the market.** On 2,735 past fights with betting prices, the market was more accurate than the model (log loss 0.618 against 0.664). Blending the model into the price added nothing demonstrable. Treat the model as context, not a betting edge.
 - **Public ledger.** `data/ledger/` holds what the model said before each event. Entries are never edited, nothing is recorded once an event starts, and the GitHub commit history is the timestamp.
 
 What it cannot see: styles, injuries, weigh-ins, camp news, and anything outside UFC results and per-minute fight statistics. The method model assumes winner and method are independent given the features. The ranges reflect how much the answer depends on which past fights were used, not everything the model cannot see.
@@ -67,11 +67,11 @@ Cards live in `data/events/*.json` as versioned snapshots. To record a change (a
 
 Three GitHub Actions workflows run on this repository:
 
-- **Deploy** (`pages.yml`): on every push and every four hours. Typechecks, tests, builds, adds market prices if a key is set, and deploys.
+- **Deploy** (`pages.yml`): on every push and every six hours. Typechecks, tests, builds, adds market prices if a key is set, and deploys.
 - **Refresh** (`refresh.yml`): every six hours. Re-runs the backtest, records new predictions, refreshes the snapshot, commits only if something changed, and triggers a deploy.
 - **Checks** (`ci.yml`): typecheck, tests and build on pull requests.
 
-To show live prices on the public site, add your Odds API key as a repository secret named `ODDS_API_KEY` (Settings, Secrets and variables, Actions). Without it the site simply shows model probabilities. The free tier gives 500 credits a month and the deploy workflow uses about 180.
+To show live prices on the public site, add your Odds API key as a repository secret named `ODDS_API_KEY` (Settings, Secrets and variables, Actions). Without it the site simply shows model probabilities. The consensus (the default view) averages up to ten bookmakers (Pinnacle, DraftKings, FanDuel, BetMGM, Caesars, Bovada, BetOnline, BetRivers, ESPN Bet, Fanatics and so on, in that order of preference). Each fetch costs 3 credits (three regions), so the six-hourly deploy uses about 360 of the free tier's 500 monthly credits; pushes cost 3 each.
 
 ## Data and licenses
 

@@ -4,6 +4,7 @@ import { logit } from './models.ts'
 export const RESULT_FEATURES = [
   'elo', 'experience', 'winRate', 'finishRate', 'koLossRate', 'subLossRate', 'form',
   'layoff', 'age', 'reach', 'debut', 'ageMissing', 'reachMissing',
+  'oppElo', 'activity',
 ] as const
 
 /** Rolling striking and grappling features built from earlier fights' statistics. */
@@ -62,12 +63,16 @@ interface State {
   subWins: number
   subLosses: number
   form: number
+  /** Sum of the opponents' ratings at the time of each fight, for the strength-of-schedule feature */
+  oppEloSum: number
+  /** Fights counted with a two-year exponential memory, so it measures recent activity */
+  activity: number
   lastDate: number | null
   roll: Roll
 }
 
 const zeroRoll = (): Roll => ({ min: 0, sigL: 0, sigAbs: 0, sigAtt: 0, kdFor: 0, kdAg: 0, tdL: 0, tdAtt: 0, oppTdL: 0, oppTdAtt: 0, sub: 0, ctrlFor: 0, ctrlAg: 0 })
-const fresh = (): State => ({ elo: 1500, n: 0, wins: 0, finishWins: 0, koWins: 0, koLosses: 0, subWins: 0, subLosses: 0, form: 0.5, lastDate: null, roll: zeroRoll() })
+const fresh = (): State => ({ elo: 1500, n: 0, wins: 0, finishWins: 0, koWins: 0, koLosses: 0, subWins: 0, subLosses: 0, form: 0.5, oppEloSum: 0, activity: 0, lastDate: null, roll: zeroRoll() })
 const DAY = 86_400_000
 const YEAR = 365.25 * DAY
 
@@ -75,6 +80,7 @@ const YEAR = 365.25 * DAY
 const K_MIN = 15
 const K_STRIKES = 30
 const K_TD = 6
+const K_OPP = 3
 
 function addStats(prev: Roll, own: SideStats, opp: SideStats, minutes: number, decay: number): Roll {
   const r = { ...prev }
@@ -172,6 +178,8 @@ function describe(s: State, p: FighterProfile | undefined, date: number, g: Glob
     s.n === 0 ? 1 : 0,
     age === null ? 1 : 0,
     reach === null ? 1 : 0,
+    (((s.oppEloSum + 1500 * K_OPP) / (s.n + K_OPP)) - 1500) / 400,
+    Math.log1p(s.lastDate === null ? 0 : s.activity * 0.5 ** ((date - s.lastDate) / (2 * YEAR))),
     ...describeStats(s.roll, g),
   ]
 }
@@ -197,6 +205,8 @@ function update(
     koLosses: s.koLosses + (lost && method === 'ko' ? 1 : 0),
     subLosses: s.subLosses + (lost && method === 'sub' ? 1 : 0),
     form: 0.7 * s.form + 0.3 * score,
+    oppEloSum: s.oppEloSum + opp.elo,
+    activity: (s.lastDate === null ? 0 : s.activity * 0.5 ** ((date - s.lastDate) / (2 * YEAR))) + 1,
     lastDate: date,
     roll,
   }

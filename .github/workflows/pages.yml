@@ -6,7 +6,7 @@ on:
   # Rebuild every few hours so betting prices stay fresh. The key lives in repository secrets; without it
   # the site still deploys, with model probabilities only.
   schedule:
-    - cron: '17 */4 * * *'
+    - cron: '17 */6 * * *'
   workflow_dispatch:
 
 permissions:

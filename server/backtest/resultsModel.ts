@@ -23,8 +23,8 @@ export function loadAliases(root: string): Record<string, string> {
   }
 }
 
-export const RESULTS_MODEL_VERSION = 'octa-results-lr-0.1'
-export const STATS_MODEL_VERSION = 'octa-results-stats-lr-0.1'
+export const RESULTS_MODEL_VERSION = 'octa-results-lr-0.2'
+export const STATS_MODEL_VERSION = 'octa-results-stats-lr-0.2'
 
 const unavailable = (reason: string): ResultsModel => ({ status: 'unavailable', reason, version: RESULTS_MODEL_VERSION, bouts: {} })
 

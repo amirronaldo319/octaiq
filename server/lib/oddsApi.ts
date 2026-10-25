@@ -17,8 +17,23 @@ export interface OddsEvent {
 
 export const SPORT_KEY = 'mma_mixed_martial_arts'
 
+/** US, extra US and EU books: together they cover the ten big sportsbooks (the EU region carries Pinnacle). */
+export const ODDS_REGIONS = 'us,us2,eu'
+
+/** The consensus averages at most this many bookmakers. */
+export const MAX_BOOKS = 10
+
+/**
+ * Bookmakers in the order they are preferred when more than MAX_BOOKS quote a fight: the sharpest and
+ * most widely used first. Any bookmaker not listed here fills remaining places alphabetically.
+ */
+export const PREFERRED_BOOKS: readonly string[] = [
+  'pinnacle', 'draftkings', 'fanduel', 'betmgm', 'williamhill_us', 'bovada',
+  'betonlineag', 'betrivers', 'espnbet', 'fanatics', 'unibet_us', 'mybookieag',
+]
+
 export function oddsUrl(apiKey: string): string {
-  const q = new URLSearchParams({ apiKey, regions: 'us', markets: 'h2h', oddsFormat: 'american' })
+  const q = new URLSearchParams({ apiKey, regions: ODDS_REGIONS, markets: 'h2h', oddsFormat: 'american' })
   return `https://api.the-odds-api.com/v4/sports/${SPORT_KEY}/odds?${q.toString()}`
 }
 
@@ -38,15 +53,30 @@ export function placeholderFighter(name: string, record = '—'): Fighter {
   }
 }
 
-export function extractBooks(event: OddsEvent): BookLine[] {
-  const lines: BookLine[] = []
+const rankOf = (key: string): number => {
+  const i = PREFERRED_BOOKS.indexOf(key)
+  return i === -1 ? PREFERRED_BOOKS.length : i
+}
+
+/** Valid two-way quotes from at most `limit` bookmakers (preferred ones first), sorted by name. */
+export function extractBooks(event: OddsEvent, limit = MAX_BOOKS): BookLine[] {
+  const quotes: { key: string; line: BookLine }[] = []
+  const seen = new Set<string>()
   for (const bm of event.bookmakers ?? []) {
+    if (seen.has(bm.key)) continue
     const market = bm.markets?.find((m) => m.key === 'h2h')
     const a = market?.outcomes.find((o) => o.name === event.home_team)?.price
     const b = market?.outcomes.find((o) => o.name === event.away_team)?.price
-    if (validAmerican(a) && validAmerican(b)) lines.push({ book: bm.title, a, b })
+    if (validAmerican(a) && validAmerican(b)) {
+      seen.add(bm.key)
+      quotes.push({ key: bm.key, line: { book: bm.title, a, b } })
+    }
   }
-  return lines.sort((x, y) => x.book.localeCompare(y.book))
+  return quotes
+    .sort((x, y) => rankOf(x.key) - rankOf(y.key) || x.line.book.localeCompare(y.line.book))
+    .slice(0, limit)
+    .map((q) => q.line)
+    .sort((x, y) => x.book.localeCompare(y.book))
 }
 
 export function mapEvents(

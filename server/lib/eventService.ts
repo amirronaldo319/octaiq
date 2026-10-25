@@ -48,10 +48,10 @@ export function createEventService(deps: EventServiceDeps): { getEvent: () => Pr
             try {
               return deps.resultsModel(fights.map((f) => ({ id: f.id, a: f.a.name, b: f.b.name, date: eventDate, rounds: f.rounds, weightClass: f.weightClass })))
             } catch {
-              return { status: 'unavailable' as const, reason: 'The results model failed to run; see the server log.', version: 'octa-results-lr-0.1', bouts: {} }
+              return { status: 'unavailable' as const, reason: 'The results model failed to run; see the server log.', version: 'octa-results-lr-0.2', bouts: {} }
             }
           })()
-        : { status: 'unavailable', reason: 'Not configured.', version: 'octa-results-lr-0.1', bouts: {} }
+        : { status: 'unavailable', reason: 'Not configured.', version: 'octa-results-lr-0.2', bouts: {} }
       return {
         event: file.event,
         snapshot: {
