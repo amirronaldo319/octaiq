@@ -70,3 +70,15 @@ What is and is not verified:
 - **What it is not:** the file does not say which bookmaker, or whether prices are opening, closing or best-available, so it is an as-recorded market price rather than a verified closing line. Coverage ends March 2020.
 - **Method:** prices are joined only after predictions exist and never enter features. Intervals are 95% event-level bootstrap. A walk-forward blend (fit on earlier years only) tests whether the model adds information beyond the price.
 - **Other sources I checked:** The Odds API sells historical snapshots from June 2020 (paid; its terms allow storing the data and using it to train models), but MMA historical coverage is not documented, so it is not wired in. UFCalendar exposes closing consensus lines per settled bout with no documented history depth, and its terms forbid use for regulated betting operations. jansen88/ufc-data has odds but no license, so it is not used.
+
+## License and third-party terms
+
+OctaIQ's own code is released under the [MIT License](LICENSE).
+
+That license covers this repository only. Data the app downloads or calls keeps its own terms, and none of it is bundled here:
+
+- **Stats data** from [Greco1899/scrape_ufc_stats](https://github.com/Greco1899/scrape_ufc_stats) is downloaded at run time (the repository declares GPL-3.0; its data is scraped from ufcstats.com, whose terms I could not review).
+- **Historical odds** from [OpenML 43464](https://www.openml.org/d/43464) are CC BY 4.0: attribution is given in the section above.
+- **The Odds API** and **UFCalendar** are used with your own keys and are subject to their terms (for example, UFCalendar forbids redistributing its data and forbids use for regulated betting operations).
+
+OctaIQ is a research tool, not betting advice. See the Model health tab: on past fights the bundled models were less accurate than betting prices.
