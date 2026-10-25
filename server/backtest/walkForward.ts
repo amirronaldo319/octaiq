@@ -2,6 +2,7 @@ import type { Bout, FighterProfile } from './dataset.ts'
 import { buildFeatureRows, FEATURE_NAMES, STATS_FEATURES } from './features.ts'
 import { bootstrapLogLoss, logLossOne, metrics, type EventAgg, type Interval, type Metrics } from './metrics.ts'
 import { applyTemperature, eloProb, fitTemperature, predictLogistic, trainLogistic } from './models.ts'
+import { evaluateOutcomes, type OutcomeReport } from './outcomes.ts'
 
 export interface BacktestOptions {
   firstTestYear: number
@@ -88,6 +89,8 @@ export interface BacktestReport {
   experienced: { label: string; models: { id: string; n: number; logLoss: number; accuracy: number }[] }[]
   calibration: { rows: number; lrLogLoss: number; calibratedLogLoss: number; diff: Interval; temperatures: number[] } | null
   folds: FoldInfo[]
+  /** Goes-the-distance, method and joint outcome models versus base rates; null when skipped */
+  outcomes: OutcomeReport | null
   featureWeights: { name: string; weight: number }[]
 }
 
@@ -271,6 +274,10 @@ export function runBacktest(
   }
 
   const primary: 'lr' | 'lrStats' = statsAdopted ? 'lrStats' : 'lr'
+  const pByBout = new Map(predictions.map((p) => [p.id, primary === 'lrStats' ? p.lrStats : p.lr]))
+  const outcomes = opts.bootstrap > 0
+    ? evaluateOutcomes(rows, pByBout, { firstTestYear: opts.firstTestYear, ridge: opts.ridge, bootstrap: opts.bootstrap, seed: opts.seed })
+    : null
   const names = (keep: number[], w: number[]): { name: string; weight: number }[] =>
     keep.map((i, j) => ({ name: FEATURE_NAMES[i], weight: w[j] ?? NaN }))
   return {
@@ -288,7 +295,7 @@ export function runBacktest(
         testScored: predictions.length,
         testPeriod: `${years[0]}-${years[years.length - 1]}`,
       },
-      models, statsVsResults, statsAdopted, primary, byYear, experienced, calibration, folds,
+      models, statsVsResults, statsAdopted, primary, byYear, experienced, calibration, folds, outcomes,
       featureWeights: primary === 'lrStats' ? names(keepStats, lastStatsWeights) : names(keepResults, lastResultsWeights),
     },
   }

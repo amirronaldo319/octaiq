@@ -53,6 +53,20 @@ export function formatReport(out: BacktestOutput): string {
     lines.push(`MARKET BASELINE unavailable. ${out.marketNote ?? ''}`)
   }
   lines.push('')
+  if (out.report.outcomes) {
+    const o = out.report.outcomes
+    const row = (label: string, m: typeof o.distance): string => `  ${label.padEnd(26)} n=${String(m.n).padStart(5)}  logloss ${f(m.logLoss.estimate)} vs base ${f(m.baselineLogLoss)}  gain ${sign(m.gain)}  acc ${f(m.accuracy, 3)} vs ${f(m.baselineAccuracy, 3)}`
+    lines.push(`Outcome models (${o.period}), each against the base rate:`)
+    lines.push(row('Goes the distance', o.distance))
+    lines.push(row('KO share of finishes', o.koShare))
+    lines.push(row('Joint winner and method', o.joint))
+    lines.push('')
+  }
+  if (out.recentEvents.length > 0) {
+    lines.push('Last events, graded after the fact (picks made before each event):')
+    for (const e of out.recentEvents) lines.push(`  ${e.date}  ${e.event.padEnd(46)} ${e.bouts.filter((b) => b.correct).length}/${e.bouts.length} correct, logloss ${f(e.logLoss, 3)}`)
+    lines.push('')
+  }
   lines.push('Interpretation limits: features are fight results plus rolling fight statistics (no odds, styles, injuries or camp news);')
   lines.push('the market comparison covers only bouts with matched prices (to March 2020);')
   lines.push('fighters are matched by name; a lower log loss than Elo is evidence about this model on this data, not a betting edge.')

@@ -137,7 +137,7 @@ describe('results model service', () => {
     const out: BacktestOutput = {
       generatedAt: '2030-01-01T00:00:00Z',
       dataset: { source: 'https://github.com/Greco1899/scrape_ufc_stats', license: 'GPL-3.0', upstream: 'test', retrievedAt: '2030-01-01T00:00:00Z', files: [] },
-      ingest: stats, report, predictionCount: predictions.length, ablations: [], market: null, oddsDataset: null,
+      ingest: stats, report, predictionCount: predictions.length, ablations: [], market: null, oddsDataset: null, recentEvents: [],
     }
     mkdirSync(join(root, 'data/reports'), { recursive: true })
     writeFileSync(join(root, 'data/reports/backtest-latest.json'), JSON.stringify(out))
@@ -157,7 +157,7 @@ describe('results model service', () => {
     const base: Omit<BacktestOutput, 'report'> = {
       generatedAt: '2030-01-01T00:00:00Z',
       dataset: { source: 'https://github.com/Greco1899/scrape_ufc_stats', license: 'GPL-3.0', upstream: 'test', retrievedAt: '2030-01-01T00:00:00Z', files: [] },
-      ingest: stats, predictionCount: predictions.length, ablations: [], market: null, oddsDataset: null,
+      ingest: stats, predictionCount: predictions.length, ablations: [], market: null, oddsDataset: null, recentEvents: [],
     }
     const write = (primary: 'lr' | 'lrStats'): void =>
       writeFileSync(join(root, 'data/reports/backtest-latest.json'), JSON.stringify({ ...base, report: { ...report, primary, statsAdopted: primary === 'lrStats' } }))

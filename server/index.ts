@@ -3,7 +3,7 @@ import { createServer, type ServerResponse } from 'node:http'
 import { extname, join, normalize, resolve, sep } from 'node:path'
 import { parseFighterCsv } from './lib/csv.ts'
 import { createResultsModelService } from './backtest/resultsModel.ts'
-import { createEventService } from './lib/eventService.ts'
+import { createEventCatalog } from './lib/eventService.ts'
 import { createFileCache } from './lib/fighterCache.ts'
 import { createFileHistory } from './lib/history.ts'
 import { combineProviders, type FighterProvider } from './lib/providers.ts'
@@ -47,8 +47,8 @@ const service = createCardService({
 })
 
 const resultsModel = createResultsModelService(ROOT)
-const events = createEventService({
-  eventPath: resolve(ROOT, process.env.EVENT_FILE ?? 'data/events/ufc-vegas-123.json'),
+const events = createEventCatalog({
+  dir: resolve(ROOT, 'data/events'),
   cards: service,
   loadFighters,
   history,
@@ -105,10 +105,18 @@ createServer((req, res) => {
     )
     return
   }
+  if (url.pathname === '/api/events') {
+    try {
+      sendJson(res, 200, events.getIndex())
+    } catch {
+      sendJson(res, 500, { error: 'No valid event files. Check data/events/.' })
+    }
+    return
+  }
   if (url.pathname === '/api/event') {
-    events.getEvent().then(
+    events.getEvent(url.searchParams.get('id') ?? undefined).then(
       (payload) => sendJson(res, 200, payload),
-      () => sendJson(res, 500, { error: 'Event file is missing or invalid. Check data/events/ and the server log.' }),
+      (err: unknown) => sendJson(res, err instanceof Error && err.message.startsWith('Unknown event') ? 404 : 500, { error: 'Event not found or its file is invalid.' }),
     )
     return
   }

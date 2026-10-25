@@ -1,20 +1,29 @@
 import { useEffect, useMemo, useState } from 'react'
+import type { Career } from '../server/backtest/careers'
 import { AboutData, Hero } from './components/Hero'
 import { BankrollView } from './components/BankrollView'
 import { BoutCard } from './components/BoutCard'
 import { BoutModal } from './components/BoutModal'
+import { EventPicker } from './components/EventPicker'
 import { FightDetail } from './components/FightDetail'
+import { FighterPanel } from './components/FighterPanel'
 import { Highlights } from './components/Highlights'
 import { ModelHealth } from './components/ModelHealth'
 import { ParlayView, type ParlayEntry } from './components/ParlayView'
+import { TrackRecord } from './components/TrackRecord'
 import { ValueView } from './components/ValueView'
 import { analyzeCard, findValue, type FightAnalysis, type SideAnalysis } from './lib/analysis'
 import { loadBets, saveBets, type Bet, type BetStatus } from './lib/bets'
+import { withBase } from './lib/fetchJson'
 import { fmtOdds } from './lib/format'
-import { buildHighlights, primaryView, SORT_LABELS, sortRows, type SortKey } from './lib/primary'
+import { isMarketFile, marketFor, type MarketFile } from './lib/market'
+import { buildHighlights, primaryView, SORT_LABELS, sortRows, type SortKey, type ViewMode } from './lib/primary'
+import { shareUrl, useRoute, type Tab } from './lib/route'
+import { slugify } from './lib/slug'
+import { useTheme } from './lib/theme'
 import { useCard } from './lib/useCard'
+import { useJson } from './lib/useJson'
 
-type Tab = 'event' | 'health' | 'value' | 'parlay' | 'bankroll'
 type Filter = 'all' | 'main' | 'prelim'
 
 const FILTERS: { id: Filter; label: string }[] = [
@@ -22,6 +31,8 @@ const FILTERS: { id: Filter; label: string }[] = [
   { id: 'main', label: 'Main card' },
   { id: 'prelim', label: 'Prelims' },
 ]
+
+const isCareers = (b: unknown): boolean => typeof b === 'object' && b !== null && !Array.isArray(b)
 
 function DataBanner({ card }: { card: ReturnType<typeof useCard> }) {
   if (card.loading) return null
@@ -57,11 +68,13 @@ function Skeleton() {
 }
 
 export function App() {
-  const [tab, setTab] = useState<Tab>('event')
-  const card = useCard()
-  const [openId, setOpenId] = useState<string | null>(null)
+  const [route, go] = useRoute()
+  const [theme, toggleTheme] = useTheme()
+  const tab: Tab = route.tab
+  const card = useCard(route.eventId)
   const [filter, setFilter] = useState<Filter>('all')
   const [sortKey, setSortKey] = useState<SortKey>('order')
+  const [mode, setMode] = useState<ViewMode>('market')
   const [aboutOpen, setAboutOpen] = useState(false)
   const [bets, setBets] = useState<Bet[]>(() => loadBets())
   const [legs, setLegs] = useState<ParlayEntry[]>([])
@@ -74,21 +87,26 @@ export function App() {
   const event = card.source === 'event' ? card.event : null
   const isStatic = event?.static === true
   const results = event?.resultsModel
+  const careers = useJson<Record<string, Career>>(route.fighter ? [withBase('data/fighters.json')] : null, isCareers)
+  const marketState = useJson<MarketFile>([withBase('data/market.json')], isMarketFile)
+  const marketFile = marketState.status === 'ready' ? marketState.data : undefined
+  const hasMarket = Boolean(card.eventId && marketFile && Object.keys(marketFile.events[card.eventId] ?? {}).length > 0)
 
   const analyses = useMemo(() => analyzeCard(card.fights, kellyScale), [card.fights, kellyScale])
   const rows = useMemo(
     () => analyses.map((an) => {
       const r = results?.bouts[an.fight.id]
-      const view = primaryView(an, r)
+      const m = marketFor(marketFile, card.eventId, an.fight.id)
+      const view = primaryView(an, r, m, mode)
       return {
-        an, view, r,
+        an, view, r, m,
         order: an.fight.bout?.order ?? analyses.indexOf(an) + 1,
         hasModel: view.source !== 'none',
         probA: view.probA,
         thinnest: r ? Math.min(r.priorA, r.priorB) : null,
       }
     }),
-    [analyses, results],
+    [analyses, results, marketFile, card.eventId, mode],
   )
   const featured = rows.find((x) => x.an.fight.mainEvent) ?? null
   const visible = useMemo(() => {
@@ -102,11 +120,13 @@ export function App() {
     [rows],
   )
   const opportunities = useMemo(() => findValue(analyses, minEdge), [analyses, minEdge])
-  const opened: FightAnalysis | undefined = analyses.find((a) => a.fight.id === openId)
-  const openedRow = rows.find((x) => x.an.fight.id === openId)
+  const opened: FightAnalysis | undefined = route.boutId ? analyses.find((a) => a.fight.id === route.boutId) : undefined
+  const openedRow = route.boutId ? rows.find((x) => x.an.fight.id === route.boutId) : undefined
+  const currentEventId = card.eventId ?? route.eventId
 
   const tabs: { id: Tab; label: string }[] = [
     { id: 'event', label: event ? 'Event' : 'Fight card' },
+    { id: 'record', label: 'Track record' },
     ...(isStatic ? [] : [
       { id: 'value' as const, label: `Value board${opportunities.length ? ` (${opportunities.length})` : ''}` },
       { id: 'parlay' as const, label: `Parlay${legs.length ? ` (${legs.length})` : ''}` },
@@ -122,9 +142,25 @@ export function App() {
     return () => clearTimeout(id)
   }, [toast])
 
+  const eventRoute = (extra: { boutId?: string; fighter?: string } = {}) => ({ tab: 'event' as const, eventId: currentEventId ?? undefined, ...extra })
+  const openBout = (id: string): void => go(eventRoute({ boutId: id }))
+  const closeAll = (): void => go(eventRoute())
+  const openFighter = (slug: string): void => go(eventRoute({ boutId: route.boutId, fighter: slug }))
+  const closeFighter = (): void => go(eventRoute({ boutId: route.boutId }))
+
   const goAbout = (): void => {
     setAboutOpen(true)
     requestAnimationFrame(() => document.getElementById('about')?.scrollIntoView({ behavior: 'smooth', block: 'start' }))
+  }
+
+  const copyLink = async (): Promise<void> => {
+    const url = shareUrl(eventRoute({ boutId: route.boutId }))
+    try {
+      await navigator.clipboard.writeText(url)
+      setToast('Link copied')
+    } catch {
+      setToast(url)
+    }
   }
 
   const logBet = (side: SideAnalysis, fightLabel: string): void => {
@@ -159,37 +195,48 @@ export function App() {
   }
   const deleteBet = (id: string): void => setBets((prev) => prev.filter((b) => b.id !== id))
 
+  const fighterName = route.fighter
+    ? (careers.status === 'ready' ? careers.data[route.fighter]?.name : undefined) ??
+      analyses.flatMap((a) => [a.fight.a.name, a.fight.b.name]).find((n) => slugify(n) === route.fighter) ?? route.fighter
+    : ''
+
   return (
     <div className="app">
+      <a className="skip" href="#main">Skip to content</a>
       <header className="topbar">
-        <a className="brand" href="./" aria-label="OctaIQ home">
+        <a className="brand" href={withBase('')} onClick={(e) => { e.preventDefault(); go({ tab: 'event' }) }} aria-label="OctaIQ home">
           <span className="logo" aria-hidden="true" />
           <span className="brand-name">OctaIQ</span>
         </a>
         <nav aria-label="Sections">
           {tabs.map((t) => (
-            <button key={t.id} type="button" className={`tab ${tab === t.id ? 'active' : ''}`} aria-current={tab === t.id ? 'page' : undefined} onClick={() => setTab(t.id)}>
+            <button key={t.id} type="button" className={`tab ${tab === t.id ? 'active' : ''}`} aria-current={tab === t.id ? 'page' : undefined}
+              onClick={() => go(t.id === 'event' ? eventRoute() : { tab: t.id })}>
               {t.label}
             </button>
           ))}
         </nav>
+        <button type="button" className="theme-toggle" onClick={toggleTheme} aria-pressed={theme === 'light'}>
+          {theme === 'light' ? 'Dark theme' : 'Light theme'}
+        </button>
         <a className="gh" href="https://github.com/amirronaldo319/octaiq" target="_blank" rel="noopener noreferrer">Source on GitHub</a>
       </header>
 
       <DataBanner card={card} />
 
-      <main>
+      <main id="main">
         {tab === 'event' && (
           card.loading ? <Skeleton /> : (
             <>
-              {event && <Hero payload={event} onAbout={goAbout} />}
-              {event && <AboutData payload={event} open={aboutOpen} onToggle={setAboutOpen} />}
+              {event && <EventPicker events={card.events} selectedId={card.eventId} onSelect={(id) => go({ tab: 'event', eventId: id })} />}
+              {event && <Hero payload={event} onAbout={goAbout} marketUpdated={hasMarket ? marketFile?.generatedAt : undefined} />}
+              {event && <AboutData payload={event} open={aboutOpen} onToggle={setAboutOpen} marketAttribution={hasMarket ? marketFile?.attribution : undefined} />}
               {!event && <h1 className="plain-title">{card.source === 'demo' ? 'Demo fight card' : 'Live fight card'}</h1>}
 
-              {event && <Highlights items={highlights} onOpen={setOpenId} />}
+              {event && <Highlights items={highlights} onOpen={openBout} />}
 
               {featured && filter !== 'prelim' && (
-                <BoutCard analysis={featured.an} view={featured.view} results={featured.r} featured onOpen={setOpenId} />
+                <BoutCard analysis={featured.an} view={featured.view} results={featured.r} market={featured.m} featured onOpen={openBout} />
               )}
 
               <div className="toolbar">
@@ -200,6 +247,16 @@ export function App() {
                     </button>
                   ))}
                 </div>
+                {hasMarket && (
+                  <div className="chips" role="group" aria-label="Headline probabilities">
+                    <span className="muted small">Headline numbers</span>
+                    {(['market', 'model'] as const).map((m) => (
+                      <button key={m} type="button" className={`chip ${mode === m ? 'on' : ''}`} aria-pressed={mode === m} onClick={() => setMode(m)}>
+                        {m === 'market' ? 'Betting market' : 'Model'}
+                      </button>
+                    ))}
+                  </div>
+                )}
                 <label className="sort">
                   <span>Sort</span>
                   <select value={sortKey} onChange={(e) => setSortKey(e.target.value as SortKey)}>
@@ -212,13 +269,14 @@ export function App() {
                 <p className="empty">No bouts match this filter.</p>
               ) : (
                 <div className="grid">
-                  {visible.map((x) => <BoutCard key={x.an.fight.id} analysis={x.an} view={x.view} results={x.r} onOpen={setOpenId} />)}
+                  {visible.map((x) => <BoutCard key={x.an.fight.id} analysis={x.an} view={x.view} results={x.r} market={x.m} onOpen={openBout} />)}
                 </div>
               )}
             </>
           )
         )}
 
+        {tab === 'record' && <TrackRecord />}
         {tab === 'health' && <ModelHealth />}
 
         {tab === 'value' && (
@@ -238,9 +296,21 @@ export function App() {
         <p>OctaIQ is a research project, not betting advice. In past tests, betting prices were more accurate than this model. Please gamble responsibly.</p>
       </footer>
 
-      {opened && openedRow && (
-        <BoutModal title={`${opened.fight.a.name} versus ${opened.fight.b.name}`} onClose={() => setOpenId(null)}>
-          <FightDetail analysis={opened} view={openedRow.view} results={openedRow.r} resultsMeta={results} isStatic={isStatic} onBet={logBet} onAddLeg={addLeg} />
+      {tab === 'event' && route.fighter && (
+        <BoutModal title={`${fighterName}: career and rating history`} onClose={route.boutId ? closeFighter : closeAll}>
+          <FighterPanel
+            name={fighterName}
+            status={careers.status === 'ready' ? 'ready' : careers.status === 'missing' ? 'missing' : 'loading'}
+            career={careers.status === 'ready' ? careers.data[route.fighter] : undefined}
+            onBack={route.boutId ? closeFighter : undefined}
+            backLabel="Back to the bout"
+          />
+        </BoutModal>
+      )}
+      {tab === 'event' && !route.fighter && opened && openedRow && (
+        <BoutModal title={`${opened.fight.a.name} versus ${opened.fight.b.name}`} onClose={closeAll}>
+          <FightDetail analysis={opened} view={openedRow.view} results={openedRow.r} resultsMeta={results} market={openedRow.m} marketUpdated={marketFile?.generatedAt} isStatic={isStatic}
+            onFighter={openFighter} onShare={copyLink} onBet={logBet} onAddLeg={addLeg} />
         </BoutModal>
       )}
       <div className="toast" role="status" aria-live="polite">{toast}</div>

@@ -1,14 +1,22 @@
 import type { ResultsModel, ResultsModelBout } from '../engine/eventTypes'
+import type { MarketBout } from './market'
 import type { FightAnalysis } from './analysis'
 
 /** Which model's probability a bout card shows. The backtested model wins when it exists. */
 export interface PrimaryView {
-  source: 'validated' | 'baseline' | 'none'
+  source: 'validated' | 'baseline' | 'market' | 'none'
   probA: number
   probB: number
 }
 
-export function primaryView(an: FightAnalysis, results?: ResultsModelBout): PrimaryView {
+export type ViewMode = 'market' | 'model'
+
+/**
+ * The probability a card headlines. With betting prices available and the market view chosen it is the
+ * market consensus; otherwise the backtested model, then the untested baseline.
+ */
+export function primaryView(an: FightAnalysis, results?: ResultsModelBout, market?: MarketBout, mode: ViewMode = 'model'): PrimaryView {
+  if (market && mode === 'market') return { source: 'market', probA: market.pA, probB: 1 - market.pA }
   if (results) return { source: 'validated', probA: results.probA, probB: results.probB }
   if (an.modelValid) return { source: 'baseline', probA: an.prediction.probA, probB: an.prediction.probB }
   return { source: 'none', probA: 0.5, probB: 0.5 }

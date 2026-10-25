@@ -27,6 +27,8 @@ export interface Fighter {
   cardio: number
   /** Days since last fight */
   layoffDays: number
+  /** Official UFC ranking in the division, when listed */
+  rank?: number
 }
 
 export interface Fight {

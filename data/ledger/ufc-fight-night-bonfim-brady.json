@@ -1,0 +1,237 @@
+{
+  "eventId": "ufc-fight-night-bonfim-brady",
+  "title": "UFC Fight Night: Bonfim vs. Brady",
+  "lockedAt": "2026-11-07T22:00:00Z",
+  "mainCardStart": "2026-11-08T01:00:00Z",
+  "entries": [
+    {
+      "recordedAt": "2026-10-25T17:36:28.975Z",
+      "model": "octa-results-stats-lr-0.1",
+      "dataThrough": "2026-10-17",
+      "cardVersion": 1,
+      "bouts": [
+        {
+          "id": "ufc-fight-night-bonfim-brady-1",
+          "a": "Gabriel Bonfim",
+          "b": "Sean Brady",
+          "probA": 0.4356,
+          "probLo": 0.4181,
+          "probHi": 0.4595,
+          "distance": 0.4122,
+          "joint": {
+            "aKo": 0.1726,
+            "aSub": 0.0835,
+            "aDec": 0.1796,
+            "bKo": 0.1424,
+            "bSub": 0.1893,
+            "bDec": 0.2326
+          }
+        },
+        {
+          "id": "ufc-fight-night-bonfim-brady-2",
+          "a": "Tatiana Suarez",
+          "b": "Virna Jandiroba",
+          "probA": 0.6774,
+          "probLo": 0.6518,
+          "probHi": 0.707,
+          "distance": 0.74,
+          "joint": {
+            "aKo": 0.0433,
+            "aSub": 0.1328,
+            "aDec": 0.5013,
+            "bKo": 0.0239,
+            "bSub": 0.06,
+            "bDec": 0.2388
+          }
+        },
+        {
+          "id": "ufc-fight-night-bonfim-brady-3",
+          "a": "Davey Grant",
+          "b": "Elijah Smith",
+          "probA": 0.2108,
+          "probLo": 0.1807,
+          "probHi": 0.2495,
+          "distance": 0.5422,
+          "joint": {
+            "aKo": 0.0711,
+            "aSub": 0.0255,
+            "aDec": 0.1143,
+            "bKo": 0.1217,
+            "bSub": 0.2396,
+            "bDec": 0.4279
+          }
+        },
+        {
+          "id": "ufc-fight-night-bonfim-brady-4",
+          "a": "Seokhyeon Ko",
+          "b": "Wellington Turman",
+          "probA": 0.7523,
+          "probLo": 0.718,
+          "probHi": 0.789,
+          "distance": 0.5984,
+          "joint": {
+            "aKo": 0.2121,
+            "aSub": 0.09,
+            "aDec": 0.4502,
+            "bKo": 0.0553,
+            "bSub": 0.0442,
+            "bDec": 0.1482
+          }
+        },
+        {
+          "id": "ufc-fight-night-bonfim-brady-5",
+          "a": "Mantas Kondratavičius",
+          "b": "Andre Petroski",
+          "probA": 0.753,
+          "probLo": 0.7229,
+          "probHi": 0.7859,
+          "distance": 0.4776,
+          "joint": {
+            "aKo": 0.3096,
+            "aSub": 0.0837,
+            "aDec": 0.3597,
+            "bKo": 0.0712,
+            "bSub": 0.0578,
+            "bDec": 0.118
+          }
+        },
+        {
+          "id": "ufc-fight-night-bonfim-brady-6",
+          "a": "Billy Elekana",
+          "b": "Lucas Fernando",
+          "probA": 0.296,
+          "probLo": 0.2543,
+          "probHi": 0.3355,
+          "distance": 0.3308,
+          "joint": {
+            "aKo": 0.0975,
+            "aSub": 0.1005,
+            "aDec": 0.0979,
+            "bKo": 0.3435,
+            "bSub": 0.1276,
+            "bDec": 0.2329
+          }
+        },
+        {
+          "id": "ufc-fight-night-bonfim-brady-7",
+          "a": "Gabriel Lorenco",
+          "b": "Alvin Hines",
+          "probA": 0.6173,
+          "probLo": 0.5827,
+          "probHi": 0.657,
+          "distance": 0.3707,
+          "joint": {
+            "aKo": 0.3003,
+            "aSub": 0.0882,
+            "aDec": 0.2288,
+            "bKo": 0.1812,
+            "bSub": 0.0596,
+            "bDec": 0.1419
+          }
+        },
+        {
+          "id": "ufc-fight-night-bonfim-brady-8",
+          "a": "Karine Silva",
+          "b": "Gabriella Fernandes",
+          "probA": 0.692,
+          "probLo": 0.6592,
+          "probHi": 0.7252,
+          "distance": 0.6602,
+          "joint": {
+            "aKo": 0.0713,
+            "aSub": 0.1638,
+            "aDec": 0.4568,
+            "bKo": 0.0431,
+            "bSub": 0.0616,
+            "bDec": 0.2034
+          }
+        },
+        {
+          "id": "ufc-fight-night-bonfim-brady-9",
+          "a": "Jose Delano",
+          "b": "Murtazali Magomedov",
+          "probA": 0.4768,
+          "probLo": 0.4415,
+          "probHi": 0.5048,
+          "distance": 0.5197,
+          "joint": {
+            "aKo": 0.1532,
+            "aSub": 0.0758,
+            "aDec": 0.2478,
+            "bKo": 0.1024,
+            "bSub": 0.1489,
+            "bDec": 0.2719
+          }
+        },
+        {
+          "id": "ufc-fight-night-bonfim-brady-10",
+          "a": "Keiichiro Nakamura",
+          "b": "Ollie Schmid",
+          "probA": 0.5498,
+          "probLo": 0.5103,
+          "probHi": 0.5817,
+          "distance": 0.4387,
+          "joint": {
+            "aKo": 0.2547,
+            "aSub": 0.0539,
+            "aDec": 0.2412,
+            "bKo": 0.1575,
+            "bSub": 0.0952,
+            "bDec": 0.1975
+          }
+        },
+        {
+          "id": "ufc-fight-night-bonfim-brady-11",
+          "a": "Austin Bashi",
+          "b": "Lucas Brennan",
+          "probA": 0.6324,
+          "probLo": 0.6135,
+          "probHi": 0.6531,
+          "distance": 0.6104,
+          "joint": {
+            "aKo": 0.1184,
+            "aSub": 0.128,
+            "aDec": 0.386,
+            "bKo": 0.0917,
+            "bSub": 0.0515,
+            "bDec": 0.2244
+          }
+        },
+        {
+          "id": "ufc-fight-night-bonfim-brady-12",
+          "a": "Priscila Cachoeira",
+          "b": "Nina Milošević",
+          "probA": 0.1005,
+          "probLo": 0.0841,
+          "probHi": 0.1273,
+          "distance": 0.4752,
+          "joint": {
+            "aKo": 0.0442,
+            "aSub": 0.0086,
+            "aDec": 0.0478,
+            "bKo": 0.2479,
+            "bSub": 0.2241,
+            "bDec": 0.4274
+          }
+        },
+        {
+          "id": "ufc-fight-night-bonfim-brady-13",
+          "a": "Jonny Parsons",
+          "b": "José Souza",
+          "probA": 0.4419,
+          "probLo": 0.4046,
+          "probHi": 0.4806,
+          "distance": 0.4595,
+          "joint": {
+            "aKo": 0.1856,
+            "aSub": 0.0532,
+            "aDec": 0.2031,
+            "bKo": 0.2086,
+            "bSub": 0.0931,
+            "bDec": 0.2565
+          }
+        }
+      ]
+    }
+  ]
+}

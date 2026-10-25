@@ -6,6 +6,7 @@ import { compareWithMarket, type MarketReport } from './market.ts'
 import { fetchOddsDataset, matchOdds, ODDS_SOURCE, parseOddsArff, type OddsManifest } from './oddsData.ts'
 import { formatReport } from './format.ts'
 import type { Ablation, BacktestOutput } from './types.ts'
+import { recentEventResults } from './recent.ts'
 import { runBacktest } from './walkForward.ts'
 
 const ROOT = resolve(import.meta.dirname, '../..')
@@ -76,7 +77,8 @@ try {
   marketNote = `Market comparison skipped: ${err instanceof Error ? err.message : 'unknown error'}`
 }
 
-const output: BacktestOutput = { generatedAt: new Date().toISOString(), dataset: manifest, ingest: stats, report, predictionCount: predictions.length, ablations, market, oddsDataset, marketNote }
+const recentEvents = recentEventResults(bouts, predictions, report.primary, 6)
+const output: BacktestOutput = { generatedAt: new Date().toISOString(), dataset: manifest, ingest: stats, report, predictionCount: predictions.length, ablations, market, oddsDataset, marketNote, recentEvents }
 mkdirSync(resolve(ROOT, 'data/reports'), { recursive: true })
 writeFileSync(OUT, JSON.stringify(output, null, 2))
 console.info(formatReport(output))

@@ -1,6 +1,7 @@
 import type { IngestStats } from './dataset.ts'
 import type { Manifest } from './fetchDataset.ts'
 import type { MarketReport } from './market.ts'
+import type { RecentEvent } from './recent.ts'
 import type { OddsManifest } from './oddsData.ts'
 import type { BacktestReport } from './walkForward.ts'
 
@@ -16,6 +17,8 @@ export interface BacktestOutput {
   /** Model versus betting-market prices on matched bouts; null when the odds dataset is unavailable */
   market: MarketReport | null
   oddsDataset: OddsManifest | null
+  /** The last few test events with each pick and its result (retrospective, from the walk-forward) */
+  recentEvents: RecentEvent[]
   /** Why the market comparison is missing, when it is */
   marketNote?: string
 }

@@ -1,0 +1,169 @@
+{
+  "event": {
+    "id": "ufc-fight-night-prochazka-stirling",
+    "title": "UFC Fight Night: Procházka vs. Stirling",
+    "alias": "UFC Fight Night, Nov 21",
+    "venue": "ABHA Arena",
+    "city": "Doha, Qatar",
+    "timeZone": "Asia/Qatar",
+    "prelimsStart": "2026-11-21T15:00:00Z",
+    "mainCardStart": "2026-11-21T18:00:00Z",
+    "timesNote": "9:00 AM and 12:00 PM CST on ufc.com. The page does not group bouts into main card and prelims, so the split here is its order, not an official placement.",
+    "officialUrl": "https://www.ufc.com/event/ufc-fight-night-november-21-2026"
+  },
+  "snapshots": [
+    {
+      "version": 1,
+      "capturedAt": "2026-10-25T21:00:00Z",
+      "source": "Read from the official UFC event page on 2026-10-25: 9 bouts in a single list, no cancellation or replacement notices.",
+      "corroboration": "ufc.com does not state the number of rounds; five is assumed for main events and title bouts, three otherwise.",
+      "recordsSource": "Fighter records are not shown on the pages that were read, so records appear as a dash.",
+      "verification": {
+        "status": "official",
+        "checkedAt": "2026-10-25T21:00:00Z",
+        "url": "https://www.ufc.com/event/ufc-fight-night-november-21-2026",
+        "note": "Read by an automated fetch, not by a person. Cards change in fight week; re-check before relying on it."
+      },
+      "bouts": [
+        {
+          "order": 1,
+          "card": "main",
+          "weightClass": "Light Heavyweight",
+          "rounds": 5,
+          "a": {
+            "name": "Jiří Procházka",
+            "record": "—"
+          },
+          "b": {
+            "name": "Navajo Stirling",
+            "record": "—"
+          },
+          "notes": []
+        },
+        {
+          "order": 2,
+          "card": "main",
+          "weightClass": "Featherweight",
+          "rounds": 3,
+          "a": {
+            "name": "Aljamain Sterling",
+            "record": "—"
+          },
+          "b": {
+            "name": "Kevin Vallejos",
+            "record": "—"
+          },
+          "notes": [
+            "ufc.com does not say which bouts are on the main card; this order is the page's order."
+          ]
+        },
+        {
+          "order": 3,
+          "card": "main",
+          "weightClass": "Lightweight",
+          "rounds": 3,
+          "a": {
+            "name": "Dan Hooker",
+            "record": "—"
+          },
+          "b": {
+            "name": "Brian Ortega",
+            "record": "—"
+          },
+          "notes": []
+        },
+        {
+          "order": 4,
+          "card": "main",
+          "weightClass": "Middleweight",
+          "rounds": 3,
+          "a": {
+            "name": "Jared Cannonier",
+            "record": "—"
+          },
+          "b": {
+            "name": "Ikram Aliskerov",
+            "record": "—"
+          },
+          "notes": []
+        },
+        {
+          "order": 5,
+          "card": "main",
+          "weightClass": "Heavyweight",
+          "rounds": 3,
+          "a": {
+            "name": "Shamil Gaziev",
+            "record": "—"
+          },
+          "b": {
+            "name": "Tallison Teixeira",
+            "record": "—"
+          },
+          "notes": []
+        },
+        {
+          "order": 6,
+          "card": "prelim",
+          "weightClass": "Welterweight",
+          "rounds": 3,
+          "a": {
+            "name": "Jake Matthews",
+            "record": "—"
+          },
+          "b": {
+            "name": "Tahir Abdullayev",
+            "record": "—"
+          },
+          "notes": []
+        },
+        {
+          "order": 7,
+          "card": "prelim",
+          "weightClass": "Bantamweight",
+          "rounds": 3,
+          "a": {
+            "name": "Aleksandre Topuria",
+            "record": "—"
+          },
+          "b": {
+            "name": "Santiago Luna",
+            "record": "—"
+          },
+          "notes": []
+        },
+        {
+          "order": 8,
+          "card": "prelim",
+          "weightClass": "Flyweight",
+          "rounds": 3,
+          "a": {
+            "name": "Asu Almabayev",
+            "record": "—"
+          },
+          "b": {
+            "name": "Kyoji Horiguchi",
+            "record": "—"
+          },
+          "notes": []
+        },
+        {
+          "order": 9,
+          "card": "prelim",
+          "weightClass": "Flyweight",
+          "rounds": 3,
+          "a": {
+            "name": "Amir Albazi",
+            "record": "—"
+          },
+          "b": {
+            "name": "Alessandro Costa",
+            "record": "—"
+          },
+          "notes": []
+        }
+      ],
+      "unlisted": []
+    }
+  ]
+}

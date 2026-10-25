@@ -1,12 +1,37 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>OctaIQ</title>
+    <title>OctaIQ: UFC predictions you can check</title>
+    <meta name="description" content="Win probabilities, likely ranges and method odds for upcoming UFC cards, tested on past fights and against the betting market. Every pick is saved before the event and graded in public." />
+    <meta name="theme-color" content="#0a0e14" />
+    <link rel="icon" href="./icon.svg" type="image/svg+xml" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="OctaIQ" />
+    <meta property="og:title" content="OctaIQ: UFC predictions you can check" />
+    <meta property="og:description" content="Every pick is saved before the event and graded in public. Tested against past fights and the betting market." />
+    <meta property="og:url" content="https://amirronaldo319.github.io/octaiq/" />
+    <meta property="og:image" content="https://amirronaldo319.github.io/octaiq/og.jpg" />
+    <meta property="og:image:width" content="800" />
+    <meta property="og:image:height" content="420" />
+    <meta property="og:image:alt" content="OctaIQ: red corner against blue corner with a probability bar between them" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <script>
+      /* Set the theme before first paint so a light-theme visitor never sees a dark flash. */
+      (function () {
+        try {
+          var t = localStorage.getItem('octaiq.theme')
+          if (t !== 'light' && t !== 'dark') t = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'
+          document.documentElement.dataset.theme = t
+        } catch (e) {}
+      })()
+    </script>
   </head>
   <body>
     <div id="root"></div>
+    <noscript>OctaIQ needs JavaScript to show the fight card.</noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

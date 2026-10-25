@@ -1,6 +1,7 @@
 import { devig, probToAmerican } from '../../src/engine/odds.ts'
-import type { CardChange, EventFile, Snapshot, SnapshotBout } from '../../src/engine/eventTypes.ts'
+import type { CardChange, EventFile, EventSummary, Snapshot, SnapshotBout, Verification } from '../../src/engine/eventTypes.ts'
 import type { BookLine, Fight, Fighter } from '../../src/engine/types.ts'
+import { pickDefaultEvent } from '../../src/engine/pickEvent.ts'
 import { buildNameIndex, sameName } from './names.ts'
 import { extractBooks, placeholderFighter, type HistoryStore, type OddsEvent } from './oddsApi.ts'
 
@@ -17,13 +18,28 @@ function validateBout(raw: unknown, where: string): SnapshotBout {
   for (const [key, side] of [['a', a], ['b', b]] as const) {
     if (!isObject(side) || !isString(side.name)) throw new Error(`${where}: ${key}.name is required`)
   }
-  const side = (s: unknown): { name: string; record: string } => {
+  const side = (s: unknown): { name: string; record: string; rank?: number } => {
     const o = s as Record<string, unknown>
-    return { name: o.name as string, record: isString(o.record) ? o.record : '—' }
+    return {
+      name: o.name as string,
+      record: isString(o.record) ? o.record : '—',
+      ...(typeof o.rank === 'number' ? { rank: o.rank } : {}),
+    }
   }
   return {
     order, card, weightClass, rounds, a: side(a), b: side(b),
     notes: Array.isArray(notes) ? notes.filter(isString) : [],
+  }
+}
+
+function parseVerification(raw: unknown): Verification | undefined {
+  if (!isObject(raw)) return undefined
+  if (raw.status !== 'official' && raw.status !== 'unverified') throw new Error('verification.status must be "official" or "unverified"')
+  return {
+    status: raw.status,
+    ...(isString(raw.checkedAt) ? { checkedAt: raw.checkedAt } : {}),
+    ...(isString(raw.url) ? { url: raw.url } : {}),
+    ...(isString(raw.note) ? { note: raw.note } : {}),
   }
 }
 
@@ -47,6 +63,7 @@ export function parseEventFile(raw: unknown): EventFile {
     }
     return {
       version: s.version,
+      verification: parseVerification(s.verification),
       capturedAt: s.capturedAt,
       source: s.source,
       corroboration: isString(s.corroboration) ? s.corroboration : undefined,
@@ -72,6 +89,17 @@ export function diffSnapshots(prev: Snapshot, next: Snapshot): CardChange[] {
   const addedBouts = next.bouts.filter((b) => !prevKeys.has(pairKey(b)))
   const removedBouts = prev.bouts.filter((b) => !nextKeys.has(pairKey(b)))
   const meta = { fromVersion: prev.version, toVersion: next.version }
+
+  for (const [key, was] of prevKeys) {
+    const now = nextKeys.get(key)
+    if (now && now.card !== was.card) {
+      changes.push({
+        kind: 'placement-changed',
+        description: `${now.a.name} vs. ${now.b.name} moved from the ${was.card === 'main' ? 'main card' : 'prelims'} to the ${now.card === 'main' ? 'main card' : 'prelims'}`,
+        ...meta,
+      })
+    }
+  }
 
   const handledRemoved = new Set<SnapshotBout>()
   for (const added of addedBouts) {
@@ -133,8 +161,12 @@ export function buildEventFights({ file, snapshot, fighters, odds, history }: Bu
       const market = odds ? matchOdds(bout, odds) : null
       const books = market?.books ?? []
       const fairA = books.length ? books.map((l) => devig(l.a, l.b).a).reduce((s, v) => s + v, 0) / books.length : null
-      const side = (stats: Fighter | undefined, snap: SnapshotBout['a']): Fighter =>
-        stats ? { ...stats, name: snap.name, record: snap.record !== '—' ? snap.record : stats.record } : placeholderFighter(snap.name, snap.record)
+      const side = (stats: Fighter | undefined, snap: SnapshotBout['a']): Fighter => {
+        const base = stats
+          ? { ...stats, name: snap.name, record: snap.record !== '—' ? snap.record : stats.record }
+          : placeholderFighter(snap.name, snap.record)
+        return snap.rank !== undefined ? { ...base, rank: snap.rank } : base
+      }
       return {
         id: `${file.event.id}-${bout.order}`,
         weightClass: bout.weightClass,
@@ -150,3 +182,21 @@ export function buildEventFights({ file, snapshot, fighters, odds, history }: Bu
       }
     })
 }
+
+/** One picker row for an event file, using its latest snapshot. */
+export function summarizeEvent(file: EventFile): EventSummary {
+  const snap = latestSnapshot(file)
+  return {
+    id: file.event.id,
+    title: file.event.title,
+    alias: file.event.alias,
+    venue: file.event.venue,
+    city: file.event.city,
+    mainCardStart: file.event.mainCardStart,
+    timeZone: file.event.timeZone,
+    bouts: snap.bouts.length,
+    verification: snap.verification?.status ?? 'unverified',
+  }
+}
+
+export { pickDefaultEvent }

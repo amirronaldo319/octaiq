@@ -38,16 +38,26 @@ function solve(a: number[][], b: number[]): number[] {
 }
 
 /** L2-regularised logistic regression with no intercept, fitted by Newton's method. */
-export function trainLogistic(x: readonly number[][], y: readonly number[], lambda: number): LogisticModel {
+export interface TrainOptions {
+  /** Start from these (scaled-space) weights instead of zero, to converge in a few steps on resampled data */
+  init?: readonly number[]
+  /** Reuse feature scales, so weights from different resamples are comparable */
+  scales?: readonly number[]
+  maxIter?: number
+}
+
+export function trainLogistic(x: readonly number[][], y: readonly number[], lambda: number, opts: TrainOptions = {}): LogisticModel {
   if (x.length === 0) throw new Error('No training rows')
   const d = x[0].length
-  const scales = Array.from({ length: d }, (_, j) => {
-    const rms = Math.sqrt(x.reduce((s, row) => s + row[j] ** 2, 0) / x.length)
-    return rms > 1e-9 ? rms : 1
-  })
+  const scales = opts.scales
+    ? [...opts.scales]
+    : Array.from({ length: d }, (_, j) => {
+        const rms = Math.sqrt(x.reduce((s, row) => s + row[j] ** 2, 0) / x.length)
+        return rms > 1e-9 ? rms : 1
+      })
   const xs = x.map((row) => row.map((v, j) => v / scales[j]))
-  let w = new Array<number>(d).fill(0)
-  for (let iter = 0; iter < 30; iter++) {
+  let w: number[] = opts.init ? [...opts.init] : new Array<number>(d).fill(0)
+  for (let iter = 0; iter < (opts.maxIter ?? 30); iter++) {
     const grad = w.map((wj) => lambda * wj)
     const hess = Array.from({ length: d }, (_, i) => Array.from({ length: d }, (_, j) => (i === j ? lambda : 0)))
     for (let k = 0; k < xs.length; k++) {

@@ -1,6 +1,6 @@
 interface AvatarProps {
   name: string
-  corner: 'a' | 'b'
+  corner: 'a' | 'b' | 'n'
   size?: 'sm' | 'md' | 'lg'
 }
 

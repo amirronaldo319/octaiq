@@ -9,6 +9,15 @@ import { createRoot } from 'react-dom/client'
 import { App } from './App'
 import './styles.css'
 
+// Offline support: only in production builds, and only where service workers exist.
+if (import.meta.env.PROD && 'serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register(`${import.meta.env.BASE_URL}sw.js`).catch(() => {
+      /* The site works without it. */
+    })
+  })
+}
+
 const root = document.getElementById('root')
 if (!root) throw new Error('Root element #root not found')
 

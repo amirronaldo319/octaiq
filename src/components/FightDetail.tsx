@@ -1,9 +1,11 @@
-import type { ResultsModel, ResultsModelBout } from '../engine/eventTypes'
+import type { OutcomeCheck, ResultsModel, ResultsModelBout } from '../engine/eventTypes'
 import type { Fighter, Method } from '../engine/types'
 import type { FightAnalysis, SideAnalysis } from '../lib/analysis'
 import { fmtOdds, fmtPct, fmtSignedPct } from '../lib/format'
 import { agreementLabel, buildNarrative } from '../lib/narrative'
 import { accuracyStrip, leanOf, trustFor, type PrimaryView } from '../lib/primary'
+import { gapPoints, type MarketBout } from '../lib/market'
+import { slugify } from '../lib/slug'
 import { Avatar } from './Avatar'
 import { LineChart } from './LineChart'
 import { TugBar } from './TugBar'
@@ -13,7 +15,11 @@ interface FightDetailProps {
   view: PrimaryView
   results?: ResultsModelBout
   resultsMeta?: ResultsModel
+  market?: MarketBout
+  marketUpdated?: string
   isStatic: boolean
+  onFighter: (slug: string) => void
+  onShare: () => void
   onBet: (side: SideAnalysis, fightLabel: string) => void
   onAddLeg: (side: SideAnalysis, fightLabel: string) => void
 }
@@ -66,7 +72,13 @@ function Prediction({ analysis, view, results, meta }: { analysis: FightAnalysis
         <div className="pred-side a"><span>{fight.a.name}</span><strong>{pct0(view.probA)}</strong></div>
         <div className="pred-side b"><span>{fight.b.name}</span><strong>{pct0(view.probB)}</strong></div>
       </div>
-      <TugBar nameA={fight.a.name} nameB={fight.b.name} probA={view.probA} size="lg" />
+      <TugBar nameA={fight.a.name} nameB={fight.b.name} probA={view.probA} size="lg" lo={view.source === 'validated' ? results?.probLo : undefined} hi={view.source === 'validated' ? results?.probHi : undefined} />
+      {view.source === 'validated' && results?.probLo !== undefined && results.probHi !== undefined && (
+        <p className="range-note">
+          Likely range for {fight.a.name}: <strong>{pct0(results.probLo)} to {pct0(results.probHi)}</strong>. Shown as the pale band on the bar. It comes from
+          re-fitting the model on resampled history, so it reflects how much the answer depends on which past fights were used, not everything the model cannot see.
+        </p>
+      )}
 
       <p className="pred-sentence">
         <strong>{lean.label}{lean.label === 'Toss-up' ? '' : `: ${favored.name}`}.</strong>{' '}
@@ -114,6 +126,95 @@ function Prediction({ analysis, view, results, meta }: { analysis: FightAnalysis
         <p className="muted small">
           Trained on {meta?.trainedOn?.toLocaleString()} fights through {meta?.trainedThrough}. It sees results and per-minute fight statistics, not styles, injuries or camp news.
         </p>
+      )}
+    </section>
+  )
+}
+
+function MarketPanel({ analysis, results, market, updated, meta }: { analysis: FightAnalysis; results?: ResultsModelBout; market: MarketBout; updated?: string; meta?: ResultsModel }) {
+  const { fight } = analysis
+  const gap = results ? gapPoints(results.probA, market) : null
+  const bt = meta?.backtest?.market
+  const leans = gap === null ? null : Math.abs(gap) < 2 ? 'The model and the market agree.' : `The model gives ${gap > 0 ? fight.a.name : fight.b.name} ${Math.abs(gap).toFixed(0)} points more than the market does.`
+  return (
+    <section className="pred market-pred" aria-label="Betting market">
+      <div className="pred-head">
+        <h3>What the betting market says</h3>
+        <span className="pred-source">{market.books} bookmaker{market.books === 1 ? '' : 's'}{updated ? `, updated ${new Date(updated).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}` : ''}</span>
+      </div>
+      <div className="pred-split">
+        <div className="pred-side a"><span>{fight.a.name}</span><strong>{pct0(market.pA)}</strong></div>
+        <div className="pred-side b"><span>{fight.b.name}</span><strong>{pct0(1 - market.pA)}</strong></div>
+      </div>
+      <TugBar nameA={fight.a.name} nameB={fight.b.name} probA={market.pA} size="lg" lo={market.pLo} hi={market.pHi} />
+      <p className="range-note">
+        Consensus with the bookmakers’ margin removed. The pale band spans the lowest to highest single bookmaker ({pct0(market.pLo)} to {pct0(market.pHi)} for {fight.a.name}).
+      </p>
+      {leans && (
+        <p className="pred-sentence">
+          <strong>{leans}</strong>{' '}
+          {bt && `In past tests the market was the more accurate of the two (${(bt.marketAccuracy ?? 0) * 100 > 0 ? `${((bt.marketAccuracy ?? 0) * 100).toFixed(1)}% of winners against ${((bt.modelAccuracy ?? 0) * 100).toFixed(1)}%` : ''}), so where they differ, lean toward the market.`}
+        </p>
+      )}
+    </section>
+  )
+}
+
+const pctOf = (n: number, d = 0): string => `${(n * 100).toFixed(d)}%`
+
+function Check({ label, c }: { label: string; c: OutcomeCheck }) {
+  return (
+    <li>
+      <strong>{label}:</strong> log loss {c.logLoss.toFixed(3)} against {c.baselineLogLoss.toFixed(3)} for the base rate
+      (gain {c.gain.toFixed(3)}, 95% range {c.gainLo.toFixed(3)} to {c.gainHi.toFixed(3)}); right {pctOf(c.accuracy)} of the time against {pctOf(c.baselineAccuracy)}.
+    </li>
+  )
+}
+
+function Outcomes({ analysis, results, meta }: { analysis: FightAnalysis; results?: ResultsModelBout; meta?: ResultsModel }) {
+  if (!results?.joint || results.distance === undefined) return null
+  const { fight } = analysis
+  const j = results.joint
+  const rows: { label: string; a: number; b: number }[] = [
+    { label: 'Knockout or TKO', a: j.aKo, b: j.bKo },
+    { label: 'Submission', a: j.aSub, b: j.bSub },
+    { label: 'Decision', a: j.aDec, b: j.bDec },
+  ]
+  const top = Math.max(...rows.flatMap((r) => [r.a, r.b]))
+  const oc = meta?.outcomes
+  return (
+    <section className="outcomes" aria-label="How it could end">
+      <h3>How it could end</h3>
+      <div className="distance">
+        <div><strong>{pctOf(results.distance)}</strong><span>goes the distance</span></div>
+        <div><strong>{pctOf(1 - results.distance)}</strong><span>ends in a finish</span></div>
+      </div>
+      <table className="tbl">
+        <thead><tr><th>Winner and method</th><th>{fight.a.name}</th><th>{fight.b.name}</th></tr></thead>
+        <tbody>
+          {rows.map((r) => (
+            <tr key={r.label}>
+              <td>{r.label}</td>
+              <td className={r.a === top ? 'best' : ''}>{pctOf(r.a)}</td>
+              <td className={r.b === top ? 'best' : ''}>{pctOf(r.b)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <p className="muted small">
+        A single most likely outcome is rarely likely on its own: even the top row here is {pctOf(top)}.
+        {oc ? ` ${oc.note}` : ''}
+      </p>
+      {oc && (
+        <details className="fold inline-fold">
+          <summary>How well these did on past fights ({oc.period})</summary>
+          <ul className="reasons">
+            <Check label="Goes the distance" c={oc.distance} />
+            <Check label="Knockout or submission, among finishes" c={oc.koShare} />
+            <Check label="Winner and method together" c={oc.joint} />
+          </ul>
+          <p className="muted small">A negative gain means the model beat simply guessing the usual rate. These are not compared with betting prices.</p>
+        </details>
       )}
     </section>
   )
@@ -286,25 +387,38 @@ function DeepDive({ analysis, isStatic, onBet, onAddLeg }: Pick<FightDetailProps
   )
 }
 
-export function FightDetail({ analysis, view, results, resultsMeta, isStatic, onBet, onAddLeg }: FightDetailProps) {
+export function FightDetail({ analysis, view, results, resultsMeta, market, marketUpdated, isStatic, onFighter, onShare, onBet, onAddLeg }: FightDetailProps) {
   const { fight } = analysis
   const notes = fight.bout?.notes ?? []
   return (
     <article className="detail" aria-label={`${fight.a.name} versus ${fight.b.name}`}>
       <header className="detail-head">
+        <h2 className="sr-only">{fight.a.name} versus {fight.b.name}</h2>
         <p className="muted">
           {fight.weightClass}, {fight.rounds} rounds
           {fight.bout ? `, ${fight.bout.card === 'main' ? 'main card' : 'prelims'}, bout ${fight.bout.order}` : ''}
           {fight.mainEvent ? ', main event' : ''}
         </p>
         <div className="detail-names">
-          <div className="detail-name a"><Avatar name={fight.a.name} corner="a" size="lg" /><div><h2>{fight.a.name}</h2><span>{fight.a.record}</span></div></div>
-          <span className="detail-vs">vs</span>
-          <div className="detail-name b"><Avatar name={fight.b.name} corner="b" size="lg" /><div><h2>{fight.b.name}</h2><span>{fight.b.record}</span></div></div>
+          {([['a', fight.a], ['b', fight.b]] as const).map(([corner, f], i) => (
+            <div key={corner} className="detail-fighter">
+              {i === 1 && <span className="detail-vs">vs</span>}
+              <button type="button" className={`detail-name ${corner}`} onClick={() => onFighter(slugify(f.name))} aria-label={`${f.name}: career and rating history`}>
+                <Avatar name={f.name} corner={corner} size="lg" />
+                <span>
+                  <span className="fname">{f.name}</span>
+                  <span className="detail-rec">{f.rank ? `Ranked #${f.rank}, ` : ''}{f.record}</span>
+                </span>
+              </button>
+            </div>
+          ))}
         </div>
+        <button type="button" className="share" onClick={onShare}>Copy link to this bout</button>
       </header>
 
-      <Prediction analysis={analysis} view={view} results={results} meta={resultsMeta} />
+      {market && <MarketPanel analysis={analysis} results={results} market={market} updated={marketUpdated} meta={resultsMeta} />}
+      <Prediction analysis={analysis} view={view.source === 'market' && results ? { source: 'validated', probA: results.probA, probB: results.probB } : view} results={results} meta={resultsMeta} />
+      <Outcomes analysis={analysis} results={results} meta={resultsMeta} />
       <Facts analysis={analysis} results={results} />
 
       {notes.length > 0 && (

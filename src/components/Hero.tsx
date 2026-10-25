@@ -22,21 +22,31 @@ export function splitTitle(title: string): { series: string; headline: string } 
   return at > 0 ? { series: title.slice(0, at).trim(), headline: title.slice(at + 1).trim() } : { series: '', headline: title }
 }
 
-/** The card's start times are published in US Eastern, so show them that way rather than in the viewer's zone. */
 const EASTERN = 'America/New_York'
-const day = (iso: string): string => new Date(iso).toLocaleDateString('en-US', { timeZone: EASTERN, weekday: 'long', month: 'long', day: 'numeric' })
-const time = (iso: string): string => new Date(iso).toLocaleTimeString('en-US', { timeZone: EASTERN, hour: 'numeric', minute: '2-digit', timeZoneName: 'short' })
+const zone = (event: { timeZone?: string }): string => event.timeZone ?? EASTERN
+const dayIn = (iso: string, tz: string): string => new Date(iso).toLocaleDateString('en-US', { timeZone: tz, weekday: 'long', month: 'long', day: 'numeric' })
+const timeIn = (iso: string, tz: string): string => new Date(iso).toLocaleTimeString('en-US', { timeZone: tz, hour: 'numeric', minute: '2-digit', timeZoneName: 'short' })
+
+/** Time at the venue, with US Eastern in brackets when that differs, since most viewers think in Eastern. */
+export function venueTime(iso: string, tz: string): string {
+  return tz === EASTERN ? timeIn(iso, tz) : `${timeIn(iso, tz)} (${timeIn(iso, EASTERN)})`
+}
 
 interface HeroProps {
   payload: EventPayload
   onAbout: () => void
+  /** When betting prices were last collected, if the site has them */
+  marketUpdated?: string
 }
 
-export function Hero({ payload, onAbout }: HeroProps) {
+export function Hero({ payload, onAbout, marketUpdated }: HeroProps) {
   const now = useNow(30_000)
   const { event } = payload
   const { series, headline } = splitTitle(event.title)
   const left = remaining(event.mainCardStart, now)
+  const verification = payload.snapshot.verification
+  const verified = verification?.status === 'official'
+  const checkedOn = verification?.checkedAt ? new Date(verification.checkedAt).toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric' }) : ''
 
   return (
     <section className="hero" aria-label="Event overview">
@@ -45,11 +55,15 @@ export function Hero({ payload, onAbout }: HeroProps) {
         <h1 className="hero-title">{headline}</h1>
         <p className="hero-where">{event.venue}, {event.city}</p>
         <p className="hero-when">
-          Prelims {day(event.prelimsStart)} at {time(event.prelimsStart)}. Main card at {time(event.mainCardStart)}.
+          {dayIn(event.mainCardStart, zone(event))}. Early start {venueTime(event.prelimsStart, zone(event))}. Main card {venueTime(event.mainCardStart, zone(event))}.
         </p>
         <div className="hero-flags">
-          <button type="button" className="flag" onClick={onAbout}>Card not verified against ufc.com</button>
-          {payload.odds.status !== 'live' && <button type="button" className="flag" onClick={onAbout}>No live odds</button>}
+          {verified
+            ? <button type="button" className="flag ok" onClick={onAbout}>Checked against ufc.com{checkedOn ? `, ${checkedOn}` : ''}</button>
+            : <button type="button" className="flag" onClick={onAbout}>Card not verified against ufc.com</button>}
+          {marketUpdated
+            ? <button type="button" className="flag" onClick={onAbout}>Prices updated {new Date(marketUpdated).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}</button>
+            : payload.odds.status !== 'live' && <button type="button" className="flag" onClick={onAbout}>No live odds</button>}
           {payload.static && <button type="button" className="flag" onClick={onAbout}>Public snapshot</button>}
         </div>
       </div>
@@ -68,7 +82,7 @@ export function Hero({ payload, onAbout }: HeroProps) {
   )
 }
 
-export function AboutData({ payload, open, onToggle }: { payload: EventPayload; open: boolean; onToggle: (open: boolean) => void }) {
+export function AboutData({ payload, open, onToggle, marketAttribution }: { payload: EventPayload; open: boolean; onToggle: (open: boolean) => void; marketAttribution?: string }) {
   const { event, snapshot, odds, stats, changes } = payload
   return (
     <details className="about" id="about" open={open} onToggle={(e) => onToggle((e.currentTarget as HTMLDetailsElement).open)}>
@@ -84,6 +98,7 @@ export function AboutData({ payload, open, onToggle }: { payload: EventPayload; 
         )}
         <h4>Where the card comes from</h4>
         <p>{snapshot.source}</p>
+        {snapshot.verification && <p><strong>{snapshot.verification.status === 'official' ? 'Checked against the official page.' : 'Not checked against the official page.'}</strong> {snapshot.verification.note}</p>}
         {snapshot.corroboration && <p>{snapshot.corroboration}</p>}
         {snapshot.recordsSource && <p>{snapshot.recordsSource}</p>}
         {event.timesNote && <p>{event.timesNote}</p>}
@@ -104,7 +119,7 @@ export function AboutData({ payload, open, onToggle }: { payload: EventPayload; 
           : <ul>{changes.map((c) => <li key={c.description}>Version {c.fromVersion} to {c.toVersion}: {c.description}</li>)}</ul>}
         <h4>Data status</h4>
         <ul>
-          <li>Odds: {odds.status === 'live' ? 'live' : `unavailable. ${odds.reason ?? ''}`}</li>
+          <li>Odds: {odds.status === 'live' ? 'live' : marketAttribution ?? `unavailable. ${odds.reason ?? ''}`}</li>
           <li>Fighter statistics: {stats.status === 'available' ? 'complete' : stats.status === 'partial' ? `${stats.missing.length} fighters missing` : 'not loaded'}</li>
           {stats.warnings.map((w) => <li key={w}>{w}</li>)}
         </ul>

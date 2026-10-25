@@ -1,0 +1,220 @@
+{
+  "eventId": "ufc-334-gane-hokit",
+  "title": "UFC 334: Gane vs. Hokit",
+  "lockedAt": "2026-11-14T22:00:00Z",
+  "mainCardStart": "2026-11-15T02:00:00Z",
+  "entries": [
+    {
+      "recordedAt": "2026-10-25T17:36:28.975Z",
+      "model": "octa-results-stats-lr-0.1",
+      "dataThrough": "2026-10-17",
+      "cardVersion": 1,
+      "bouts": [
+        {
+          "id": "ufc-334-gane-hokit-1",
+          "a": "Ciryl Gane",
+          "b": "Josh Hokit",
+          "probA": 0.6566,
+          "probLo": 0.606,
+          "probHi": 0.7182,
+          "distance": 0.2967,
+          "joint": {
+            "aKo": 0.3892,
+            "aSub": 0.0726,
+            "aDec": 0.1948,
+            "bKo": 0.204,
+            "bSub": 0.0376,
+            "bDec": 0.1019
+          }
+        },
+        {
+          "id": "ufc-334-gane-hokit-2",
+          "a": "Kayla Harrison",
+          "b": "Amanda Nunes",
+          "probA": 0.3521,
+          "probLo": 0.3104,
+          "probHi": 0.3976,
+          "distance": 0.4705,
+          "joint": {
+            "aKo": 0.0615,
+            "aSub": 0.1249,
+            "aDec": 0.1656,
+            "bKo": 0.2245,
+            "bSub": 0.1186,
+            "bDec": 0.3048
+          }
+        },
+        {
+          "id": "ufc-334-gane-hokit-3",
+          "a": "Caio Borralho",
+          "b": "Yousri Belgaroui",
+          "probA": 0.3912,
+          "probLo": 0.3287,
+          "probHi": 0.4475,
+          "distance": 0.4996,
+          "joint": {
+            "aKo": 0.1333,
+            "aSub": 0.0624,
+            "aDec": 0.1954,
+            "bKo": 0.2597,
+            "bSub": 0.045,
+            "bDec": 0.3042
+          }
+        },
+        {
+          "id": "ufc-334-gane-hokit-4",
+          "a": "Uroš Medić",
+          "b": "Kevin Holland",
+          "probA": 0.4071,
+          "probLo": 0.3542,
+          "probHi": 0.4732,
+          "distance": 0.3959,
+          "joint": {
+            "aKo": 0.2231,
+            "aSub": 0.0229,
+            "aDec": 0.1612,
+            "bKo": 0.2221,
+            "bSub": 0.136,
+            "bDec": 0.2347
+          }
+        },
+        {
+          "id": "ufc-334-gane-hokit-5",
+          "a": "Bilal Hasan",
+          "b": "Luis Gurule",
+          "probA": 0.8316,
+          "probLo": 0.8052,
+          "probHi": 0.855,
+          "distance": 0.5202,
+          "joint": {
+            "aKo": 0.2601,
+            "aSub": 0.139,
+            "aDec": 0.4326,
+            "bKo": 0.0467,
+            "bSub": 0.0341,
+            "bDec": 0.0876
+          }
+        },
+        {
+          "id": "ufc-334-gane-hokit-6",
+          "a": "Stephen Thompson",
+          "b": "Charles Radtke",
+          "probA": 0.4132,
+          "probLo": 0.3763,
+          "probHi": 0.461,
+          "distance": 0.5203,
+          "joint": {
+            "aKo": 0.1889,
+            "aSub": 0.0093,
+            "aDec": 0.215,
+            "bKo": 0.2146,
+            "bSub": 0.0668,
+            "bDec": 0.3053
+          }
+        },
+        {
+          "id": "ufc-334-gane-hokit-7",
+          "a": "Drew Dober",
+          "b": "Chris Duncan",
+          "probA": 0.3686,
+          "probLo": 0.3457,
+          "probHi": 0.4078,
+          "distance": 0.4302,
+          "joint": {
+            "aKo": 0.1713,
+            "aSub": 0.0387,
+            "aDec": 0.1585,
+            "bKo": 0.1193,
+            "bSub": 0.2405,
+            "bDec": 0.2716
+          }
+        },
+        {
+          "id": "ufc-334-gane-hokit-8",
+          "a": "Jim Miller",
+          "b": "Terrance McKinney",
+          "probA": 0.2892,
+          "probLo": 0.2415,
+          "probHi": 0.3432,
+          "distance": 0.3989,
+          "joint": {
+            "aKo": 0.0927,
+            "aSub": 0.0812,
+            "aDec": 0.1154,
+            "bKo": 0.2452,
+            "bSub": 0.1821,
+            "bDec": 0.2835
+          }
+        },
+        {
+          "id": "ufc-334-gane-hokit-9",
+          "a": "Donte Johnson",
+          "b": "Baisangur Susurkaev",
+          "probA": 0.3875,
+          "probLo": 0.3596,
+          "probHi": 0.4215,
+          "distance": 0.4142,
+          "joint": {
+            "aKo": 0.1441,
+            "aSub": 0.0829,
+            "aDec": 0.1605,
+            "bKo": 0.1977,
+            "bSub": 0.1611,
+            "bDec": 0.2537
+          }
+        },
+        {
+          "id": "ufc-334-gane-hokit-10",
+          "a": "Macy Chiasson",
+          "b": "Bia Mesquita",
+          "probA": 0.4222,
+          "probLo": 0.3792,
+          "probHi": 0.4601,
+          "distance": 0.5577,
+          "joint": {
+            "aKo": 0.1172,
+            "aSub": 0.0695,
+            "aDec": 0.2355,
+            "bKo": 0.0568,
+            "bSub": 0.1987,
+            "bDec": 0.3222
+          }
+        },
+        {
+          "id": "ufc-334-gane-hokit-11",
+          "a": "Adrian Yanez",
+          "b": "Juan Diaz",
+          "probA": 0.4065,
+          "probLo": 0.3725,
+          "probHi": 0.4571,
+          "distance": 0.4758,
+          "joint": {
+            "aKo": 0.1869,
+            "aSub": 0.0262,
+            "aDec": 0.1934,
+            "bKo": 0.1483,
+            "bSub": 0.1628,
+            "bDec": 0.2824
+          }
+        },
+        {
+          "id": "ufc-334-gane-hokit-12",
+          "a": "Nazim Sadykhov",
+          "b": "Jefferson Nascimento",
+          "probA": 0.3956,
+          "probLo": 0.3659,
+          "probHi": 0.4342,
+          "distance": 0.3709,
+          "joint": {
+            "aKo": 0.2023,
+            "aSub": 0.0466,
+            "aDec": 0.1468,
+            "bKo": 0.29,
+            "bSub": 0.0902,
+            "bDec": 0.2242
+          }
+        }
+      ]
+    }
+  ]
+}

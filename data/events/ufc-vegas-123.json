@@ -7,8 +7,9 @@
     "city": "Las Vegas, Nevada",
     "prelimsStart": "2026-10-31T21:00:00Z",
     "mainCardStart": "2026-11-01T00:00:00Z",
-    "timesNote": "5:00 PM / 8:00 PM Eastern (EDT) as supplied by the project owner; not verified against ufc.com.",
-    "officialUrl": "https://www.ufc.com/event/ufc-fight-night-october-31-2026"
+    "timesNote": "5:00 PM and 8:00 PM Eastern (4:00 PM and 7:00 PM CDT on ufc.com), checked against the official event page on 2026-10-25.",
+    "officialUrl": "https://www.ufc.com/event/ufc-fight-night-october-31-2026",
+    "timeZone": "America/Los_Angeles"
   },
   "snapshots": [
     {
@@ -17,23 +18,425 @@
       "source": "Card list supplied by the project owner as an October 25, 2026 snapshot of the official UFC page. ufc.com could not be reached from this environment, so it has NOT been independently verified against the official page.",
       "corroboration": "ESPN Deportes fight center lists the same 12 pairings (plus one extra bout) and the main/prelim split used below.",
       "bouts": [
-        { "order": 1, "card": "main", "weightClass": "Lightweight", "rounds": 5, "a": { "name": "Renato Moicano", "record": "21-7-1" }, "b": { "name": "Tom Nolan", "record": "11-1-0" }, "notes": ["Main event. Replaced Brian Ortega, who withdrew with a cut (CagesidePress, Sept 14 2026)."] },
-        { "order": 2, "card": "main", "weightClass": "Welterweight", "rounds": 3, "a": { "name": "Randy Brown", "record": "20-8-0" }, "b": { "name": "Jacobe Smith", "record": "13-0-0" }, "notes": ["MMA Sucka lists Carlos Leal as Brown's opponent; its own sidebar says Jacobe Smith stepped in. Treated as an earlier opponent."] },
-        { "order": 3, "card": "main", "weightClass": "Women's Bantamweight", "rounds": 3, "a": { "name": "Yana Santos", "record": "17-8-0" }, "b": { "name": "Luana Santos", "record": "11-2-0" }, "notes": [] },
-        { "order": 4, "card": "main", "weightClass": "Flyweight", "rounds": 3, "a": { "name": "Ode' Osbourne", "record": "13-10-0" }, "b": { "name": "Cody Durden", "record": "18-11-1" }, "notes": ["Appears on only one secondary source (ESPN Deportes)."] },
-        { "order": 5, "card": "prelim", "weightClass": "Middleweight", "rounds": 3, "a": { "name": "Zachary Reese", "record": "10-4-0" }, "b": { "name": "Mickey Gall", "record": "7-7-0" }, "notes": ["Appears on only one secondary source (ESPN Deportes)."] },
-        { "order": 6, "card": "main", "weightClass": "Welterweight", "rounds": 3, "a": { "name": "Jean-Paul Lebosnoyani", "record": "11-2-0" }, "b": { "name": "Farman Hasanov", "record": "6-0-0" }, "notes": ["Hasanov's record is 6-0-0 on ESPN Deportes but 5-0-0 on MMA Sucka."] },
-        { "order": 7, "card": "main", "weightClass": "Featherweight", "rounds": 3, "a": { "name": "Francis Marshall", "record": "10-3-0" }, "b": { "name": "Dakota Hope", "record": "11-2-0" }, "notes": ["Fightmag (Sept 15) and MMA Sucka list Gaston Bolanos as Marshall's opponent; ESPN Deportes lists Dakota Hope. Likely an opponent change; verify."] },
-        { "order": 8, "card": "prelim", "weightClass": "Welterweight", "rounds": 3, "a": { "name": "Rodrigo Sezinando", "record": "9-2-0" }, "b": { "name": "Theodor Berggren", "record": "8-4-0" }, "notes": [] },
-        { "order": 9, "card": "prelim", "weightClass": "Featherweight", "rounds": 3, "a": { "name": "Julian Erosa", "record": "31-14-0" }, "b": { "name": "JeongYeong Lee", "record": "11-3-0" }, "notes": ["MMA Sucka's sidebar carries a headline that Erosa announced retirement before this event. The article was not read; confirm this bout is still on."] },
-        { "order": 10, "card": "prelim", "weightClass": "Middleweight", "rounds": 3, "a": { "name": "Nick Klein", "record": "6-3-0" }, "b": { "name": "Joseph Kropschot", "record": "9-3-0" }, "notes": [] },
-        { "order": 11, "card": "prelim", "weightClass": "Women's Strawweight", "rounds": 3, "a": { "name": "Talita Alencar", "record": "8-1-1" }, "b": { "name": "Piera Rodriguez", "record": "12-2-0" }, "notes": [] },
-        { "order": 12, "card": "prelim", "weightClass": "Women's Flyweight", "rounds": 3, "a": { "name": "Lucia Szabova", "record": "12-0-0" }, "b": { "name": "Tainara Lisboa", "record": "7-4-0" }, "notes": [] }
+        {
+          "order": 1,
+          "card": "main",
+          "weightClass": "Lightweight",
+          "rounds": 5,
+          "a": {
+            "name": "Renato Moicano",
+            "record": "21-7-1"
+          },
+          "b": {
+            "name": "Tom Nolan",
+            "record": "11-1-0"
+          },
+          "notes": [
+            "Main event. Replaced Brian Ortega, who withdrew with a cut (CagesidePress, Sept 14 2026)."
+          ]
+        },
+        {
+          "order": 2,
+          "card": "main",
+          "weightClass": "Welterweight",
+          "rounds": 3,
+          "a": {
+            "name": "Randy Brown",
+            "record": "20-8-0"
+          },
+          "b": {
+            "name": "Jacobe Smith",
+            "record": "13-0-0"
+          },
+          "notes": [
+            "MMA Sucka lists Carlos Leal as Brown's opponent; its own sidebar says Jacobe Smith stepped in. Treated as an earlier opponent."
+          ]
+        },
+        {
+          "order": 3,
+          "card": "main",
+          "weightClass": "Women's Bantamweight",
+          "rounds": 3,
+          "a": {
+            "name": "Yana Santos",
+            "record": "17-8-0"
+          },
+          "b": {
+            "name": "Luana Santos",
+            "record": "11-2-0"
+          },
+          "notes": []
+        },
+        {
+          "order": 4,
+          "card": "main",
+          "weightClass": "Flyweight",
+          "rounds": 3,
+          "a": {
+            "name": "Ode' Osbourne",
+            "record": "13-10-0"
+          },
+          "b": {
+            "name": "Cody Durden",
+            "record": "18-11-1"
+          },
+          "notes": [
+            "Appears on only one secondary source (ESPN Deportes)."
+          ]
+        },
+        {
+          "order": 5,
+          "card": "prelim",
+          "weightClass": "Middleweight",
+          "rounds": 3,
+          "a": {
+            "name": "Zachary Reese",
+            "record": "10-4-0"
+          },
+          "b": {
+            "name": "Mickey Gall",
+            "record": "7-7-0"
+          },
+          "notes": [
+            "Appears on only one secondary source (ESPN Deportes)."
+          ]
+        },
+        {
+          "order": 6,
+          "card": "main",
+          "weightClass": "Welterweight",
+          "rounds": 3,
+          "a": {
+            "name": "Jean-Paul Lebosnoyani",
+            "record": "11-2-0"
+          },
+          "b": {
+            "name": "Farman Hasanov",
+            "record": "6-0-0"
+          },
+          "notes": [
+            "Hasanov's record is 6-0-0 on ESPN Deportes but 5-0-0 on MMA Sucka."
+          ]
+        },
+        {
+          "order": 7,
+          "card": "main",
+          "weightClass": "Featherweight",
+          "rounds": 3,
+          "a": {
+            "name": "Francis Marshall",
+            "record": "10-3-0"
+          },
+          "b": {
+            "name": "Dakota Hope",
+            "record": "11-2-0"
+          },
+          "notes": [
+            "Fightmag (Sept 15) and MMA Sucka list Gaston Bolanos as Marshall's opponent; ESPN Deportes lists Dakota Hope. Likely an opponent change; verify."
+          ]
+        },
+        {
+          "order": 8,
+          "card": "prelim",
+          "weightClass": "Welterweight",
+          "rounds": 3,
+          "a": {
+            "name": "Rodrigo Sezinando",
+            "record": "9-2-0"
+          },
+          "b": {
+            "name": "Theodor Berggren",
+            "record": "8-4-0"
+          },
+          "notes": []
+        },
+        {
+          "order": 9,
+          "card": "prelim",
+          "weightClass": "Featherweight",
+          "rounds": 3,
+          "a": {
+            "name": "Julian Erosa",
+            "record": "31-14-0"
+          },
+          "b": {
+            "name": "JeongYeong Lee",
+            "record": "11-3-0"
+          },
+          "notes": [
+            "MMA Sucka's sidebar carries a headline that Erosa announced retirement before this event. The article was not read; confirm this bout is still on."
+          ]
+        },
+        {
+          "order": 10,
+          "card": "prelim",
+          "weightClass": "Middleweight",
+          "rounds": 3,
+          "a": {
+            "name": "Nick Klein",
+            "record": "6-3-0"
+          },
+          "b": {
+            "name": "Joseph Kropschot",
+            "record": "9-3-0"
+          },
+          "notes": []
+        },
+        {
+          "order": 11,
+          "card": "prelim",
+          "weightClass": "Women's Strawweight",
+          "rounds": 3,
+          "a": {
+            "name": "Talita Alencar",
+            "record": "8-1-1"
+          },
+          "b": {
+            "name": "Piera Rodriguez",
+            "record": "12-2-0"
+          },
+          "notes": []
+        },
+        {
+          "order": 12,
+          "card": "prelim",
+          "weightClass": "Women's Flyweight",
+          "rounds": 3,
+          "a": {
+            "name": "Lucia Szabova",
+            "record": "12-0-0"
+          },
+          "b": {
+            "name": "Tainara Lisboa",
+            "record": "7-4-0"
+          },
+          "notes": []
+        }
       ],
       "unlisted": [
         "Azamat Bekoev vs. Andre Petroski (middleweight) appears on ESPN Deportes, Fightmag and MMA Sucka but not in the supplied snapshot. An MMA Sucka headline says Bekoev withdrew. Not included as an active bout."
       ],
-      "recordsSource": "Records are from ESPN Deportes (secondary source, retrieved 2026-10-25) and have not been checked against UFC.com or UFCStats."
+      "recordsSource": "Records are from ESPN Deportes (secondary source, retrieved 2026-10-25) and have not been checked against UFC.com or UFCStats.",
+      "verification": {
+        "status": "unverified",
+        "note": "Supplied by the project owner and corroborated only by secondary sources."
+      }
+    },
+    {
+      "version": 2,
+      "capturedAt": "2026-10-25T21:00:00Z",
+      "source": "Checked against the official UFC event page (ufc.com/event/ufc-fight-night-october-31-2026) on 2026-10-25 by an automated page read: the same 12 bouts and weight classes, no cancellation or replacement notices, and the start times used here. Only the Reese vs. Gall card placement is not stated on that page.",
+      "corroboration": "ESPN Deportes lists the same 12 pairings plus one extra bout (Bekoev vs. Petroski) that is not on the official page. Fightmag (Sept 15) and MMA Sucka list Gaston Bolanos as Francis Marshall's opponent; the official page lists Dakota Hope.",
+      "bouts": [
+        {
+          "order": 1,
+          "card": "main",
+          "weightClass": "Lightweight",
+          "rounds": 5,
+          "a": {
+            "name": "Renato Moicano",
+            "record": "21-7-1",
+            "rank": 12
+          },
+          "b": {
+            "name": "Tom Nolan",
+            "record": "11-1-0",
+            "rank": 14
+          },
+          "notes": [
+            "Main event. Replaced Brian Ortega, who withdrew with a cut (CagesidePress, Sept 14 2026)."
+          ]
+        },
+        {
+          "order": 2,
+          "card": "main",
+          "weightClass": "Welterweight",
+          "rounds": 3,
+          "a": {
+            "name": "Randy Brown",
+            "record": "20-8-0"
+          },
+          "b": {
+            "name": "Jacobe Smith",
+            "record": "13-0-0"
+          },
+          "notes": [
+            "Confirmed on ufc.com. One older listing named Carlos Leal; its own sidebar says Jacobe Smith stepped in."
+          ]
+        },
+        {
+          "order": 3,
+          "card": "main",
+          "weightClass": "Women's Bantamweight",
+          "rounds": 3,
+          "a": {
+            "name": "Yana Santos",
+            "record": "17-8-0",
+            "rank": 6
+          },
+          "b": {
+            "name": "Luana Santos",
+            "record": "11-2-0",
+            "rank": 7
+          },
+          "notes": []
+        },
+        {
+          "order": 4,
+          "card": "main",
+          "weightClass": "Flyweight",
+          "rounds": 3,
+          "a": {
+            "name": "Ode' Osbourne",
+            "record": "13-10-0"
+          },
+          "b": {
+            "name": "Cody Durden",
+            "record": "18-11-1"
+          },
+          "notes": [
+            "Confirmed on ufc.com."
+          ]
+        },
+        {
+          "order": 5,
+          "card": "prelim",
+          "weightClass": "Middleweight",
+          "rounds": 3,
+          "a": {
+            "name": "Zachary Reese",
+            "record": "10-4-0"
+          },
+          "b": {
+            "name": "Mickey Gall",
+            "record": "7-7-0"
+          },
+          "notes": [
+            "ufc.com lists this bout but does not say whether it is on the main card or prelims. ESPN Deportes lists it as a prelim. Appears on only one secondary source for its record."
+          ]
+        },
+        {
+          "order": 6,
+          "card": "main",
+          "weightClass": "Welterweight",
+          "rounds": 3,
+          "a": {
+            "name": "Jean-Paul Lebosnoyani",
+            "record": "11-2-0"
+          },
+          "b": {
+            "name": "Farman Hasanov",
+            "record": "6-0-0"
+          },
+          "notes": [
+            "Hasanov's record is 6-0-0 on ESPN Deportes but 5-0-0 on MMA Sucka; ufc.com does not show it."
+          ]
+        },
+        {
+          "order": 7,
+          "card": "prelim",
+          "weightClass": "Featherweight",
+          "rounds": 3,
+          "a": {
+            "name": "Francis Marshall",
+            "record": "10-3-0"
+          },
+          "b": {
+            "name": "Dakota Hope",
+            "record": "11-2-0"
+          },
+          "notes": [
+            "ufc.com lists Dakota Hope as Marshall's opponent. Older listings (Fightmag, MMA Sucka) had Gaston Bolanos."
+          ]
+        },
+        {
+          "order": 8,
+          "card": "prelim",
+          "weightClass": "Welterweight",
+          "rounds": 3,
+          "a": {
+            "name": "Rodrigo Sezinando",
+            "record": "9-2-0"
+          },
+          "b": {
+            "name": "Theodor Berggren",
+            "record": "8-4-0"
+          },
+          "notes": []
+        },
+        {
+          "order": 9,
+          "card": "prelim",
+          "weightClass": "Featherweight",
+          "rounds": 3,
+          "a": {
+            "name": "Julian Erosa",
+            "record": "31-14-0"
+          },
+          "b": {
+            "name": "JeongYeong Lee",
+            "record": "11-3-0"
+          },
+          "notes": [
+            "Still listed on ufc.com with no cancellation notice on 2026-10-25. One site's headline reported that Erosa announced retirement; that article was not read. Check before relying on this bout."
+          ]
+        },
+        {
+          "order": 10,
+          "card": "prelim",
+          "weightClass": "Middleweight",
+          "rounds": 3,
+          "a": {
+            "name": "Nick Klein",
+            "record": "6-3-0"
+          },
+          "b": {
+            "name": "Joseph Kropschot",
+            "record": "9-3-0"
+          },
+          "notes": []
+        },
+        {
+          "order": 11,
+          "card": "prelim",
+          "weightClass": "Women's Strawweight",
+          "rounds": 3,
+          "a": {
+            "name": "Talita Alencar",
+            "record": "8-1-1"
+          },
+          "b": {
+            "name": "Piera Rodriguez",
+            "record": "12-2-0"
+          },
+          "notes": []
+        },
+        {
+          "order": 12,
+          "card": "prelim",
+          "weightClass": "Women's Flyweight",
+          "rounds": 3,
+          "a": {
+            "name": "Lucia Szabova",
+            "record": "12-0-0"
+          },
+          "b": {
+            "name": "Tainara Lisboa",
+            "record": "7-4-0"
+          },
+          "notes": []
+        }
+      ],
+      "unlisted": [
+        "Azamat Bekoev vs. Andre Petroski (middleweight) appears on ESPN Deportes, Fightmag and MMA Sucka but is not on the official ufc.com page. An MMA Sucka headline says Bekoev withdrew. Not included."
+      ],
+      "recordsSource": "Records are from ESPN Deportes (secondary source, retrieved 2026-10-25) and have not been checked against UFC.com or UFCStats.",
+      "verification": {
+        "status": "official",
+        "checkedAt": "2026-10-25T21:00:00Z",
+        "url": "https://www.ufc.com/event/ufc-fight-night-october-31-2026",
+        "note": "Read by an automated fetch, not by a person. Re-check before relying on it: cards change in fight week."
+      }
     }
   ]
 }

@@ -1,0 +1,220 @@
+{
+  "eventId": "ufc-vegas-123",
+  "title": "UFC Fight Night: Moicano vs. Nolan",
+  "lockedAt": "2026-10-31T21:00:00Z",
+  "mainCardStart": "2026-11-01T00:00:00Z",
+  "entries": [
+    {
+      "recordedAt": "2026-10-25T17:36:28.975Z",
+      "model": "octa-results-stats-lr-0.1",
+      "dataThrough": "2026-10-17",
+      "cardVersion": 2,
+      "bouts": [
+        {
+          "id": "ufc-vegas-123-1",
+          "a": "Renato Moicano",
+          "b": "Tom Nolan",
+          "probA": 0.4772,
+          "probLo": 0.4471,
+          "probHi": 0.5122,
+          "distance": 0.3542,
+          "joint": {
+            "aKo": 0.1689,
+            "aSub": 0.1392,
+            "aDec": 0.1691,
+            "bKo": 0.2134,
+            "bSub": 0.1242,
+            "bDec": 0.1852
+          }
+        },
+        {
+          "id": "ufc-vegas-123-2",
+          "a": "Randy Brown",
+          "b": "Jacobe Smith",
+          "probA": 0.3373,
+          "probLo": 0.3021,
+          "probHi": 0.3842,
+          "distance": 0.483,
+          "joint": {
+            "aKo": 0.1286,
+            "aSub": 0.0458,
+            "aDec": 0.1629,
+            "bKo": 0.2548,
+            "bSub": 0.0878,
+            "bDec": 0.3201
+          }
+        },
+        {
+          "id": "ufc-vegas-123-3",
+          "a": "Yana Santos",
+          "b": "Luana Santos",
+          "probA": 0.216,
+          "probLo": 0.1847,
+          "probHi": 0.2635,
+          "distance": 0.7215,
+          "joint": {
+            "aKo": 0.0375,
+            "aSub": 0.0226,
+            "aDec": 0.1559,
+            "bKo": 0.1398,
+            "bSub": 0.0786,
+            "bDec": 0.5657
+          }
+        },
+        {
+          "id": "ufc-vegas-123-4",
+          "a": "Ode' Osbourne",
+          "b": "Cody Durden",
+          "probA": 0.5462,
+          "probLo": 0.5041,
+          "probHi": 0.5808,
+          "distance": 0.5014,
+          "joint": {
+            "aKo": 0.1988,
+            "aSub": 0.0735,
+            "aDec": 0.2739,
+            "bKo": 0.1081,
+            "bSub": 0.1181,
+            "bDec": 0.2275
+          }
+        },
+        {
+          "id": "ufc-vegas-123-5",
+          "a": "Zachary Reese",
+          "b": "Mickey Gall",
+          "probA": 0.7064,
+          "probLo": 0.6716,
+          "probHi": 0.747,
+          "distance": 0.402,
+          "joint": {
+            "aKo": 0.3228,
+            "aSub": 0.0996,
+            "aDec": 0.284,
+            "bKo": 0.0878,
+            "bSub": 0.0878,
+            "bDec": 0.118
+          }
+        },
+        {
+          "id": "ufc-vegas-123-6",
+          "a": "Jean-Paul Lebosnoyani",
+          "b": "Farman Hasanov",
+          "probA": 0.389,
+          "probLo": 0.3246,
+          "probHi": 0.4512,
+          "distance": 0.6378,
+          "joint": {
+            "aKo": 0.0829,
+            "aSub": 0.058,
+            "aDec": 0.2481,
+            "bKo": 0.1061,
+            "bSub": 0.1152,
+            "bDec": 0.3897
+          }
+        },
+        {
+          "id": "ufc-vegas-123-7",
+          "a": "Francis Marshall",
+          "b": "Dakota Hope",
+          "probA": 0.603,
+          "probLo": 0.5655,
+          "probHi": 0.6432,
+          "distance": 0.5917,
+          "joint": {
+            "aKo": 0.1582,
+            "aSub": 0.088,
+            "aDec": 0.3568,
+            "bKo": 0.1188,
+            "bSub": 0.0433,
+            "bDec": 0.2349
+          }
+        },
+        {
+          "id": "ufc-vegas-123-8",
+          "a": "Rodrigo Sezinando",
+          "b": "Theodor Berggren",
+          "probA": 0.4887,
+          "probLo": 0.4609,
+          "probHi": 0.5149,
+          "distance": 0.3967,
+          "joint": {
+            "aKo": 0.2112,
+            "aSub": 0.0836,
+            "aDec": 0.1939,
+            "bKo": 0.2286,
+            "bSub": 0.0798,
+            "bDec": 0.2029
+          }
+        },
+        {
+          "id": "ufc-vegas-123-9",
+          "a": "Julian Erosa",
+          "b": "JeongYeong Lee",
+          "probA": 0.4393,
+          "probLo": 0.4032,
+          "probHi": 0.4874,
+          "distance": 0.5319,
+          "joint": {
+            "aKo": 0.1317,
+            "aSub": 0.0739,
+            "aDec": 0.2337,
+            "bKo": 0.2272,
+            "bSub": 0.0352,
+            "bDec": 0.2983
+          }
+        },
+        {
+          "id": "ufc-vegas-123-10",
+          "a": "Nick Klein",
+          "b": "Joseph Kropschot",
+          "probA": 0.6139,
+          "probLo": 0.5659,
+          "probHi": 0.667,
+          "distance": 0.3231,
+          "joint": {
+            "aKo": 0.2388,
+            "aSub": 0.1768,
+            "aDec": 0.1984,
+            "bKo": 0.1902,
+            "bSub": 0.0711,
+            "bDec": 0.1247
+          }
+        },
+        {
+          "id": "ufc-vegas-123-11",
+          "a": "Talita Alencar",
+          "b": "Piera Rodriguez",
+          "probA": 0.3833,
+          "probLo": 0.3544,
+          "probHi": 0.4114,
+          "distance": 0.7916,
+          "joint": {
+            "aKo": 0.02,
+            "aSub": 0.0598,
+            "aDec": 0.3035,
+            "bKo": 0.0577,
+            "bSub": 0.0708,
+            "bDec": 0.4882
+          }
+        },
+        {
+          "id": "ufc-vegas-123-12",
+          "a": "Lucia Szabova",
+          "b": "Tainara Lisboa",
+          "probA": 0.6419,
+          "probLo": 0.608,
+          "probHi": 0.6694,
+          "distance": 0.4908,
+          "joint": {
+            "aKo": 0.1445,
+            "aSub": 0.1824,
+            "aDec": 0.3151,
+            "bKo": 0.07,
+            "bSub": 0.1123,
+            "bDec": 0.1758
+          }
+        }
+      ]
+    }
+  ]
+}

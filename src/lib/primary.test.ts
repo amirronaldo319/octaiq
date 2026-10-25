@@ -17,6 +17,17 @@ describe('primaryView', () => {
   })
 })
 
+describe('primaryView with a market', () => {
+  const an = analyzeFight(FIGHTS[0], 0.25)
+  const mkt = { pA: 0.62, pLo: 0.6, pHi: 0.64, books: 5 }
+
+  it('headlines the market only when the market view is chosen', () => {
+    expect(primaryView(an, rb(0.7), mkt, 'market')).toEqual({ source: 'market', probA: 0.62, probB: 1 - 0.62 })
+    expect(primaryView(an, rb(0.7), mkt, 'model')).toMatchObject({ source: 'validated', probA: 0.7 })
+    expect(primaryView(an, rb(0.7), undefined, 'market').source).toBe('validated')
+  })
+})
+
 describe('leanOf', () => {
   it('labels the size of the gap and picks the favoured side', () => {
     expect(leanOf(0.51).label).toBe('Toss-up')

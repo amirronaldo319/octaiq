@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-25T16:32:50.379Z",
+  "generatedAt": "2026-10-25T17:33:14.070Z",
   "dataset": {
     "source": "https://github.com/Greco1899/scrape_ufc_stats",
     "license": "GPL-3.0 (repository LICENSE file)",
@@ -808,6 +808,58 @@
         "calibrationTemperature": 1.010425913320306
       }
     ],
+    "outcomes": {
+      "period": "2014-2026",
+      "distance": {
+        "n": 6321,
+        "logLoss": {
+          "estimate": 0.6759692084126969,
+          "lo": 0.6682742696479511,
+          "hi": 0.6837904453764978
+        },
+        "baselineLogLoss": 0.6996068595417523,
+        "gain": {
+          "estimate": -0.0236376511290554,
+          "lo": -0.03213358791993384,
+          "hi": -0.014811374007963058
+        },
+        "accuracy": 0.5832937826293308,
+        "baselineAccuracy": 0.5030849549121974
+      },
+      "koShare": {
+        "n": 3180,
+        "logLoss": {
+          "estimate": 0.5906321055141537,
+          "lo": 0.5730247905857723,
+          "hi": 0.6097900055242015
+        },
+        "baselineLogLoss": 0.6525354177609253,
+        "gain": {
+          "estimate": -0.061903312246771584,
+          "lo": -0.0774748637641715,
+          "hi": -0.044466943248778555
+        },
+        "accuracy": 0.689937106918239,
+        "baselineAccuracy": 0.6440251572327044
+      },
+      "joint": {
+        "n": 6273,
+        "logLoss": {
+          "estimate": 1.6289639428277025,
+          "lo": 1.6120676192284455,
+          "hi": 1.6452553206220875
+        },
+        "baselineLogLoss": 1.7234645918771392,
+        "gain": {
+          "estimate": -0.0945006490494367,
+          "lo": -0.10765981981703544,
+          "hi": -0.0813005548187099
+        },
+        "accuracy": 0.3224932249322493,
+        "baselineAccuracy": 0.2419894787183166
+      },
+      "note": "The joint distribution multiplies the win probability by the method model, assuming winner and method are independent given the features."
+    },
     "featureWeights": [
       {
         "name": "elo",
@@ -1829,5 +1881,580 @@
     "md5": "5a25fab3ff4bd389d40ce432462e4443",
     "bytes": 545652,
     "retrievedAt": "2026-10-25T16:32:50.293Z"
-  }
+  },
+  "recentEvents": [
+    {
+      "event": "UFC Fight Night: Buckley vs. Malott",
+      "date": "2026-10-17",
+      "bouts": [
+        {
+          "a": "SuYoung You",
+          "b": "Cody Chovancek",
+          "probA": 0.5850705720737235,
+          "winner": "a",
+          "correct": true
+        },
+        {
+          "a": "Chelsea Chandler",
+          "b": "Melissa Croden",
+          "probA": 0.27253368664576866,
+          "winner": "a",
+          "correct": false
+        },
+        {
+          "a": "Chad Anheliger",
+          "b": "Steven Koslow",
+          "probA": 0.30838122360100484,
+          "winner": "b",
+          "correct": true
+        },
+        {
+          "a": "Mackenzie Stiller",
+          "b": "Katlyn Cerminara",
+          "probA": 0.5823004033074924,
+          "winner": "b",
+          "correct": false
+        },
+        {
+          "a": "Joel Faglier",
+          "b": "Javad Mahjoub",
+          "probA": 0.6264007073720544,
+          "winner": "a",
+          "correct": true
+        },
+        {
+          "a": "Nick Galanti",
+          "b": "Julien Leblanc",
+          "probA": 0.5610632966278748,
+          "winner": "a",
+          "correct": true
+        },
+        {
+          "a": "Tanner Boser",
+          "b": "Jhonata Diniz",
+          "probA": 0.5225916964965249,
+          "winner": "a",
+          "correct": true
+        },
+        {
+          "a": "Mandel Nallo",
+          "b": "Nate Landwehr",
+          "probA": 0.5121350367965238,
+          "winner": "a",
+          "correct": true
+        },
+        {
+          "a": "Timmy Cuamba",
+          "b": "Louis Jourdain",
+          "probA": 0.6255954728729962,
+          "winner": "a",
+          "correct": true
+        },
+        {
+          "a": "Kyle Daukaus",
+          "b": "Marc-Andre Barriault",
+          "probA": 0.6687644039443815,
+          "winner": "b",
+          "correct": false
+        },
+        {
+          "a": "Cristian Perez",
+          "b": "Kyle Nelson",
+          "probA": 0.557505065923193,
+          "winner": "a",
+          "correct": true
+        },
+        {
+          "a": "Jasmine Jasudavicius",
+          "b": "Erin Blanchfield",
+          "probA": 0.349714836608013,
+          "winner": "a",
+          "correct": false
+        },
+        {
+          "a": "Joaquin Buckley",
+          "b": "Mike Malott",
+          "probA": 0.5649018902293295,
+          "winner": "b",
+          "correct": false
+        }
+      ],
+      "accuracy": 0.6153846153846154,
+      "logLoss": 0.7294322049758116
+    },
+    {
+      "event": "UFC Fight Night: Allen vs. Duncan",
+      "date": "2026-10-10",
+      "bouts": [
+        {
+          "a": "Daria Zhelezniakova",
+          "b": "Alice Pereira",
+          "probA": 0.27821721786897347,
+          "winner": "b",
+          "correct": true
+        },
+        {
+          "a": "RJ Harris",
+          "b": "Allen Frye Jr.",
+          "probA": 0.624961547266909,
+          "winner": "b",
+          "correct": false
+        },
+        {
+          "a": "Brendson Ribeiro",
+          "b": "Felipe Franco",
+          "probA": 0.22120456078651465,
+          "winner": "a",
+          "correct": false
+        },
+        {
+          "a": "Leon Shahbazyan",
+          "b": "Niko Price",
+          "probA": 0.5872592943952829,
+          "winner": "b",
+          "correct": false
+        },
+        {
+          "a": "Ismael Bonfim",
+          "b": "Francisco Prado",
+          "probA": 0.408913198028593,
+          "winner": "b",
+          "correct": true
+        },
+        {
+          "a": "Julius Walker",
+          "b": "Gerald Meerschaert",
+          "probA": 0.7549076645289896,
+          "winner": "a",
+          "correct": true
+        },
+        {
+          "a": "Malcolm Wellmaker",
+          "b": "Otari Tanzilovi",
+          "probA": 0.37073004468491116,
+          "winner": "b",
+          "correct": true
+        },
+        {
+          "a": "Andre Fili",
+          "b": "Kai Kamaka III",
+          "probA": 0.5105454815890486,
+          "winner": "a",
+          "correct": true
+        },
+        {
+          "a": "Ketlen Souza",
+          "b": "Loopy Godinez",
+          "probA": 0.4309636856143907,
+          "winner": "b",
+          "correct": true
+        },
+        {
+          "a": "Matheus Camilo",
+          "b": "Jai Herbert",
+          "probA": 0.637127268715919,
+          "winner": "b",
+          "correct": false
+        },
+        {
+          "a": "Brendan Allen",
+          "b": "Christian Leroy Duncan",
+          "probA": 0.45631349692384726,
+          "winner": "a",
+          "correct": false
+        }
+      ],
+      "accuracy": 0.5454545454545454,
+      "logLoss": 0.7277157210996239
+    },
+    {
+      "event": "UFC 332: Silva vs. Wang",
+      "date": "2026-10-03",
+      "bouts": [
+        {
+          "a": "Court McGee",
+          "b": "Eric Nolan",
+          "probA": 0.4080122736158857,
+          "winner": "b",
+          "correct": true
+        },
+        {
+          "a": "Ismail Naurdiev",
+          "b": "Marvin Vettori",
+          "probA": 0.6041012792791703,
+          "winner": "a",
+          "correct": true
+        },
+        {
+          "a": "Alexander Hernandez",
+          "b": "Rafael Dos Anjos",
+          "probA": 0.5992840591518093,
+          "winner": "a",
+          "correct": true
+        },
+        {
+          "a": "Bruce Whitehead",
+          "b": "Jacobe Smith",
+          "probA": 0.2108750764237631,
+          "winner": "b",
+          "correct": true
+        },
+        {
+          "a": "Johnny Walker",
+          "b": "Mick Parkin",
+          "probA": 0.498829828816864,
+          "winner": "a",
+          "correct": false
+        },
+        {
+          "a": "Anthony Wint",
+          "b": "Lucas Armand",
+          "probA": 0.6867264041599944,
+          "winner": "a",
+          "correct": true
+        },
+        {
+          "a": "Marcus McGhee",
+          "b": "Anthony Romero",
+          "probA": 0.6649198647733117,
+          "winner": "a",
+          "correct": true
+        },
+        {
+          "a": "Damian Pinas",
+          "b": "Andrey Pulyaev",
+          "probA": 0.6902762014989345,
+          "winner": "a",
+          "correct": true
+        },
+        {
+          "a": "Alden Coria",
+          "b": "Imanol Rodriguez",
+          "probA": 0.5195146997272261,
+          "winner": "b",
+          "correct": false
+        },
+        {
+          "a": "Ateba Gautier",
+          "b": "Roman Kopylov",
+          "probA": 0.7692218136812161,
+          "winner": "b",
+          "correct": false
+        },
+        {
+          "a": "Roberto Soldic",
+          "b": "Khaos Williams",
+          "probA": 0.3282766020204935,
+          "winner": "a",
+          "correct": false
+        },
+        {
+          "a": "Esteban Ribovics",
+          "b": "King Green",
+          "probA": 0.40303308157065804,
+          "winner": "a",
+          "correct": false
+        },
+        {
+          "a": "Payton Talbott",
+          "b": "Deiveson Figueiredo",
+          "probA": 0.7222075770920607,
+          "winner": "a",
+          "correct": true
+        },
+        {
+          "a": "Wang Cong",
+          "b": "Natalia Silva",
+          "probA": 0.3795862460202049,
+          "winner": "b",
+          "correct": true
+        }
+      ],
+      "accuracy": 0.6428571428571429,
+      "logLoss": 0.6179927443767684
+    },
+    {
+      "event": "UFC Fight Night: Rosas Jr. vs. Barcelos",
+      "date": "2026-09-26",
+      "bouts": [
+        {
+          "a": "Vanessa Demopoulos",
+          "b": "Yazmin Jauregui",
+          "probA": 0.19946494653919158,
+          "winner": "b",
+          "correct": true
+        },
+        {
+          "a": "John Castaneda",
+          "b": "Alatengheili",
+          "probA": 0.6507440536255332,
+          "winner": "b",
+          "correct": false
+        },
+        {
+          "a": "Montel Jackson",
+          "b": "Ricky Simon",
+          "probA": 0.7066620819113758,
+          "winner": "a",
+          "correct": true
+        },
+        {
+          "a": "Elves Brener",
+          "b": "Josiah Harrell",
+          "probA": 0.6079983268612206,
+          "winner": "a",
+          "correct": true
+        },
+        {
+          "a": "Christian Edwards",
+          "b": "Rodolfo Bellato",
+          "probA": 0.5160940994251647,
+          "winner": "a",
+          "correct": true
+        },
+        {
+          "a": "Robert Bryczek",
+          "b": "Rodolfo Vieira",
+          "probA": 0.43930599995601666,
+          "winner": "b",
+          "correct": true
+        },
+        {
+          "a": "Rinya Nakamura",
+          "b": "Brady Hiestand",
+          "probA": 0.5172456244731413,
+          "winner": "b",
+          "correct": false
+        },
+        {
+          "a": "Tina Black",
+          "b": "Melissa Amaya",
+          "probA": 0.5273141163846291,
+          "winner": "a",
+          "correct": true
+        },
+        {
+          "a": "Ilimbek Akylbek",
+          "b": "Mahammadali Osmanli",
+          "probA": 0.5,
+          "winner": "a",
+          "correct": true
+        },
+        {
+          "a": "Sedriques Dumas",
+          "b": "Luis Hernandez",
+          "probA": 0.47201702039485144,
+          "winner": "b",
+          "correct": true
+        },
+        {
+          "a": "Ailin Perez",
+          "b": "Norma Dumont",
+          "probA": 0.5582549843423125,
+          "winner": "a",
+          "correct": true
+        },
+        {
+          "a": "Raoni Barcelos",
+          "b": "Raul Rosas Jr.",
+          "probA": 0.22407573328911298,
+          "winner": "b",
+          "correct": true
+        }
+      ],
+      "accuracy": 0.8333333333333334,
+      "logLoss": 0.5746617982294856
+    },
+    {
+      "event": "UFC 331: Van vs. Pantoja 2",
+      "date": "2026-09-19",
+      "bouts": [
+        {
+          "a": "Joanderson Brito",
+          "b": "Giga Chikadze",
+          "probA": 0.7196848307673804,
+          "winner": "a",
+          "correct": true
+        },
+        {
+          "a": "Casey O'Neill",
+          "b": "Eduarda Moura",
+          "probA": 0.5959986500167157,
+          "winner": "a",
+          "correct": true
+        },
+        {
+          "a": "Edmen Shahbazyan",
+          "b": "Brunno Ferreira",
+          "probA": 0.703458939423766,
+          "winner": "a",
+          "correct": true
+        },
+        {
+          "a": "Ozzy Diaz",
+          "b": "Ryan Gandra",
+          "probA": 0.2742987649561459,
+          "winner": "b",
+          "correct": true
+        },
+        {
+          "a": "JooSang Yoo",
+          "b": "Michael Aswell Jr.",
+          "probA": 0.4207769685891709,
+          "winner": "b",
+          "correct": true
+        },
+        {
+          "a": "Robelis Despaigne",
+          "b": "Tai Tuivasa",
+          "probA": 0.6257932173988784,
+          "winner": "a",
+          "correct": true
+        },
+        {
+          "a": "Marlon Vera",
+          "b": "Charles Jourdain",
+          "probA": 0.42196190668138794,
+          "winner": "a",
+          "correct": false
+        },
+        {
+          "a": "Iwo Baraniewski",
+          "b": "Alonzo Menifield",
+          "probA": 0.5502579514653013,
+          "winner": "b",
+          "correct": false
+        },
+        {
+          "a": "Gable Steveson",
+          "b": "Sean Sharaf",
+          "probA": 0.8732364045112632,
+          "winner": "b",
+          "correct": false
+        },
+        {
+          "a": "Dooho Choi",
+          "b": "Patricio Pitbull",
+          "probA": 0.6530869608470169,
+          "winner": "b",
+          "correct": false
+        },
+        {
+          "a": "Mauricio Ruffy",
+          "b": "Arman Tsarukyan",
+          "probA": 0.23238171535429455,
+          "winner": "b",
+          "correct": true
+        },
+        {
+          "a": "Joshua Van",
+          "b": "Alexandre Pantoja",
+          "probA": 0.5669172777970269,
+          "winner": "a",
+          "correct": true
+        }
+      ],
+      "accuracy": 0.6666666666666666,
+      "logLoss": 0.6793052327740837
+    },
+    {
+      "event": "Noche UFC: Silva vs. Delgado",
+      "date": "2026-09-12",
+      "bouts": [
+        {
+          "a": "Regina Tarin",
+          "b": "JJ Aldrich",
+          "probA": 0.5486753090336474,
+          "winner": "a",
+          "correct": true
+        },
+        {
+          "a": "Jessie Rosas",
+          "b": "Sean King III",
+          "probA": 0.591967262621269,
+          "winner": "b",
+          "correct": false
+        },
+        {
+          "a": "Rongzhu",
+          "b": "Rafa Garcia",
+          "probA": 0.38237447578282374,
+          "winner": "a",
+          "correct": false
+        },
+        {
+          "a": "Tommy Gantt",
+          "b": "Drakkar Klose",
+          "probA": 0.7010511392027605,
+          "winner": "a",
+          "correct": true
+        },
+        {
+          "a": "Yousri Belgaroui",
+          "b": "Djorden Santos",
+          "probA": 0.7924249011090971,
+          "winner": "a",
+          "correct": true
+        },
+        {
+          "a": "Ignacio Bahamondes",
+          "b": "Muslim Salikhov",
+          "probA": 0.7475384545783387,
+          "winner": "a",
+          "correct": true
+        },
+        {
+          "a": "Edgar Chairez",
+          "b": "Tim Elliott",
+          "probA": 0.6115948055859206,
+          "winner": "b",
+          "correct": false
+        },
+        {
+          "a": "Dan Ige",
+          "b": "David Martinez",
+          "probA": 0.3476584480784038,
+          "winner": "b",
+          "correct": true
+        },
+        {
+          "a": "Curtis Blaydes",
+          "b": "Waldo Cortes Acosta",
+          "probA": 0.5272458521683879,
+          "winner": "a",
+          "correct": true
+        },
+        {
+          "a": "Alexa Grasso",
+          "b": "Manon Fiorot",
+          "probA": 0.4202018612076003,
+          "winner": "a",
+          "correct": false
+        },
+        {
+          "a": "Tommy McMillen",
+          "b": "Marwan Rahiki",
+          "probA": 0.7896780589380689,
+          "winner": "a",
+          "correct": true
+        },
+        {
+          "a": "Joseph Morales",
+          "b": "Brandon Moreno",
+          "probA": 0.30426447606360907,
+          "winner": "b",
+          "correct": true
+        },
+        {
+          "a": "Jean Silva",
+          "b": "Jose Delgado",
+          "probA": 0.46875447907460166,
+          "winner": "a",
+          "correct": false
+        }
+      ],
+      "accuracy": 0.6153846153846154,
+      "logLoss": 0.5825696916579849
+    }
+  ]
 }

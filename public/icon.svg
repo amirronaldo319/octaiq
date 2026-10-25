@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="OctaIQ">
+  <rect width="64" height="64" rx="14" fill="#0a0e14"/>
+  <defs><clipPath id="o"><polygon points="23,8 41,8 56,23 56,41 41,56 23,56 8,41 8,23"/></clipPath></defs>
+  <g clip-path="url(#o)"><rect x="8" y="8" width="24" height="48" fill="#e5484d"/><rect x="32" y="8" width="24" height="48" fill="#3e7bfa"/></g>
+</svg>

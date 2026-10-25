@@ -9,7 +9,7 @@ import { createMemoryHistory } from './history.ts'
 import type { OddsEvent } from './oddsApi.ts'
 
 const NOW = new Date('2026-10-25T12:00:00Z')
-const EVENT_PATH = resolve(import.meta.dirname, '../../data/events/ufc-vegas-123.json')
+const EVENT_PATH = resolve(import.meta.dirname, '../fixtures/events/ufc-vegas-123.json')
 const realFile = (): unknown => JSON.parse(readFileSync(EVENT_PATH, 'utf8'))
 
 const bout = (order: number, a: string, b: string, card: 'main' | 'prelim' = 'main'): SnapshotBout => ({

@@ -163,7 +163,7 @@ export function ModelHealth() {
 
       {state.data.market ? (
         <div className="panel market-panel">
-          <h3>Market baseline: model vs betting prices</h3>
+          <h2>Market baseline: model vs betting prices</h2>
           <p className="small">{state.data.market.verdict}</p>
           <table className="tbl">
             <thead><tr><th>Predictor</th><th>n</th><th>Log loss [95% CI]</th><th>Δ vs market [95% CI]</th><th>Brier</th><th>Accuracy</th></tr></thead>
@@ -195,7 +195,7 @@ export function ModelHealth() {
         </div>
       ) : (
         <div className="panel">
-          <h3>Market baseline</h3>
+          <h2>Market baseline</h2>
           <p className="empty">Not available. {state.data.marketNote ?? 'Re-run `npm run backtest` with network access.'}</p>
         </div>
       )}

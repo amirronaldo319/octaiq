@@ -35,6 +35,8 @@ export interface Bout {
   result: ResultKind
   method: MethodKind
   weightClass: string
+  /** Scheduled rounds from the results file's time format (3 or 5 for almost every bout), null if unknown */
+  scheduledRounds?: number | null
   /** Post-fight statistics. Only ever read for fights that happened BEFORE the bout being predicted. */
   stats?: BoutStats
 }
@@ -76,6 +78,12 @@ export function parseDate(text: string): number | null {
   if (month < 0) return null
   const ms = Date.UTC(Number(m[3]), month, Number(m[2]))
   return Number.isNaN(ms) ? null : ms
+}
+
+/** "3 Rnd (5-5-5)" gives 3, "5 Rnd (5-5-5-5-5)" gives 5, "No Time Limit" gives null. */
+export function scheduledRounds(timeFormat: string): number | null {
+  const m = /^(\d+)\s*Rnd/i.exec(timeFormat.trim())
+  return m ? Number(m[1]) : null
 }
 
 export function classifyMethod(raw: string): MethodKind {
@@ -244,6 +252,7 @@ export function parseBouts(files: RawFiles): { bouts: Bout[]; stats: IngestStats
       result,
       method: classifyMethod(r.method ?? ''),
       weightClass: (r.weightclass ?? '').trim(),
+      scheduledRounds: scheduledRounds(r['time format'] ?? ''),
       ...(boutStats ? { stats: boutStats } : {}),
     })
     stats.results[result]++

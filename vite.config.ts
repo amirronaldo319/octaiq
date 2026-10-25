@@ -6,5 +6,5 @@ export default defineConfig({
   base: './',
   plugins: [react()],
   server: { proxy: { '/api': 'http://127.0.0.1:8787' } },
-  test: { environment: 'node', include: ['src/**/*.test.ts', 'server/**/*.test.ts'] },
+  test: { environment: 'node', include: ['src/**/*.test.{ts,tsx}', 'server/**/*.test.ts'] },
 })

@@ -1,6 +1,7 @@
 import type { FightAnalysis } from '../lib/analysis'
 import { leanOf, trustFor, type PrimaryView } from '../lib/primary'
 import type { ResultsModelBout } from '../engine/eventTypes'
+import type { MarketBout } from '../lib/market'
 import { Avatar } from './Avatar'
 import { TugBar } from './TugBar'
 
@@ -8,6 +9,8 @@ interface BoutCardProps {
   analysis: FightAnalysis
   view: PrimaryView
   results?: ResultsModelBout
+  /** Consensus betting price, when one exists */
+  market?: MarketBout
   featured?: boolean
   onOpen: (id: string) => void
 }
@@ -33,13 +36,17 @@ function Corner({ name, record, prob, corner, leading, hasModel, big }: {
   )
 }
 
-export function BoutCard({ analysis, view, results, featured = false, onOpen }: BoutCardProps) {
+export function BoutCard({ analysis, view, results, market, featured = false, onOpen }: BoutCardProps) {
   const { fight } = analysis
   const hasModel = view.source !== 'none'
   const lean = leanOf(view.probA)
   const favored = lean.side === 'a' ? fight.a.name : fight.b.name
   const trust = trustFor(results)
   const notes = fight.bout?.notes.length ?? 0
+  // The other estimate, shown small, so the market and the model can be compared at a glance.
+  const other = view.source === 'market' ? results?.probA : market?.pA
+  const otherLabel = view.source === 'market' ? 'Model' : 'Market'
+  const otherFav = other === undefined ? null : other >= 0.5 ? { name: fight.a.name, p: other } : { name: fight.b.name, p: 1 - other }
 
   return (
     <button
@@ -70,7 +77,9 @@ export function BoutCard({ analysis, view, results, featured = false, onOpen }: 
               {lean.label === 'Toss-up' ? '' : `: ${favored}`}
             </span>
             {view.source === 'baseline' && <span className="tag warn">Untested estimate</span>}
-            {trust.level === 'Low' && <span className="tag">Thin data</span>}
+            {view.source === 'market' && <span className="tag">Betting market</span>}
+            {view.source !== 'market' && trust.level === 'Low' && <span className="tag">Thin data</span>}
+            {otherFav && <span className="cmp">{otherLabel}: {otherFav.name.split(' ').slice(-1)[0]} {Math.round(otherFav.p * 100)}%</span>}
           </>
         ) : (
           <span className="lean muted">No prediction yet</span>

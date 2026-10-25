@@ -1,0 +1,222 @@
+{
+  "event": {
+    "id": "ufc-334-gane-hokit",
+    "title": "UFC 334: Gane vs. Hokit",
+    "alias": "UFC 334, Nov 14",
+    "venue": "Madison Square Garden",
+    "city": "New York, New York",
+    "timeZone": "America/New_York",
+    "prelimsStart": "2026-11-14T22:00:00Z",
+    "mainCardStart": "2026-11-15T02:00:00Z",
+    "timesNote": "Early prelims 4:00 PM, prelims 6:00 PM and main card 8:00 PM CST on ufc.com; the earliest start is used for the undercard.",
+    "officialUrl": "https://www.ufc.com/event/ufc-334"
+  },
+  "snapshots": [
+    {
+      "version": 1,
+      "capturedAt": "2026-10-25T21:00:00Z",
+      "source": "Read from the official UFC event page on 2026-10-25: 12 bouts, no cancellation or replacement notices. The page title is branded 'Polymarket UFC 334'.",
+      "corroboration": "ufc.com does not state the number of rounds; five is assumed for main events and title bouts, three otherwise.",
+      "recordsSource": "Fighter records are not shown on the pages that were read, so records appear as a dash.",
+      "verification": {
+        "status": "official",
+        "checkedAt": "2026-10-25T21:00:00Z",
+        "url": "https://www.ufc.com/event/ufc-334",
+        "note": "Read by an automated fetch, not by a person. Cards change in fight week; re-check before relying on it."
+      },
+      "bouts": [
+        {
+          "order": 1,
+          "card": "main",
+          "weightClass": "Heavyweight",
+          "rounds": 5,
+          "a": {
+            "name": "Ciryl Gane",
+            "record": "—"
+          },
+          "b": {
+            "name": "Josh Hokit",
+            "record": "—"
+          },
+          "notes": [
+            "Title bout."
+          ]
+        },
+        {
+          "order": 2,
+          "card": "main",
+          "weightClass": "Women's Bantamweight",
+          "rounds": 5,
+          "a": {
+            "name": "Kayla Harrison",
+            "record": "—"
+          },
+          "b": {
+            "name": "Amanda Nunes",
+            "record": "—"
+          },
+          "notes": [
+            "Title bout."
+          ]
+        },
+        {
+          "order": 3,
+          "card": "main",
+          "weightClass": "Middleweight",
+          "rounds": 3,
+          "a": {
+            "name": "Caio Borralho",
+            "record": "—"
+          },
+          "b": {
+            "name": "Yousri Belgaroui",
+            "record": "—"
+          },
+          "notes": []
+        },
+        {
+          "order": 4,
+          "card": "main",
+          "weightClass": "Welterweight",
+          "rounds": 3,
+          "a": {
+            "name": "Uroš Medić",
+            "record": "—"
+          },
+          "b": {
+            "name": "Kevin Holland",
+            "record": "—"
+          },
+          "notes": []
+        },
+        {
+          "order": 5,
+          "card": "main",
+          "weightClass": "Flyweight",
+          "rounds": 3,
+          "a": {
+            "name": "Bilal Hasan",
+            "record": "—"
+          },
+          "b": {
+            "name": "Luis Gurule",
+            "record": "—"
+          },
+          "notes": []
+        },
+        {
+          "order": 6,
+          "card": "prelim",
+          "weightClass": "Welterweight",
+          "rounds": 3,
+          "a": {
+            "name": "Stephen Thompson",
+            "record": "—"
+          },
+          "b": {
+            "name": "Charles Radtke",
+            "record": "—"
+          },
+          "notes": []
+        },
+        {
+          "order": 7,
+          "card": "prelim",
+          "weightClass": "Lightweight",
+          "rounds": 3,
+          "a": {
+            "name": "Drew Dober",
+            "record": "—"
+          },
+          "b": {
+            "name": "Chris Duncan",
+            "record": "—"
+          },
+          "notes": []
+        },
+        {
+          "order": 8,
+          "card": "prelim",
+          "weightClass": "Lightweight",
+          "rounds": 3,
+          "a": {
+            "name": "Jim Miller",
+            "record": "—"
+          },
+          "b": {
+            "name": "Terrance McKinney",
+            "record": "—"
+          },
+          "notes": []
+        },
+        {
+          "order": 9,
+          "card": "prelim",
+          "weightClass": "Middleweight",
+          "rounds": 3,
+          "a": {
+            "name": "Donte Johnson",
+            "record": "—"
+          },
+          "b": {
+            "name": "Baisangur Susurkaev",
+            "record": "—"
+          },
+          "notes": []
+        },
+        {
+          "order": 10,
+          "card": "prelim",
+          "weightClass": "Women's Bantamweight",
+          "rounds": 3,
+          "a": {
+            "name": "Macy Chiasson",
+            "record": "—"
+          },
+          "b": {
+            "name": "Bia Mesquita",
+            "record": "—"
+          },
+          "notes": [
+            "Listed under Early Prelims on ufc.com."
+          ]
+        },
+        {
+          "order": 11,
+          "card": "prelim",
+          "weightClass": "Bantamweight",
+          "rounds": 3,
+          "a": {
+            "name": "Adrian Yanez",
+            "record": "—"
+          },
+          "b": {
+            "name": "Juan Diaz",
+            "record": "—"
+          },
+          "notes": [
+            "Listed under Early Prelims on ufc.com."
+          ]
+        },
+        {
+          "order": 12,
+          "card": "prelim",
+          "weightClass": "Lightweight",
+          "rounds": 3,
+          "a": {
+            "name": "Nazim Sadykhov",
+            "record": "—"
+          },
+          "b": {
+            "name": "Jefferson Nascimento",
+            "record": "—"
+          },
+          "notes": [
+            "Listed under Early Prelims on ufc.com."
+          ]
+        }
+      ],
+      "unlisted": []
+    }
+  ]
+}

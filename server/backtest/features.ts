@@ -1,4 +1,5 @@
-import type { Bout, FighterProfile, MethodKind, SideStats } from './dataset.ts'
+import type { Bout, FighterProfile, MethodKind, ResultKind, SideStats } from './dataset.ts'
+import { logit } from './models.ts'
 
 export const RESULT_FEATURES = [
   'elo', 'experience', 'winRate', 'finishRate', 'koLossRate', 'subLossRate', 'form',
@@ -23,7 +24,16 @@ export interface FeatureRow {
   /** Prior UFC bouts for each fighter, used for subgroup reporting */
   priorA: number
   priorB: number
+  /** Bout context and outcome, for the goes-the-distance and method models */
+  ctx: { rounds: number | null; weightClass: string; method: MethodKind; result: ResultKind }
+  /** Symmetric features: A plus B, so they describe how finish-prone the matchup is */
+  dist: number[]
+  /** Method features from each side's perspective as the winner: [A wins, B wins] */
+  mw: [number[], number[]]
 }
+
+export const DIST_DIM = 11
+export const METH_DIM = 4
 
 /** Decayed running totals of a fighter's earlier fights. */
 interface Roll {
@@ -47,7 +57,9 @@ interface State {
   n: number
   wins: number
   finishWins: number
+  koWins: number
   koLosses: number
+  subWins: number
   subLosses: number
   form: number
   lastDate: number | null
@@ -55,7 +67,7 @@ interface State {
 }
 
 const zeroRoll = (): Roll => ({ min: 0, sigL: 0, sigAbs: 0, sigAtt: 0, kdFor: 0, kdAg: 0, tdL: 0, tdAtt: 0, oppTdL: 0, oppTdAtt: 0, sub: 0, ctrlFor: 0, ctrlAg: 0 })
-const fresh = (): State => ({ elo: 1500, n: 0, wins: 0, finishWins: 0, koLosses: 0, subLosses: 0, form: 0.5, lastDate: null, roll: zeroRoll() })
+const fresh = (): State => ({ elo: 1500, n: 0, wins: 0, finishWins: 0, koWins: 0, koLosses: 0, subWins: 0, subLosses: 0, form: 0.5, lastDate: null, roll: zeroRoll() })
 const DAY = 86_400_000
 const YEAR = 365.25 * DAY
 
@@ -120,6 +132,28 @@ function describeStats(r: Roll, g: Global): number[] {
   ]
 }
 
+/** Finish-proneness descriptors for one fighter; the matchup vector is the sum over both fighters. */
+function symVector(s: State, p: FighterProfile | undefined, date: number, g: Global): number[] {
+  const age = p?.dob != null ? (date - p.dob) / YEAR : null
+  const [, landed, absorbed, , tdRate, , subRate, , kdFor, kdAgainst] = describeStats(s.roll, g)
+  return [
+    (s.finishWins + 1) / (s.n + 4),
+    s.koLosses / (s.n + 4),
+    s.subLosses / (s.n + 4),
+    landed, absorbed, tdRate, subRate, kdFor, kdAgainst,
+    Math.log1p(s.n),
+    age === null ? 0 : (age - 30) / 10,
+  ]
+}
+
+/** How a finish by `w` over `l` would most likely come: knockout or submission. */
+function methodVector(w: State, l: State, g: Global): number[] {
+  const koWinShare = (w.koWins + 1) / (w.finishWins + 2)
+  const koLossShare = (l.koLosses + 1) / (l.koLosses + l.subLosses + 2)
+  const [, , , , tdRate, , subRate] = describeStats(w.roll, g)
+  return [logit(koWinShare), logit(koLossShare), tdRate, subRate]
+}
+
 function describe(s: State, p: FighterProfile | undefined, date: number, g: Global): number[] {
   const age = p?.dob != null ? (date - p.dob) / YEAR : null
   const reach = p?.reachCm ?? null
@@ -145,16 +179,21 @@ function describe(s: State, p: FighterProfile | undefined, date: number, g: Glob
 const scoreOf = (result: 'a' | 'b' | 'draw', side: 'a' | 'b'): number => (result === 'draw' ? 0.5 : result === side ? 1 : 0)
 const expected = (eloSelf: number, eloOpp: number): number => 1 / (1 + 10 ** ((eloOpp - eloSelf) / 400))
 
+/** New Elo rating after a result. Shared with the career timelines so charts and predictions use one formula. */
+export const eloAfter = (self: number, opponent: number, score: number, k: number): number => self + k * (score - expected(self, opponent))
+export const scoreOfResult = (result: 'a' | 'b' | 'draw', side: 'a' | 'b'): number => (result === 'draw' ? 0.5 : result === side ? 1 : 0)
+
 function update(
   s: State, opp: State, score: number, kElo: number, won: boolean, lost: boolean,
   method: MethodKind, date: number, roll: Roll,
 ): State {
-  const exp = expected(s.elo, opp.elo)
   return {
-    elo: s.elo + kElo * (score - exp),
+    elo: eloAfter(s.elo, opp.elo, score, kElo),
     n: s.n + 1,
     wins: s.wins + (won ? 1 : 0),
     finishWins: s.finishWins + (won && (method === 'ko' || method === 'sub') ? 1 : 0),
+    koWins: s.koWins + (won && method === 'ko' ? 1 : 0),
+    subWins: s.subWins + (won && method === 'sub' ? 1 : 0),
     koLosses: s.koLosses + (lost && method === 'ko' ? 1 : 0),
     subLosses: s.subLosses + (lost && method === 'sub' ? 1 : 0),
     form: 0.7 * s.form + 0.3 * score,
@@ -198,6 +237,8 @@ export function buildFeatureRows(
       const sb = get(b.b)
       const fa = describe(sa, profiles.get(b.a), b.date, snapshot)
       const fb = describe(sb, profiles.get(b.b), b.date, snapshot)
+      const symA = symVector(sa, profiles.get(b.a), b.date, snapshot)
+      const symB = symVector(sb, profiles.get(b.b), b.date, snapshot)
       rows.push({
         id: b.id,
         event: b.event,
@@ -206,6 +247,9 @@ export function buildFeatureRows(
         x: fa.map((v, k) => v - fb[k]),
         priorA: sa.n,
         priorB: sb.n,
+        ctx: { rounds: b.scheduledRounds ?? null, weightClass: b.weightClass, method: b.method, result: b.result },
+        dist: symA.map((v, k) => v + symB[k]),
+        mw: [methodVector(sa, sb, snapshot), methodVector(sb, sa, snapshot)],
       })
     }
 
