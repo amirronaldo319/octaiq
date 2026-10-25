@@ -15,10 +15,26 @@ function strip(value: unknown): unknown {
   return value
 }
 
-/** True when the two JSON texts differ only in volatile timestamp fields. */
+/** Numbers this close are the same result: Linux and macOS differ in the last digits of exp/log/pow. */
+const REL_TOLERANCE = 1e-9
+
+function sameValue(a: unknown, b: unknown): boolean {
+  if (typeof a === 'number' && typeof b === 'number') {
+    return a === b || Math.abs(a - b) <= REL_TOLERANCE * Math.max(1, Math.abs(a), Math.abs(b))
+  }
+  if (Array.isArray(a) && Array.isArray(b)) return a.length === b.length && a.every((v, i) => sameValue(v, b[i]))
+  if (a !== null && b !== null && typeof a === 'object' && typeof b === 'object' && !Array.isArray(a) && !Array.isArray(b)) {
+    const ka = Object.keys(a)
+    const kb = Object.keys(b)
+    return ka.length === kb.length && ka.every((k) => k in b && sameValue((a as Record<string, unknown>)[k], (b as Record<string, unknown>)[k]))
+  }
+  return a === b
+}
+
+/** True when the two JSON texts differ only in volatile timestamps or floating-point noise. */
 export function sameIgnoringTimestamps(a: string, b: string): boolean {
   try {
-    return JSON.stringify(strip(JSON.parse(a))) === JSON.stringify(strip(JSON.parse(b)))
+    return sameValue(strip(JSON.parse(a)), strip(JSON.parse(b)))
   } catch {
     return a === b
   }
