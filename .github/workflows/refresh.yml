@@ -39,6 +39,8 @@ jobs:
         run: npm run prices
         env:
           ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
+          # One region keeps the free tier's 500 credits enough for weekly cards; set the repository variable to widen it.
+          ODDS_REGIONS: ${{ vars.ODDS_REGIONS || 'us' }}
       - name: Refresh the public snapshot
         run: npm run snapshot
       - name: Fail loudly if the data went stale

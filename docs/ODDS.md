@@ -57,7 +57,7 @@ Environment variable names (never commit values):
 | Name | Where | Purpose |
 | --- | --- | --- |
 | `ODDS_API_KEY` | GitHub Actions secret, local `.env`, Worker secret | The Odds API key. |
-| `ODDS_REGIONS` | Optional variable | Comma-separated regions, default `us,us2,eu`. Use `us` to cut cost to a third. |
+| `ODDS_REGIONS` | Optional repository variable | Comma-separated regions. The refresh workflow defaults to `us` (about 296 credits a month, inside the free 500); the code's own default is `us,us2,eu`. |
 | `UFCALENDAR_API_KEY` | Optional, local only | Licensed fighter statistics; never published. |
 | `ALLOWED_ORIGIN`, `SITE_BASE` | Worker `[vars]` in `server/worker/wrangler.toml` | The one origin allowed to read the API, and where event files are published. |
 | `VITE_MARKET_API_URL` | Site build (public, not secret) | Base URL of the deployed service. When unset the site reads the static `data/market.json`. |
