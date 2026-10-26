@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "production": "octa-results-stats-lr-0.2@58ca637e2e2c",
+  "production": "octa-results-stats-lr-0.2@0075c265d94e",
   "records": [
     {
       "id": "octa-results-stats-lr-0.2@58ca637e2e2c",
@@ -41,7 +41,7 @@
         ],
         "features": "results + rolling fight statistics"
       },
-      "status": "production"
+      "status": "previous"
     },
     {
       "id": "Boosted trees@58ca637e2e2c",
@@ -180,6 +180,185 @@
       },
       "status": "shadow",
       "decision": "log loss -0.0034 versus independent winner-and-method joint [-0.0101, +0.0030]; the interval includes zero"
+    },
+    {
+      "id": "octa-results-stats-lr-0.2@0075c265d94e",
+      "model": "octa-results-stats-lr-0.2",
+      "createdAt": "2026-10-26T04:52:09.489Z",
+      "dataVersion": "0075c265d94e",
+      "featurePipeline": "features-3",
+      "codeCommit": "a835eb852bd254a50040b8793f18610f52c61164",
+      "seed": 20261025,
+      "testPeriod": "2014-2026",
+      "n": 6302,
+      "logLoss": 0.6521404127579767,
+      "logLossLo": 0.6451978971683066,
+      "logLossHi": 0.6591881228650498,
+      "brier": 0.23011698915846956,
+      "accuracy": 0.616232941923199,
+      "calibrationSlope": 0.9202010736092212,
+      "config": {
+        "firstTestYear": 2014,
+        "validationYears": 6,
+        "ridge": 5,
+        "bootstrap": 1000,
+        "eloK": 64,
+        "statsDecay": 0.9,
+        "excludedFeatures": [
+          "ageMissing",
+          "reachMissing",
+          "southpaw",
+          "wcMove",
+          "eloWc",
+          "agePast",
+          "ageClass",
+          "sinceLoss",
+          "koRecent",
+          "cageMin",
+          "tdClash",
+          "kdClash"
+        ],
+        "features": "results + rolling fight statistics"
+      },
+      "status": "production"
+    },
+    {
+      "id": "Boosted trees@0075c265d94e",
+      "model": "Boosted trees",
+      "createdAt": "2026-10-26T04:52:09.489Z",
+      "dataVersion": "0075c265d94e",
+      "featurePipeline": "features-3",
+      "codeCommit": "a835eb852bd254a50040b8793f18610f52c61164",
+      "seed": 20261025,
+      "testPeriod": "2014-2026",
+      "n": 6302,
+      "logLoss": null,
+      "logLossLo": null,
+      "logLossHi": null,
+      "brier": null,
+      "accuracy": null,
+      "calibrationSlope": null,
+      "config": {
+        "comparedWith": "logistic stats model",
+        "logLossDifference": 0.004438796422251184
+      },
+      "status": "rejected",
+      "decision": "log loss +0.0044 versus logistic stats model [+0.0007, +0.0079]; the interval includes zero"
+    },
+    {
+      "id": "Ensemble of logistic and trees@0075c265d94e",
+      "model": "Ensemble of logistic and trees",
+      "createdAt": "2026-10-26T04:52:09.489Z",
+      "dataVersion": "0075c265d94e",
+      "featurePipeline": "features-3",
+      "codeCommit": "a835eb852bd254a50040b8793f18610f52c61164",
+      "seed": 20261025,
+      "testPeriod": "2014-2026",
+      "n": 6302,
+      "logLoss": null,
+      "logLossLo": null,
+      "logLossHi": null,
+      "brier": null,
+      "accuracy": null,
+      "calibrationSlope": null,
+      "config": {
+        "comparedWith": "logistic stats model",
+        "logLossDifference": -0.000506037926208516
+      },
+      "status": "shadow",
+      "decision": "log loss -0.0005 versus logistic stats model [-0.0024, +0.0013]; the interval includes zero"
+    },
+    {
+      "id": "Calibration: temperature@0075c265d94e",
+      "model": "Calibration: temperature",
+      "createdAt": "2026-10-26T04:52:09.489Z",
+      "dataVersion": "0075c265d94e",
+      "featurePipeline": "features-3",
+      "codeCommit": "a835eb852bd254a50040b8793f18610f52c61164",
+      "seed": 20261025,
+      "testPeriod": "2014-2026",
+      "n": 6302,
+      "logLoss": null,
+      "logLossLo": null,
+      "logLossHi": null,
+      "brier": null,
+      "accuracy": null,
+      "calibrationSlope": null,
+      "config": {
+        "comparedWith": "no recalibration",
+        "logLossDifference": 0.000597982047659412
+      },
+      "status": "rejected",
+      "decision": "log loss +0.0006 versus no recalibration [-0.0008, +0.0022]; the interval includes zero"
+    },
+    {
+      "id": "Calibration: platt@0075c265d94e",
+      "model": "Calibration: platt",
+      "createdAt": "2026-10-26T04:52:09.489Z",
+      "dataVersion": "0075c265d94e",
+      "featurePipeline": "features-3",
+      "codeCommit": "a835eb852bd254a50040b8793f18610f52c61164",
+      "seed": 20261025,
+      "testPeriod": "2014-2026",
+      "n": 6302,
+      "logLoss": null,
+      "logLossLo": null,
+      "logLossHi": null,
+      "brier": null,
+      "accuracy": null,
+      "calibrationSlope": null,
+      "config": {
+        "comparedWith": "no recalibration",
+        "logLossDifference": 0.000597982047659412
+      },
+      "status": "rejected",
+      "decision": "log loss +0.0006 versus no recalibration [-0.0008, +0.0022]; the interval includes zero"
+    },
+    {
+      "id": "Calibration: isotonic@0075c265d94e",
+      "model": "Calibration: isotonic",
+      "createdAt": "2026-10-26T04:52:09.489Z",
+      "dataVersion": "0075c265d94e",
+      "featurePipeline": "features-3",
+      "codeCommit": "a835eb852bd254a50040b8793f18610f52c61164",
+      "seed": 20261025,
+      "testPeriod": "2014-2026",
+      "n": 6302,
+      "logLoss": null,
+      "logLossLo": null,
+      "logLossHi": null,
+      "brier": null,
+      "accuracy": null,
+      "calibrationSlope": null,
+      "config": {
+        "comparedWith": "no recalibration",
+        "logLossDifference": 0.000881824204276614
+      },
+      "status": "rejected",
+      "decision": "log loss +0.0009 versus no recalibration [-0.0004, +0.0022]; the interval includes zero"
+    },
+    {
+      "id": "Direct six-outcome method model (hybrid with the win model)@0075c265d94e",
+      "model": "Direct six-outcome method model (hybrid with the win model)",
+      "createdAt": "2026-10-26T04:52:09.489Z",
+      "dataVersion": "0075c265d94e",
+      "featurePipeline": "features-3",
+      "codeCommit": "a835eb852bd254a50040b8793f18610f52c61164",
+      "seed": 20261025,
+      "testPeriod": "2014-2026",
+      "n": 6302,
+      "logLoss": null,
+      "logLossLo": null,
+      "logLossHi": null,
+      "brier": null,
+      "accuracy": null,
+      "calibrationSlope": null,
+      "config": {
+        "comparedWith": "independent winner-and-method joint",
+        "logLossDifference": -0.003384283907840214
+      },
+      "status": "shadow",
+      "decision": "log loss -0.0034 versus independent winner-and-method joint [-0.0096, +0.0026]; the interval includes zero"
     }
   ]
 }
