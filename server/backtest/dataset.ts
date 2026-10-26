@@ -37,6 +37,9 @@ export interface Bout {
   weightClass: string
   /** Scheduled rounds from the results file's time format (3 or 5 for almost every bout), null if unknown */
   scheduledRounds?: number | null
+  /** The round the fight ended in and the seconds into that round; for round and duration research, never used as a forecast input */
+  endRound?: number | null
+  endSeconds?: number | null
   /** Post-fight statistics. Only ever read for fights that happened BEFORE the bout being predicted. */
   stats?: BoutStats
 }
@@ -260,6 +263,8 @@ export function parseBouts(files: RawFiles): { bouts: Bout[]; stats: IngestStats
       method: classifyMethod(r.method ?? ''),
       weightClass: (r.weightclass ?? '').trim(),
       scheduledRounds: scheduledRounds(r['time format'] ?? ''),
+      endRound: Number.parseInt(r.round ?? '', 10) || null,
+      endSeconds: parseClock(r.time ?? ''),
       ...(boutStats ? { stats: boutStats } : {}),
     })
     stats.results[result]++

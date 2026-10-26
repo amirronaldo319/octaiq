@@ -10,7 +10,7 @@ export interface MonitorInput {
   now: Date
   events: readonly EventPayload[]
   /** Graded published bouts: probability that A won and whether the pick was right, newest last */
-  graded: readonly { probA: number; winner: 'a' | 'b' }[]
+  graded: readonly { probA: number; winner: 'a' | 'b'; shadowProbA?: number }[]
   /** Names quarantined for review and the number of names checked, from the identity audit */
   identity: { checked: number; quarantined: number } | null
   market: MarketFile | null
@@ -25,6 +25,8 @@ export interface Monitor {
   inputs: { fights: number; withForecast: number; debutantBouts: number; identityChecked: number | null; quarantined: number | null }
   drift: { currentMeanConfidence: number | null; trainingMeanConfidence: number | null; flagged: boolean }
   market: { ageHours: number | null; pricedBouts: number; fights: number } | null
+  /** Production against the shadow challenger on graded published forecasts that carry both; null until there are any */
+  shadow: { graded: number; productionLogLoss: number; shadowLogLoss: number; difference: number } | null
   alerts: string[]
 }
 
@@ -62,12 +64,23 @@ export function buildMonitor(i: MonitorInput): Monitor {
     if (ageHours > STALE_HOURS) alerts.push(`Betting prices were last collected ${Math.round(ageHours)} hours ago.`)
   }
 
+  const both = i.graded.filter((g): g is { probA: number; winner: 'a' | 'b'; shadowProbA: number } => g.shadowProbA !== undefined)
+  const ll = (p: number, w: 'a' | 'b'): number => -Math.log(Math.max(1e-6, w === 'a' ? p : 1 - p))
+  const shadow = both.length
+    ? (() => {
+        const production = both.reduce((s, g) => s + ll(g.probA, g.winner), 0) / both.length
+        const sh = both.reduce((s, g) => s + ll(g.shadowProbA, g.winner), 0) / both.length
+        return { graded: both.length, productionLogLoss: production, shadowLogLoss: sh, difference: sh - production }
+      })()
+    : null
+
   return {
     generatedAt: i.now.toISOString(),
     prospective: { graded: i.graded.length, correct, logLoss, window: recent.length, note },
     inputs: { fights: fights.length, withForecast: forecasts.length, debutantBouts, identityChecked: i.identity?.checked ?? null, quarantined: i.identity?.quarantined ?? null },
     drift: { currentMeanConfidence: current, trainingMeanConfidence: i.trainingMeanConfidence, flagged },
     market,
+    shadow,
     alerts,
   }
 }

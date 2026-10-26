@@ -1,0 +1,9 @@
+numpy
+pandas
+scikit-learn
+scipy
+lightgbm
+xgboost
+catboost
+optuna
+# LightGBM and XGBoost need the OpenMP runtime on macOS: brew install libomp

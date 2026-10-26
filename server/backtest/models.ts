@@ -44,6 +44,8 @@ export interface TrainOptions {
   /** Reuse feature scales, so weights from different resamples are comparable */
   scales?: readonly number[]
   maxIter?: number
+  /** Per-row weights, for example to count recent fights more than old ones; absent means every row counts equally */
+  weights?: readonly number[]
 }
 
 export function trainLogistic(x: readonly number[][], y: readonly number[], lambda: number, opts: TrainOptions = {}): LogisticModel {
@@ -62,8 +64,9 @@ export function trainLogistic(x: readonly number[][], y: readonly number[], lamb
     const hess = Array.from({ length: d }, (_, i) => Array.from({ length: d }, (_, j) => (i === j ? lambda : 0)))
     for (let k = 0; k < xs.length; k++) {
       const p = sigmoid(xs[k].reduce((s, v, j) => s + v * w[j], 0))
-      const r = p - y[k]
-      const wgt = p * (1 - p)
+      const wk = opts.weights?.[k] ?? 1
+      const r = (p - y[k]) * wk
+      const wgt = p * (1 - p) * wk
       for (let i = 0; i < d; i++) {
         grad[i] += r * xs[k][i]
         for (let j = 0; j < d; j++) hess[i][j] += wgt * xs[k][i] * xs[k][j]

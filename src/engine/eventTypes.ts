@@ -91,6 +91,8 @@ export interface ResultsModelBout {
   priorB: number
   /** Elo rating gap, A minus B */
   eloDiff: number
+  /** A research challenger's probability that A wins. Recorded for later grading, never shown as the forecast. */
+  shadowProbA?: number
   /** The main reasons behind the forecast: the biggest factors for the pick and against it */
   why?: { pick: 'a' | 'b'; for: { text: string; strength: number }[]; against: { text: string; strength: number }[]; details?: { family: string; text: string; strength: number }[] }
 }
@@ -109,6 +111,8 @@ export interface ResultsModel {
   featurePipeline?: string
   codeCommit?: string
   featureCutoff?: string
+  /** Name of the shadow challenger whose probabilities are saved with each forecast */
+  shadowModel?: string
   backtest?: {
     period: string
     n: number

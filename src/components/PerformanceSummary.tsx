@@ -74,6 +74,9 @@ export function PerformanceSummary({ backtest }: { backtest: BacktestOutput }) {
           <>
             <p><strong>{ledgerData.graded === 0 ? 'None graded yet' : `${ledgerData.correct} of ${ledgerData.graded} correct`}</strong>{ledgerData.graded > 0 ? ` (${pct(ledgerData.correct / ledgerData.graded)})` : ''}</p>
             <p className="muted small">{ledgerData.events.length} cards tracked, {versions} saved forecast versions. Each version has a time, a model version and a reason, on the Track record page.</p>
+            {ledgerData.byHorizon && ledgerData.byHorizon.length > 0 && (
+              <p className="muted small">By how early the forecast was saved: {ledgerData.byHorizon.map((h) => `${h.label.toLowerCase()} ${h.correct} of ${h.graded}`).join('; ')}. Small samples; read as a record, not a ranking.</p>
+            )}
           </>
         ) : <p className="muted small">Loading the public archive…</p>}
       </article>
@@ -119,6 +122,11 @@ export function MonitorPanel() {
         <li>Bouts on current cards: {d.inputs.fights}, with a forecast: {d.inputs.withForecast}, involving a UFC debutant: {d.inputs.debutantBouts}.</li>
         <li>Fighter names checked against the results data: {d.inputs.identityChecked ?? 'not run'}; waiting for a person to confirm: {d.inputs.quarantined ?? 'not run'}.</li>
         <li>Forecast confidence now {d.drift.currentMeanConfidence?.toFixed(2) ?? '–'} on average, against {d.drift.trainingMeanConfidence?.toFixed(2) ?? '–'} in the tests{d.drift.flagged ? ' (a notable shift)' : ''}.</li>
+        {d.shadow ? (
+          <li>Shadow challenger (older fights count for less) on {d.shadow.graded} graded fights: log loss {d.shadow.shadowLogLoss.toFixed(3)} against {d.shadow.productionLogLoss.toFixed(3)} for the production model. Too few to decide anything.</li>
+        ) : (
+          <li>A recency-weighted shadow challenger forecasts alongside the production model; there is nothing graded to compare yet.</li>
+        )}
         {d.market && <li>Betting prices: collected {d.market.ageHours} hours ago, covering {d.market.pricedBouts} of {d.market.fights} bouts.</li>}
       </ul>
     </section>

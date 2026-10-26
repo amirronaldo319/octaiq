@@ -13,6 +13,8 @@ export interface LedgerBout {
   probA: number
   probLo?: number
   probHi?: number
+  /** Probability that A wins under the shadow challenger; saved for later grading, never part of the headline forecast */
+  shadowProbA?: number
   /** Probability the fight goes the distance */
   distance?: number
   joint?: JointOutcome
@@ -27,6 +29,7 @@ export interface LedgerEntry {
   dataVersion?: string
   featurePipeline?: string
   codeCommit?: string
+  shadowModel?: string
   /** Latest fight in the training data when this was made */
   dataThrough?: string
   cardVersion: number
@@ -54,6 +57,7 @@ export function entryFromPayload(payload: EventPayload, now: Date): LedgerEntry 
     ...(model.dataVersion ? { dataVersion: model.dataVersion } : {}),
     ...(model.featurePipeline ? { featurePipeline: model.featurePipeline } : {}),
     ...(model.codeCommit ? { codeCommit: model.codeCommit } : {}),
+    ...(model.shadowModel ? { shadowModel: model.shadowModel } : {}),
     dataThrough: model.trainedThrough,
     cardVersion: payload.snapshot.version,
     bouts: payload.fights
@@ -64,6 +68,7 @@ export function entryFromPayload(payload: EventPayload, now: Date): LedgerEntry 
           id: f.id, a: f.a.name, b: f.b.name, probA: round4(r.probA),
           ...(r.probLo !== undefined ? { probLo: round4(r.probLo) } : {}),
           ...(r.probHi !== undefined ? { probHi: round4(r.probHi) } : {}),
+          ...(r.shadowProbA !== undefined ? { shadowProbA: round4(r.shadowProbA) } : {}),
           ...(r.distance !== undefined ? { distance: round4(r.distance) } : {}),
           ...(r.joint ? { joint: Object.fromEntries(Object.entries(r.joint).map(([k, v]) => [k, round4(v)])) as unknown as JointOutcome } : {}),
         }
@@ -73,6 +78,9 @@ export function entryFromPayload(payload: EventPayload, now: Date): LedgerEntry 
 }
 
 const round4 = (n: number): number => Math.round(n * 10_000) / 10_000
+
+export { HORIZONS, horizonOf } from '../../src/engine/horizons.ts'
+import { horizonOf } from '../../src/engine/horizons.ts'
 
 /** A stable ID for one saved forecast version. Pure in the event, the save time and the model, so older entries get the same ID today as they will tomorrow. */
 export function forecastIdOf(eventId: string, e: Pick<LedgerEntry, 'recordedAt' | 'model'>): string {
@@ -86,8 +94,9 @@ export interface LedgerHistoryEntry {
   supersedes: string | null
   dataVersion?: string
   featurePipeline?: string
-  /** Hours between saving this version and the main card, the forecast's prediction horizon */
+  /** Hours between saving this version and the main card, the forecast's prediction horizon, and its named horizon */
   horizonHours: number
+  horizon: string
   at: string
   model: string
   dataThrough?: string
@@ -103,6 +112,7 @@ export function describeChange(prev: LedgerEntry | undefined, next: LedgerEntry)
   const before = new Set(prev.bouts.map((b) => `${b.id}|${b.a}|${b.b}`))
   if (before.size !== next.bouts.length || next.bouts.some((b) => !before.has(`${b.id}|${b.a}|${b.b}`))) return 'The card changed'
   if (prev.model !== next.model) return `The model was updated (${next.model})`
+  if (prev.shadowModel !== next.shadowModel) return 'A shadow challenger forecast was added for later grading'
   if (prev.dataThrough !== next.dataThrough) return `New results were added (data through ${next.dataThrough ?? 'a later date'})`
   return 'A small shift in the probabilities'
 }
@@ -113,6 +123,7 @@ export function historyOf(ledger: Ledger): LedgerHistoryEntry[] {
     supersedes: i > 0 ? forecastIdOf(ledger.eventId, ledger.entries[i - 1]) : null,
     ...(e.dataVersion ? { dataVersion: e.dataVersion } : {}),
     ...(e.featurePipeline ? { featurePipeline: e.featurePipeline } : {}),
+    horizon: horizonOf(e.recordedAt, ledger.mainCardStart),
     horizonHours: Math.round(((Date.parse(ledger.mainCardStart) - Date.parse(e.recordedAt)) / 3_600_000) * 10) / 10,
     at: e.recordedAt, model: e.model, dataThrough: e.dataThrough, cardVersion: e.cardVersion,
     reason: describeChange(ledger.entries[i - 1], e),
@@ -123,7 +134,7 @@ export function historyOf(ledger: Ledger): LedgerHistoryEntry[] {
 export type RecordDecision = { record: true; reason: string } | { record: false; reason: string }
 
 /** Pure decision: should `next` be appended to a ledger that already holds `entries`? */
-export function shouldRecord(ledger: Ledger | null, next: LedgerEntry, lockedAt: string): RecordDecision {
+export function shouldRecord(ledger: Ledger | null, next: LedgerEntry, lockedAt: string, mainCardStart?: string): RecordDecision {
   if (Date.parse(next.recordedAt) >= Date.parse(lockedAt)) return { record: false, reason: 'The event has started, so the ledger is locked.' }
   const last = ledger?.entries[ledger.entries.length - 1]
   if (!last) return { record: true, reason: 'First entry for this event.' }
@@ -132,8 +143,11 @@ export function shouldRecord(ledger: Ledger | null, next: LedgerEntry, lockedAt:
     return { record: true, reason: 'The card changed.' }
   }
   if (last.model !== next.model) return { record: true, reason: 'The model version changed.' }
+  if (last.shadowModel !== next.shadowModel) return { record: true, reason: 'A shadow challenger was added.' }
   const moved = next.bouts.some((b) => Math.abs((before.get(b.id)?.probA ?? 0) - b.probA) >= CHANGE_THRESHOLD)
-  return moved ? { record: true, reason: 'A probability moved.' } : { record: false, reason: 'Nothing changed.' }
+  if (moved) return { record: true, reason: 'A probability moved.' }
+  if (mainCardStart && horizonOf(next.recordedAt, mainCardStart) !== horizonOf(last.recordedAt, mainCardStart)) return { record: true, reason: 'The card entered a new forecast horizon.' }
+  return { record: false, reason: 'Nothing changed.' }
 }
 
 export const ledgerPath = (root: string, eventId: string): string => resolve(root, 'data/ledger', `${eventId}.json`)
@@ -170,7 +184,7 @@ export function recordLedgers(root: string, payloads: readonly EventPayload[], n
     const entry = entryFromPayload(p, now)
     if (!entry) return { eventId: p.event.id, recorded: false, reason: p.resultsModel.reason ?? 'No model output.' }
     const existing = readLedger(root, p.event.id)
-    const decision = shouldRecord(existing, entry, p.event.prelimsStart)
+    const decision = shouldRecord(existing, entry, p.event.prelimsStart, p.event.mainCardStart)
     if (!decision.record) return { eventId: p.event.id, recorded: false, reason: decision.reason }
     const ledger: Ledger = {
       eventId: p.event.id,

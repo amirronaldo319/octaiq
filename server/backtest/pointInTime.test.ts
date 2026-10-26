@@ -104,6 +104,38 @@ describe('fighter order', () => {
   })
 })
 
+describe('recency-weighted shadow model', () => {
+  const bouts = world(13, 90)
+  const history = bouts.slice(0, 380)
+  const date = history[history.length - 1].date + 7 * DAY
+  const input = (id: string, a: string, b: string) => ({ id, a, b, date, rounds: 3, weightClass: 'Lightweight Bout' })
+
+  it('is only produced when asked, and swapping the fighters gives the complement', () => {
+    const plain = predictUpcoming(history, profiles, [input('p', 'f3', 'f17')], upcomingDefaults(32))[0]
+    expect(plain.shadowProbA).toBeUndefined()
+    const opts = { ...upcomingDefaults(32), shadowHalfLifeYears: 4 }
+    const [ab] = predictUpcoming(history, profiles, [input('ab', 'f3', 'f17')], opts)
+    const [ba] = predictUpcoming(history, profiles, [input('ba', 'f17', 'f3')], opts)
+    expect(ab.shadowProbA).toBeDefined()
+    expect((ab.shadowProbA as number) + (ba.shadowProbA as number)).toBeCloseTo(1, 9)
+    expect(ab.probA).toBeCloseTo(plain.probA, 12)
+  })
+
+  it('weights of one reproduce the unweighted fit, and a very long half-life converges to it', async () => {
+    const { trainLogistic, predictLogistic } = await import('./models.ts')
+    const rng = createRng(4)
+    const xs = Array.from({ length: 300 }, () => [rng() - 0.5, rng() - 0.5])
+    const ys = xs.map((x) => (rng() < 1 / (1 + Math.exp(-3 * x[0])) ? 1 : 0))
+    const a = trainLogistic(xs, ys, 5)
+    const b = trainLogistic(xs, ys, 5, { weights: xs.map(() => 1) })
+    expect(predictLogistic(a, [0.3, 0.1])).toBeCloseTo(predictLogistic(b, [0.3, 0.1]), 10)
+    const old = trainLogistic(xs, ys, 5, { weights: xs.map((_, i) => 0.5 ** ((300 - i) / 1e9)) })
+    expect(predictLogistic(old, [0.3, 0.1])).toBeCloseTo(predictLogistic(a, [0.3, 0.1]), 6)
+    const recent = trainLogistic(xs, ys, 5, { weights: xs.map((_, i) => (i > 250 ? 1 : 0.01)) })
+    expect(predictLogistic(recent, [0.3, 0.1])).not.toBeCloseTo(predictLogistic(a, [0.3, 0.1]), 3)
+  })
+})
+
 describe('calibrationFit', () => {
   it('finds slope near 1 and intercept near 0 for honest forecasts', () => {
     const rng = createRng(2)

@@ -68,6 +68,7 @@ Keys stay on the server and are never sent to the browser. Odds come from [The O
 | `npm run prices` | Looks at live prices once, appends to `data/prices/` when the consensus moved, and writes `public/data/market.json` and `prices.json` (needs `ODDS_API_KEY`; skips cleanly without it) |
 | `npm run report` | Writes `docs/REPORT.md` from the latest backtest and registry |
 | `npm run registry` | Records the evaluated model, its data version and the gate decisions in `data/models/registry.json` |
+| `npm run research:export` | Writes the point-in-time feature matrix the Python research reads (`data/experiments/`, not committed) |
 | `npm run identity` | Audits fighter names on the cards against the results data |
 | `npm run check:bundle` | Scans the build for secrets |
 | `npm run check-keys` | Checks API keys without printing them (`-- --no-odds` skips the one credit it costs) |
@@ -102,6 +103,8 @@ OctaIQ's own code is MIT licensed ([LICENSE](LICENSE)). Data keeps its own terms
 ## Evaluation, odds and operations (more detail in `docs/`)
 
 - `docs/REPORT.md`: the full evaluation, generated from the saved backtest by `npm run report` (data and code versions, protocol, models on the same fights with calibration slope, promotion-gate decisions, market comparison, method models, calibration methods, subgroups, ablations).
+- `docs/RESEARCH.md`: the model research (boosted trees, ratings, hierarchical, ensembles, neural sequences, round forecasts, age and reach one at a time, data audit), generated from `data/experiments/` by `npm run report`. Reproduce with the commands inside it (Python environment in `research/`).
+- `docs/API.md`: published files, the optional prices service and its contracts, and what was deliberately not built.
 - `docs/ODDS.md`: provider research with dates, the price architecture, setup, environment variables and cost estimates.
 - `docs/CLAIMS.md`: what the product must not claim.
 - `data/models/registry.json`: every evaluated model with its data version, code commit and decision; `npm run registry -- --rollback <id>` points production at an earlier record and prints how to restore its code.

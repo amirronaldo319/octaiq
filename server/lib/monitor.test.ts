@@ -44,6 +44,14 @@ describe('buildMonitor', () => {
     expect(stale.alerts.join(' ')).toContain('hours ago')
   })
 
+  it('compares the shadow challenger with production on graded forecasts that carry both', () => {
+    const graded = [{ probA: 0.6, winner: 'a' as const, shadowProbA: 0.7 }, { probA: 0.6, winner: 'b' as const, shadowProbA: 0.5 }, { probA: 0.6, winner: 'a' as const }]
+    const m = buildMonitor({ ...base, graded })
+    expect(m.shadow?.graded).toBe(2)
+    expect(m.shadow?.difference).toBeCloseTo(m.shadow!.shadowLogLoss - m.shadow!.productionLogLoss, 12)
+    expect(buildMonitor(base).shadow).toBeNull()
+  })
+
   it('counts bouts with a debutant', () => {
     expect(buildMonitor({ ...base, events: [event([0.6, 0.7], [0, 4])] }).inputs.debutantBouts).toBe(2)
   })

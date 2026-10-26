@@ -1,0 +1,170 @@
+{
+  "generatedAt": "2026-10-26T05:26:09.490247+00:00",
+  "dataVersion": "58ca637e2e2c",
+  "n": 6288,
+  "setup": {
+    "history": "last 8 fights per fighter, strictly before the bout",
+    "seeds": [
+      11,
+      22,
+      33
+    ],
+    "inputs": 16,
+    "epochs": "up to 80, early stopping on the last training year",
+    "form": "linear(engineered features) + odd function of the difference between fighter summaries"
+  },
+  "models": {
+    "linear_torch": {
+      "summary": {
+        "n": 6288,
+        "logLoss": 0.6521171586924919,
+        "brier": 0.23014773827462537,
+        "accuracy": 0.6171278625954199,
+        "auc": 0.6623519302848784,
+        "calibration": {
+          "slope": 1.0268016029798186,
+          "intercept": -0.023646471033371794
+        }
+      },
+      "vsBaseline": {
+        "estimate": 5.934167068369815e-05,
+        "lo": -0.001791109115296575,
+        "hi": 0.001972794756905145
+      },
+      "decision": {
+        "mode": "reject",
+        "reasons": [
+          "log loss +0.0001 [-0.0018, +0.0020]",
+          "interval includes zero",
+          "gain under the 0.002 minimum",
+          "better in 4 of 13 yearly folds",
+          "calibration slope 1.03"
+        ],
+        "estimate": 5.934167068369815e-05,
+        "lo": -0.001791109115296575,
+        "hi": 0.001972794756905145,
+        "foldWinShare": 0.3076923076923077,
+        "adjustedInterval": {
+          "level": 0.9875,
+          "lo": -0.002485458143324587,
+          "hi": 0.002569104768331077,
+          "challengers": 4
+        }
+      }
+    },
+    "mlp": {
+      "summary": {
+        "n": 6288,
+        "logLoss": 0.6525691409509443,
+        "brier": 0.23037597496025736,
+        "accuracy": 0.6171278625954199,
+        "auc": 0.6608925678799034,
+        "calibration": {
+          "slope": 0.9827992488804937,
+          "intercept": -0.022791260241787403
+        }
+      },
+      "vsBaseline": {
+        "estimate": 0.000511323929136144,
+        "lo": -0.0017895542906271069,
+        "hi": 0.002773750607624862
+      },
+      "decision": {
+        "mode": "reject",
+        "reasons": [
+          "log loss +0.0005 [-0.0018, +0.0028]",
+          "interval includes zero",
+          "gain under the 0.002 minimum",
+          "better in 5 of 13 yearly folds",
+          "calibration slope 0.98"
+        ],
+        "estimate": 0.000511323929136144,
+        "lo": -0.0017895542906271069,
+        "hi": 0.002773750607624862,
+        "foldWinShare": 0.38461538461538464,
+        "adjustedInterval": {
+          "level": 0.9875,
+          "lo": -0.0024298331078128686,
+          "hi": 0.003379619469296065,
+          "challengers": 4
+        }
+      }
+    },
+    "gru": {
+      "summary": {
+        "n": 6288,
+        "logLoss": 0.6522367890459663,
+        "brier": 0.23021869663611383,
+        "accuracy": 0.616809796437659,
+        "auc": 0.6617467165231146,
+        "calibration": {
+          "slope": 0.9666400080605673,
+          "intercept": -0.019344201250441347
+        }
+      },
+      "vsBaseline": {
+        "estimate": 0.00017897202415823976,
+        "lo": -0.0027851271532093346,
+        "hi": 0.0032928160938984832
+      },
+      "decision": {
+        "mode": "reject",
+        "reasons": [
+          "log loss +0.0002 [-0.0028, +0.0033]",
+          "interval includes zero",
+          "gain under the 0.002 minimum",
+          "better in 4 of 13 yearly folds",
+          "calibration slope 0.97"
+        ],
+        "estimate": 0.00017897202415823976,
+        "lo": -0.0027851271532093346,
+        "hi": 0.0032928160938984832,
+        "foldWinShare": 0.3076923076923077,
+        "adjustedInterval": {
+          "level": 0.9875,
+          "lo": -0.0033876587410300715,
+          "hi": 0.004111813920431635,
+          "challengers": 4
+        }
+      }
+    },
+    "attn": {
+      "summary": {
+        "n": 6288,
+        "logLoss": 0.6528218018508335,
+        "brier": 0.2304810120754893,
+        "accuracy": 0.6199904580152672,
+        "auc": 0.6606307840937844,
+        "calibration": {
+          "slope": 0.9763335496981822,
+          "intercept": -0.021905263397077376
+        }
+      },
+      "vsBaseline": {
+        "estimate": 0.0007639848290254268,
+        "lo": -0.0018141838996614283,
+        "hi": 0.0036154629918413823
+      },
+      "decision": {
+        "mode": "reject",
+        "reasons": [
+          "log loss +0.0008 [-0.0018, +0.0036]",
+          "interval includes zero",
+          "gain under the 0.002 minimum",
+          "better in 4 of 13 yearly folds",
+          "calibration slope 0.98"
+        ],
+        "estimate": 0.0007639848290254268,
+        "lo": -0.0018141838996614283,
+        "hi": 0.0036154629918413823,
+        "foldWinShare": 0.3076923076923077,
+        "adjustedInterval": {
+          "level": 0.9875,
+          "lo": -0.0023661406370905263,
+          "hi": 0.004150579150167008,
+          "challengers": 4
+        }
+      }
+    }
+  }
+}

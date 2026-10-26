@@ -53,7 +53,7 @@ const total = binned.reduce((n, b) => n + b.n, 0)
 put('monitor.json', JSON.stringify(buildMonitor({
   now: new Date(),
   events: payloads,
-  graded: publishedLedger.events.flatMap((e) => e.bouts.flatMap((b) => (b.result === 'a' || b.result === 'b' ? [{ probA: b.probA, winner: b.result }] : []))),
+  graded: publishedLedger.events.flatMap((e) => e.bouts.flatMap((b) => (b.result === 'a' || b.result === 'b' ? [{ probA: b.probA, winner: b.result, ...(b.shadowProbA !== undefined ? { shadowProbA: b.shadowProbA } : {}) }] : []))),
   identity: identity ? { checked: identity.checked, quarantined: identity.quarantined.length } : null,
   market: marketFile && isMarketFile(marketFile) ? marketFile : null,
   trainingMeanConfidence: total ? binned.reduce((s, b) => s + b.n * b.meanPredicted, 0) / total : null,

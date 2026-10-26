@@ -427,6 +427,234 @@
           }
         }
       ]
+    },
+    {
+      "recordedAt": "2026-10-26T05:39:43.959Z",
+      "model": "octa-results-stats-lr-0.2",
+      "dataVersion": "58ca637e2e2c",
+      "featurePipeline": "features-3",
+      "codeCommit": "34554fed1e675339cebd9afa51fa8a3a8eff9b1a",
+      "shadowModel": "octa-results-stats-lr-recency4y-0.1",
+      "dataThrough": "2026-10-17",
+      "cardVersion": 2,
+      "bouts": [
+        {
+          "id": "ufc-vegas-123-1",
+          "a": "Renato Moicano",
+          "b": "Tom Nolan",
+          "probA": 0.4921,
+          "probLo": 0.4582,
+          "probHi": 0.53,
+          "shadowProbA": 0.4371,
+          "distance": 0.3542,
+          "joint": {
+            "aKo": 0.1742,
+            "aSub": 0.1436,
+            "aDec": 0.1743,
+            "bKo": 0.2073,
+            "bSub": 0.1206,
+            "bDec": 0.1799
+          }
+        },
+        {
+          "id": "ufc-vegas-123-2",
+          "a": "Randy Brown",
+          "b": "Jacobe Smith",
+          "probA": 0.3503,
+          "probLo": 0.3131,
+          "probHi": 0.4021,
+          "shadowProbA": 0.3028,
+          "distance": 0.483,
+          "joint": {
+            "aKo": 0.1336,
+            "aSub": 0.0476,
+            "aDec": 0.1692,
+            "bKo": 0.2498,
+            "bSub": 0.0861,
+            "bDec": 0.3138
+          }
+        },
+        {
+          "id": "ufc-vegas-123-3",
+          "a": "Yana Santos",
+          "b": "Luana Santos",
+          "probA": 0.226,
+          "probLo": 0.1943,
+          "probHi": 0.2672,
+          "shadowProbA": 0.1906,
+          "distance": 0.7215,
+          "joint": {
+            "aKo": 0.0392,
+            "aSub": 0.0237,
+            "aDec": 0.1631,
+            "bKo": 0.138,
+            "bSub": 0.0776,
+            "bDec": 0.5585
+          }
+        },
+        {
+          "id": "ufc-vegas-123-4",
+          "a": "Ode' Osbourne",
+          "b": "Cody Durden",
+          "probA": 0.4926,
+          "probLo": 0.45,
+          "probHi": 0.5257,
+          "shadowProbA": 0.4833,
+          "distance": 0.5014,
+          "joint": {
+            "aKo": 0.1793,
+            "aSub": 0.0663,
+            "aDec": 0.247,
+            "bKo": 0.1209,
+            "bSub": 0.1321,
+            "bDec": 0.2544
+          }
+        },
+        {
+          "id": "ufc-vegas-123-5",
+          "a": "Zachary Reese",
+          "b": "Mickey Gall",
+          "probA": 0.7607,
+          "probLo": 0.7248,
+          "probHi": 0.807,
+          "shadowProbA": 0.7487,
+          "distance": 0.402,
+          "joint": {
+            "aKo": 0.3476,
+            "aSub": 0.1073,
+            "aDec": 0.3058,
+            "bKo": 0.0716,
+            "bSub": 0.0715,
+            "bDec": 0.0962
+          }
+        },
+        {
+          "id": "ufc-vegas-123-6",
+          "a": "Jean-Paul Lebosnoyani",
+          "b": "Farman Hasanov",
+          "probA": 0.4357,
+          "probLo": 0.3577,
+          "probHi": 0.5007,
+          "shadowProbA": 0.5145,
+          "distance": 0.6378,
+          "joint": {
+            "aKo": 0.0928,
+            "aSub": 0.065,
+            "aDec": 0.2779,
+            "bKo": 0.098,
+            "bSub": 0.1064,
+            "bDec": 0.3599
+          }
+        },
+        {
+          "id": "ufc-vegas-123-7",
+          "a": "Francis Marshall",
+          "b": "Dakota Hope",
+          "probA": 0.6158,
+          "probLo": 0.5741,
+          "probHi": 0.658,
+          "shadowProbA": 0.6188,
+          "distance": 0.5917,
+          "joint": {
+            "aKo": 0.1615,
+            "aSub": 0.0899,
+            "aDec": 0.3644,
+            "bKo": 0.115,
+            "bSub": 0.0419,
+            "bDec": 0.2274
+          }
+        },
+        {
+          "id": "ufc-vegas-123-8",
+          "a": "Rodrigo Sezinando",
+          "b": "Theodor Berggren",
+          "probA": 0.479,
+          "probLo": 0.4472,
+          "probHi": 0.5025,
+          "shadowProbA": 0.4569,
+          "distance": 0.3967,
+          "joint": {
+            "aKo": 0.2071,
+            "aSub": 0.0819,
+            "aDec": 0.19,
+            "bKo": 0.2329,
+            "bSub": 0.0813,
+            "bDec": 0.2067
+          }
+        },
+        {
+          "id": "ufc-vegas-123-9",
+          "a": "Julian Erosa",
+          "b": "JeongYeong Lee",
+          "probA": 0.4338,
+          "probLo": 0.3973,
+          "probHi": 0.4824,
+          "shadowProbA": 0.4045,
+          "distance": 0.5319,
+          "joint": {
+            "aKo": 0.1301,
+            "aSub": 0.073,
+            "aDec": 0.2307,
+            "bKo": 0.2295,
+            "bSub": 0.0356,
+            "bDec": 0.3012
+          }
+        },
+        {
+          "id": "ufc-vegas-123-10",
+          "a": "Nick Klein",
+          "b": "Joseph Kropschot",
+          "probA": 0.5966,
+          "probLo": 0.5468,
+          "probHi": 0.6449,
+          "shadowProbA": 0.5134,
+          "distance": 0.3231,
+          "joint": {
+            "aKo": 0.232,
+            "aSub": 0.1718,
+            "aDec": 0.1927,
+            "bKo": 0.1987,
+            "bSub": 0.0743,
+            "bDec": 0.1303
+          }
+        },
+        {
+          "id": "ufc-vegas-123-11",
+          "a": "Talita Alencar",
+          "b": "Piera Rodriguez",
+          "probA": 0.3947,
+          "probLo": 0.367,
+          "probHi": 0.4253,
+          "shadowProbA": 0.421,
+          "distance": 0.7916,
+          "joint": {
+            "aKo": 0.0206,
+            "aSub": 0.0616,
+            "aDec": 0.3125,
+            "bKo": 0.0566,
+            "bSub": 0.0695,
+            "bDec": 0.4791
+          }
+        },
+        {
+          "id": "ufc-vegas-123-12",
+          "a": "Lucia Szabova",
+          "b": "Tainara Lisboa",
+          "probA": 0.6576,
+          "probLo": 0.6197,
+          "probHi": 0.6905,
+          "shadowProbA": 0.699,
+          "distance": 0.4908,
+          "joint": {
+            "aKo": 0.148,
+            "aSub": 0.1868,
+            "aDec": 0.3228,
+            "bKo": 0.0669,
+            "bSub": 0.1074,
+            "bDec": 0.1681
+          }
+        }
+      ]
     }
   ]
 }

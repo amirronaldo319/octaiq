@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { OddsEvent } from '../lib/oddsApi.ts'
+import { isErrorResponse, isHealthResponse, isMarketResponse, isPricesResponse } from './contracts.ts'
 import { handleRequest, ingest, RATE_LIMIT_PER_MINUTE, STALE_AFTER_HOURS, type Deps, type Kv } from './handler.ts'
 
 const SECRET = 'TESTKEY_1234567890abcdef'
@@ -167,5 +168,45 @@ describe('public endpoint', () => {
     const s = await withData()
     const body = await (await handleRequest(get('/api/prices?event=e1'), s.deps)).json() as { events: Record<string, { bouts: object }[]> }
     expect(body.events.e1[0].bouts).toHaveProperty('e1-1')
+  })
+})
+
+describe('API contracts', () => {
+  it('every successful response matches its published shape, and every error carries a message', async () => {
+    const s = setup()
+    s.provider.responses.push(ok(odds('2026-10-31T09:55:00Z')))
+    await ingest(s.deps)
+    expect(isMarketResponse(await (await handleRequest(get('/api/market'), s.deps)).json())).toBe(true)
+    expect(isPricesResponse(await (await handleRequest(get('/api/prices'), s.deps)).json())).toBe(true)
+    for (const path of ['/api/nope', '/api/market?x=1', '/api/market?event=../x']) {
+      const res = await handleRequest(get(path), s.deps)
+      expect(res.status).toBeGreaterThanOrEqual(400)
+      expect(isErrorResponse(await res.json())).toBe(true)
+    }
+    expect(isErrorResponse(await (await handleRequest(get('/api/market'), setup().deps)).json())).toBe(true)
+  })
+
+  it('reports health as no-data, ok, then degraded after a failed refresh, never exposing the key', async () => {
+    const s = setup()
+    const first = await (await handleRequest(get('/api/system/health'), s.deps)).json()
+    expect(isHealthResponse(first)).toBe(true)
+    expect(first.status).toBe('no-data')
+    s.provider.responses.push(ok(odds('2026-10-31T09:55:00Z')))
+    await ingest(s.deps)
+    const good = await (await handleRequest(get('/api/system/health'), s.deps)).json()
+    expect(good).toMatchObject({ status: 'ok', apiVersion: 1, quota: { remaining: '480', lastCost: '3' } })
+    s.clock.now = new Date('2026-10-31T14:00:00Z')
+    s.provider.responses.push(new Response('x', { status: 503 }), new Response('x', { status: 503 }), new Response('x', { status: 503 }))
+    await ingest(s.deps)
+    const bad = await (await handleRequest(get('/api/system/health'), s.deps)).json()
+    expect(bad.status).toBe('degraded')
+    expect(isHealthResponse(bad)).toBe(true)
+    expect(JSON.stringify(bad)).not.toContain(SECRET)
+  })
+
+  it('rejects malformed data when checked against the contract', () => {
+    expect(isMarketResponse({ generatedAt: 'x' })).toBe(false)
+    expect(isMarketResponse({ generatedAt: '2026-10-31T10:00:00Z', source: 's', attribution: 'a', freshness: { fetchedAt: '2026-10-31T10:00:00Z', ageHours: 0, stale: false }, events: { e: { b: { pA: 1.4, pLo: 0.3, pHi: 0.9, books: 3 } } } })).toBe(false)
+    expect(isHealthResponse({ status: 'ok' })).toBe(false)
   })
 })

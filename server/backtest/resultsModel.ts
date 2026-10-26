@@ -26,6 +26,14 @@ export function loadAliases(root: string): Record<string, string> {
 export const RESULTS_MODEL_VERSION = 'octa-results-lr-0.2'
 export const STATS_MODEL_VERSION = 'octa-results-stats-lr-0.2'
 
+/**
+ * The recency-weighted challenger that research found better than production in testing but that did not clear the promotion gate
+ * after adjusting for the number of challengers tried. It forecasts alongside production, is saved with each forecast, and is never
+ * shown as the forecast, so prospective evidence can accumulate before any decision.
+ */
+export const SHADOW_MODEL_VERSION = 'octa-results-stats-lr-recency4y-0.1'
+export const SHADOW_HALF_LIFE_YEARS = 4
+
 const unavailable = (reason: string): ResultsModel => ({ status: 'unavailable', reason, version: RESULTS_MODEL_VERSION, bouts: {} })
 
 const check = (m: OutcomeMetric): OutcomeCheck => ({
@@ -93,6 +101,7 @@ export function createResultsModelService(root: string, options: { bootstrap?: n
       aliases: loadAliases(root),
       bootstrap: options.bootstrap ?? 0,
       seed: out.report.options.seed,
+      shadowHalfLifeYears: SHADOW_HALF_LIFE_YEARS,
     })
     const mk = out.market
     const own = mk?.models.find((m) => m.id === mk.primaryModel)
@@ -103,6 +112,7 @@ export function createResultsModelService(root: string, options: { bootstrap?: n
       features: useStats ? 'results+stats' : 'results',
       trainedThrough: out.ingest.lastDate,
       featureCutoff: out.ingest.lastDate,
+      shadowModel: SHADOW_MODEL_VERSION,
       ...(out.reproducibility ? { dataVersion: out.reproducibility.dataVersion, featurePipeline: out.reproducibility.featurePipeline, ...(out.reproducibility.codeCommit ? { codeCommit: out.reproducibility.codeCommit } : {}) } : {}),
       trainedOn: out.report.rows.scoredDecisive,
       backtest: {
@@ -131,6 +141,7 @@ export function createResultsModelService(root: string, options: { bootstrap?: n
       bouts: Object.fromEntries(preds.map((p) => [p.id, {
         probA: p.probA, probB: p.probB, probLo: p.probLo, probHi: p.probHi, priorA: p.priorA, priorB: p.priorB,
         eloDiff: p.eloDiff, distance: p.distance, joint: p.joint, why: p.why,
+        ...(p.shadowProbA !== undefined ? { shadowProbA: p.shadowProbA } : {}),
       }])),
     }
   }

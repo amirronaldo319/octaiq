@@ -1,11 +1,11 @@
 # OctaIQ evaluation report
-Generated 2026-10-26T04:37:27.735Z by `npm run report` from `data/reports/backtest-latest.json`. Every number below comes from that file; none is typed by hand.
+Generated 2026-10-26T05:36:03.178Z by `npm run report` from `data/reports/backtest-latest.json`. Every number below comes from that file; none is typed by hand.
 
 ## 1. Reproduce this report
 
 - Command: `npm run backtest` after `npm install` (the results data is downloaded on first run).
 - Results data version `58ca637e2e2c` (retrieved 2026-10-25); price data version `d03e93106059`.
-- Feature pipeline `features-3`; code commit `a9b1ae1cfd9322b15bedeb440f9387bc795bceb8` (the working tree had uncommitted changes, so the commit alone does not reproduce this run); v26.7.0; random seed 20261025.
+- Feature pipeline `features-3`; code commit `34554fed1e675339cebd9afa51fa8a3a8eff9b1a` (the working tree had uncommitted changes, so the commit alone does not reproduce this run); v26.7.0; random seed 20261025.
 - Elo K 64, statistics decay 0.9, ridge 5, 1000 event-level bootstrap resamples; features excluded by default: ageMissing, reachMissing, southpaw, wcMove, eloWc, agePast, ageClass, sinceLoss, koRecent, cageMin, tdClash, kdClash.
 The results data keeps growing, so a later run uses more fights; the data version says which files a report used.
 
@@ -129,7 +129,7 @@ The same walk-forward protocol with different feature sets.
 | Elo + experience only | 0.6638 | 0.591 | Smallest feature set. |
 
 ## 11. Registry
-Production: `octa-results-stats-lr-0.2@58ca637e2e2c`. Records: 7.
+Production: `octa-results-stats-lr-0.2@58ca637e2e2c`. Records: 32.
 
 | Record | Status | Data version | Note |
 | --- | --- | --- | --- |
@@ -140,3 +140,28 @@ Production: `octa-results-stats-lr-0.2@58ca637e2e2c`. Records: 7.
 | Calibration: platt@58ca637e2e2c | rejected | 58ca637e2e2c | log loss +0.0006 versus no recalibration [-0.0009, +0.0022]; the interval includes zero |
 | Calibration: isotonic@58ca637e2e2c | rejected | 58ca637e2e2c | log loss +0.0009 versus no recalibration [-0.0003, +0.0021]; the interval includes zero |
 | Direct six-outcome method model (hybrid with the win model)@58ca637e2e2c | shadow | 58ca637e2e2c | log loss -0.0034 versus independent winner-and-method joint [-0.0101, +0.0030]; the interval includes zero |
+| octa-results-stats-lr-0.2@0075c265d94e | previous | 0075c265d94e |  |
+| Boosted trees@0075c265d94e | rejected | 0075c265d94e | log loss +0.0044 versus logistic stats model [+0.0007, +0.0079]; the interval includes zero |
+| Ensemble of logistic and trees@0075c265d94e | shadow | 0075c265d94e | log loss -0.0005 versus logistic stats model [-0.0024, +0.0013]; the interval includes zero |
+| Calibration: temperature@0075c265d94e | rejected | 0075c265d94e | log loss +0.0006 versus no recalibration [-0.0008, +0.0022]; the interval includes zero |
+| Calibration: platt@0075c265d94e | rejected | 0075c265d94e | log loss +0.0006 versus no recalibration [-0.0008, +0.0022]; the interval includes zero |
+| Calibration: isotonic@0075c265d94e | rejected | 0075c265d94e | log loss +0.0009 versus no recalibration [-0.0004, +0.0022]; the interval includes zero |
+| Direct six-outcome method model (hybrid with the win model)@0075c265d94e | shadow | 0075c265d94e | log loss -0.0034 versus independent winner-and-method joint [-0.0096, +0.0026]; the interval includes zero |
+| research:lr_all@58ca637e2e2c | shadow | 58ca637e2e2c | Inconclusive against the gate; log loss -0.0001 against the baseline [-0.0017, 0.0015] |
+| research:histgb@58ca637e2e2c | rejected | 58ca637e2e2c | Rejected by the gate; log loss +0.0223 against the baseline [0.0172, 0.0281] |
+| research:lightgbm@58ca637e2e2c | rejected | 58ca637e2e2c | Rejected by the gate; log loss +0.0216 against the baseline [0.0165, 0.0273] |
+| research:xgboost@58ca637e2e2c | rejected | 58ca637e2e2c | Rejected by the gate; log loss +0.0172 against the baseline [0.0123, 0.0224] |
+| research:catboost@58ca637e2e2c | rejected | 58ca637e2e2c | Rejected by the gate; log loss +0.0122 against the baseline [0.0080, 0.0170] |
+| research:lightgbm_es@58ca637e2e2c | rejected | 58ca637e2e2c | Rejected by the gate; log loss +0.0036 against the baseline [0.0005, 0.0069] |
+| research:xgboost_es@58ca637e2e2c | rejected | 58ca637e2e2c | Rejected by the gate; log loss +0.0046 against the baseline [0.0013, 0.0082] |
+| research:catboost_es@58ca637e2e2c | rejected | 58ca637e2e2c | Rejected by the gate; log loss +0.0026 against the baseline [-0.0003, 0.0058] |
+| research:glicko2@58ca637e2e2c | rejected | 58ca637e2e2c | Rejected by the gate; log loss +0.0282 against the baseline [0.0216, 0.0350] |
+| research:hier@58ca637e2e2c | shadow | 58ca637e2e2c | Inconclusive against the gate; log loss -0.0000 against the baseline [-0.0001, 0.0000] |
+| research:hier_decay@58ca637e2e2c | shadow | 58ca637e2e2c | Cleared the gate in research; not deployed as production; log loss -0.0022 against the baseline [-0.0036, -0.0007] |
+| research:lr_decay@58ca637e2e2c | shadow | 58ca637e2e2c | Inconclusive against the gate; log loss -0.0020 against the baseline [-0.0035, -0.0006] |
+| research:lr_decay_noreach@58ca637e2e2c | shadow | 58ca637e2e2c | Inconclusive against the gate; log loss -0.0017 against the baseline [-0.0041, 0.0007] |
+| research:elo_only@58ca637e2e2c | rejected | 58ca637e2e2c | Rejected by the gate; log loss +0.0297 against the baseline [0.0230, 0.0365] |
+| research:neural: linear_torch@58ca637e2e2c | rejected | 58ca637e2e2c | Rejected by the gate; log loss +0.0001 against the baseline [-0.0018, 0.0020] |
+| research:neural: mlp@58ca637e2e2c | rejected | 58ca637e2e2c | Rejected by the gate; log loss +0.0005 against the baseline [-0.0018, 0.0028] |
+| research:neural: gru@58ca637e2e2c | rejected | 58ca637e2e2c | Rejected by the gate; log loss +0.0002 against the baseline [-0.0028, 0.0033] |
+| research:neural: attn@58ca637e2e2c | rejected | 58ca637e2e2c | Rejected by the gate; log loss +0.0008 against the baseline [-0.0018, 0.0036] |

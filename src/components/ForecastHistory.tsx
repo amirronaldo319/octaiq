@@ -1,4 +1,5 @@
 import type { PublishedLedger } from '../../server/lib/snapshot'
+import { HORIZONS } from '../engine/horizons'
 import { withBase } from '../lib/fetchJson'
 import { pctPair } from '../lib/rounding'
 import { useJson } from '../lib/useJson'
@@ -61,7 +62,7 @@ export function ForecastHistory({ eventId, fightId, nameA, nameB, currentProbA, 
                 {h.reason}{counted?.at === h.at ? ' · counts for grading' : ''}
                 <br />
                 <span className="fh-meta">
-                  {h.forecastId}{h.supersedes ? `, replaces ${h.supersedes}` : ', the first version'} · {h.model} · data {h.dataVersion ?? 'version not recorded'}{h.dataThrough ? ` through ${h.dataThrough}` : ''} ·
+                  {HORIZONS.find((x) => x.id === h.horizon)?.label ?? h.horizon} · {h.forecastId}{h.supersedes ? `, replaces ${h.supersedes}` : ', the first version'} · {h.model} · data {h.dataVersion ?? 'version not recorded'}{h.dataThrough ? ` through ${h.dataThrough}` : ''} ·
                   {' '}{h.horizonHours >= 0 ? `${h.horizonHours} hours before the main card` : 'after the main card started'}
                 </span>
               </span>

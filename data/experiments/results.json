@@ -1,0 +1,1471 @@
+{
+  "dataAudit": [
+    {
+      "years": "1993-2004",
+      "fights": 430,
+      "bothDob": 0.6325581395348837,
+      "bothReach": 0.14186046511627906,
+      "withFightStats": 0.9511627906976744
+    },
+    {
+      "years": "2005-2009",
+      "fights": 820,
+      "bothDob": 0.9585365853658536,
+      "bothReach": 0.6951219512195121,
+      "withFightStats": 1.0
+    },
+    {
+      "years": "2010-2014",
+      "fights": 1748,
+      "bothDob": 0.9914187643020596,
+      "bothReach": 0.8403890160183066,
+      "withFightStats": 1.0
+    },
+    {
+      "years": "2015-2019",
+      "fights": 2368,
+      "bothDob": 0.9974662162162162,
+      "bothReach": 0.9370777027027027,
+      "withFightStats": 1.0
+    },
+    {
+      "years": "2020-2026",
+      "fights": 3426,
+      "bothDob": 0.974314068884997,
+      "bothReach": 0.9553415061295972,
+      "withFightStats": 1.0
+    }
+  ],
+  "generatedAt": "2026-10-26T05:38:47.355231+00:00",
+  "dataVersion": "58ca637e2e2c",
+  "featurePipeline": "features-3",
+  "codeCommit": "34554fed1e675339cebd9afa51fa8a3a8eff9b1a",
+  "protocol": {
+    "tuning": "Hyperparameters chosen on 2008-2013 using only earlier fights (24 Bayesian TPE trials per family); fixed afterwards.",
+    "walkForward": "Each year 2014-2026 predicted by models fitted on earlier years only; events kept whole.",
+    "baseline": "Production-form ridge logistic regression (no intercept) on the production feature set.",
+    "bootstrap": "1000 resamples of whole events; paired differences on identical fights.",
+    "ensembleMembers": [
+      "lr_prod",
+      "histgb",
+      "lightgbm",
+      "xgboost",
+      "catboost",
+      "glicko2",
+      "hier"
+    ],
+    "noUntouchedHoldout": true
+  },
+  "versions": {
+    "python": "3.14.7",
+    "numpy": "2.5.4",
+    "pandas": "3.1.0",
+    "sklearn": "1.9.1"
+  },
+  "replication": {
+    "pythonLogLoss": 0.6520578170218081,
+    "typescriptLogLoss": 0.6520590832887969,
+    "difference": -1.2662669888197087e-06
+  },
+  "tuning": {
+    "histgb": {
+      "trials": 24,
+      "devLogLoss": 0.6755089876079535,
+      "params": {
+        "learning_rate": 0.012716485982056677,
+        "max_iter": 48,
+        "max_leaf_nodes": 13,
+        "min_samples_leaf": 57,
+        "l2": 0.2713927069286984,
+        "max_depth": 4
+      }
+    },
+    "lightgbm": {
+      "trials": 24,
+      "devLogLoss": 0.6770259000104709,
+      "params": {
+        "n_estimators": 75,
+        "learning_rate": 0.012816482928169854,
+        "num_leaves": 4,
+        "min_child_samples": 62,
+        "l2": 2.9634978148183673,
+        "subsample": 0.5720449608530562,
+        "colsample": 0.9631785468690227
+      }
+    },
+    "xgboost": {
+      "trials": 24,
+      "devLogLoss": 0.669912826068297,
+      "params": {
+        "n_estimators": 50,
+        "learning_rate": 0.016307550928613346,
+        "max_depth": 5,
+        "min_child_weight": 1.1311163045171226,
+        "l2": 6.5524282022936555,
+        "subsample": 0.5422078860710096,
+        "colsample": 0.6389593484405567
+      }
+    },
+    "catboost": {
+      "trials": 24,
+      "devLogLoss": 0.6743146044281203,
+      "params": {
+        "iterations": 75,
+        "learning_rate": 0.02237354637659085,
+        "depth": 4,
+        "l2": 26.370504788941595
+      }
+    },
+    "lr_all": {
+      "devLogLoss": 0.6892484539285448,
+      "ridge": 40
+    },
+    "hier": {
+      "devLogLoss": 0.6987577652702198,
+      "effectScale": 0.2,
+      "halfLifeYears": 4.0
+    },
+    "lr_prod": {
+      "devLogLoss": 0.701761493379873,
+      "ridge": 5.0
+    },
+    "recency": {
+      "devLogLoss": 0.6985969617305975,
+      "halfLifeYears": 4.0
+    },
+    "glicko2": {
+      "devLogLoss": 0.6808429239265275,
+      "tau": 0.2,
+      "initialRd": 150.0
+    }
+  },
+  "n": 6288,
+  "period": "2014-2026",
+  "models": {
+    "lr_prod": {
+      "summary": {
+        "n": 6288,
+        "logLoss": 0.6520578170218081,
+        "brier": 0.2300771127837085,
+        "accuracy": 0.616014631043257,
+        "auc": 0.6623672073290152,
+        "calibration": {
+          "slope": 0.9209869873156611,
+          "intercept": -0.02376990212440891
+        }
+      },
+      "vsBaseline": null,
+      "decision": null
+    },
+    "lr_all": {
+      "summary": {
+        "n": 6288,
+        "logLoss": 0.6519308694012694,
+        "brier": 0.23002590055548866,
+        "accuracy": 0.6150604325699746,
+        "auc": 0.6624650411149773,
+        "calibration": {
+          "slope": 0.9255114724488784,
+          "intercept": -0.02317868527385782
+        }
+      },
+      "vsBaseline": {
+        "estimate": -0.00012694762053863009,
+        "lo": -0.001729128933610119,
+        "hi": 0.00149940089492451
+      },
+      "decision": {
+        "mode": "shadow",
+        "reasons": [
+          "log loss -0.0001 [-0.0017, +0.0015]",
+          "interval includes zero",
+          "gain under the 0.002 minimum",
+          "better in 6 of 13 yearly folds",
+          "calibration slope 0.93"
+        ],
+        "estimate": -0.00012694762053863009,
+        "lo": -0.001729128933610119,
+        "hi": 0.00149940089492451,
+        "foldWinShare": 0.46153846153846156,
+        "adjustedInterval": {
+          "level": 0.9961538461538462,
+          "lo": -0.002658827394629579,
+          "hi": 0.0020094994104929557,
+          "challengers": 13
+        }
+      }
+    },
+    "histgb": {
+      "summary": {
+        "n": 6288,
+        "logLoss": 0.6743470219128329,
+        "brier": 0.24065530401564517,
+        "accuracy": 0.59764631043257,
+        "auc": 0.6380382616099718,
+        "calibration": {
+          "slope": 2.5178104066425955,
+          "intercept": -0.018526984035220406
+        }
+      },
+      "vsBaseline": {
+        "estimate": 0.022289204891024858,
+        "lo": 0.017153915558483158,
+        "hi": 0.02805179482314446
+      },
+      "decision": {
+        "mode": "reject",
+        "reasons": [
+          "log loss +0.0223 [+0.0172, +0.0281]",
+          "interval includes zero",
+          "gain under the 0.002 minimum",
+          "better in 0 of 13 yearly folds",
+          "calibration slope 2.52 is outside 0.8 to 1.2"
+        ],
+        "estimate": 0.022289204891024858,
+        "lo": 0.017153915558483158,
+        "hi": 0.02805179482314446,
+        "foldWinShare": 0.0,
+        "adjustedInterval": {
+          "level": 0.9961538461538462,
+          "lo": 0.013535182737187054,
+          "hi": 0.030301928422201044,
+          "challengers": 13
+        }
+      }
+    },
+    "lightgbm": {
+      "summary": {
+        "n": 6288,
+        "logLoss": 0.6736509702262473,
+        "brier": 0.24031117139972472,
+        "accuracy": 0.6016221374045801,
+        "auc": 0.6400118837192339,
+        "calibration": {
+          "slope": 2.4959944583839957,
+          "intercept": -0.022402753451724485
+        }
+      },
+      "vsBaseline": {
+        "estimate": 0.021593153204439188,
+        "lo": 0.016482167788624942,
+        "hi": 0.027257125476029452
+      },
+      "decision": {
+        "mode": "reject",
+        "reasons": [
+          "log loss +0.0216 [+0.0165, +0.0273]",
+          "interval includes zero",
+          "gain under the 0.002 minimum",
+          "better in 0 of 13 yearly folds",
+          "calibration slope 2.50 is outside 0.8 to 1.2"
+        ],
+        "estimate": 0.021593153204439188,
+        "lo": 0.016482167788624942,
+        "hi": 0.027257125476029452,
+        "foldWinShare": 0.0,
+        "adjustedInterval": {
+          "level": 0.9961538461538462,
+          "lo": 0.012941398123847826,
+          "hi": 0.030493607888239762,
+          "challengers": 13
+        }
+      }
+    },
+    "xgboost": {
+      "summary": {
+        "n": 6288,
+        "logLoss": 0.6692184793788523,
+        "brier": 0.23813719137497735,
+        "accuracy": 0.6103689567430025,
+        "auc": 0.6504277420599586,
+        "calibration": {
+          "slope": 2.310284239313762,
+          "intercept": -0.023467320944266522
+        }
+      },
+      "vsBaseline": {
+        "estimate": 0.01716066235704409,
+        "lo": 0.012271372031369165,
+        "hi": 0.02244702410351016
+      },
+      "decision": {
+        "mode": "reject",
+        "reasons": [
+          "log loss +0.0172 [+0.0123, +0.0224]",
+          "interval includes zero",
+          "gain under the 0.002 minimum",
+          "better in 0 of 13 yearly folds",
+          "calibration slope 2.31 is outside 0.8 to 1.2"
+        ],
+        "estimate": 0.01716066235704409,
+        "lo": 0.012271372031369165,
+        "hi": 0.02244702410351016,
+        "foldWinShare": 0.0,
+        "adjustedInterval": {
+          "level": 0.9961538461538462,
+          "lo": 0.009329370341607262,
+          "hi": 0.02497167138878941,
+          "challengers": 13
+        }
+      }
+    },
+    "catboost": {
+      "summary": {
+        "n": 6288,
+        "logLoss": 0.6642700511869142,
+        "brier": 0.2357737887170256,
+        "accuracy": 0.6065521628498728,
+        "auc": 0.6490660110959903,
+        "calibration": {
+          "slope": 1.686883263461531,
+          "intercept": -0.021690051442475832
+        }
+      },
+      "vsBaseline": {
+        "estimate": 0.012212234165106145,
+        "lo": 0.007966541522462312,
+        "hi": 0.017027498321387797
+      },
+      "decision": {
+        "mode": "reject",
+        "reasons": [
+          "log loss +0.0122 [+0.0080, +0.0170]",
+          "interval includes zero",
+          "gain under the 0.002 minimum",
+          "better in 1 of 13 yearly folds",
+          "calibration slope 1.69 is outside 0.8 to 1.2"
+        ],
+        "estimate": 0.012212234165106145,
+        "lo": 0.007966541522462312,
+        "hi": 0.017027498321387797,
+        "foldWinShare": 0.07692307692307693,
+        "adjustedInterval": {
+          "level": 0.9961538461538462,
+          "lo": 0.005295694156826591,
+          "hi": 0.019178019387503194,
+          "challengers": 13
+        }
+      }
+    },
+    "lightgbm_es": {
+      "summary": {
+        "n": 6288,
+        "logLoss": 0.6556222962973937,
+        "brier": 0.23172583660189602,
+        "accuracy": 0.6152989821882952,
+        "auc": 0.6558852384397544,
+        "calibration": {
+          "slope": 0.9644150296411815,
+          "intercept": -0.02061793387068188
+        }
+      },
+      "vsBaseline": {
+        "estimate": 0.0035644792755855463,
+        "lo": 0.0005184433247110015,
+        "hi": 0.0068546988793050136
+      },
+      "decision": {
+        "mode": "reject",
+        "reasons": [
+          "log loss +0.0036 [+0.0005, +0.0069]",
+          "interval includes zero",
+          "gain under the 0.002 minimum",
+          "better in 4 of 13 yearly folds",
+          "calibration slope 0.96"
+        ],
+        "estimate": 0.0035644792755855463,
+        "lo": 0.0005184433247110015,
+        "hi": 0.0068546988793050136,
+        "foldWinShare": 0.3076923076923077,
+        "adjustedInterval": {
+          "level": 0.9961538461538462,
+          "lo": -0.0012054049091757841,
+          "hi": 0.008199851706021914,
+          "challengers": 13
+        }
+      }
+    },
+    "xgboost_es": {
+      "summary": {
+        "n": 6288,
+        "logLoss": 0.6566876233465788,
+        "brier": 0.2321926605971015,
+        "accuracy": 0.6153784987277354,
+        "auc": 0.6544573406753526,
+        "calibration": {
+          "slope": 1.0217998504824763,
+          "intercept": -0.022177340375584324
+        }
+      },
+      "vsBaseline": {
+        "estimate": 0.004629806324770679,
+        "lo": 0.0013484695541550035,
+        "hi": 0.00824316326020903
+      },
+      "decision": {
+        "mode": "reject",
+        "reasons": [
+          "log loss +0.0046 [+0.0013, +0.0082]",
+          "interval includes zero",
+          "gain under the 0.002 minimum",
+          "better in 3 of 13 yearly folds",
+          "calibration slope 1.02"
+        ],
+        "estimate": 0.004629806324770679,
+        "lo": 0.0013484695541550035,
+        "hi": 0.00824316326020903,
+        "foldWinShare": 0.23076923076923078,
+        "adjustedInterval": {
+          "level": 0.9961538461538462,
+          "lo": -0.0007118132081645322,
+          "hi": 0.009916775619940945,
+          "challengers": 13
+        }
+      }
+    },
+    "catboost_es": {
+      "summary": {
+        "n": 6288,
+        "logLoss": 0.6546157560026614,
+        "brier": 0.2313498811865941,
+        "accuracy": 0.6155375318066157,
+        "auc": 0.6562989832874195,
+        "calibration": {
+          "slope": 0.9675136532926214,
+          "intercept": -0.019651767608156578
+        }
+      },
+      "vsBaseline": {
+        "estimate": 0.002557938980853261,
+        "lo": -0.0002804121171769255,
+        "hi": 0.0058053737264416256
+      },
+      "decision": {
+        "mode": "reject",
+        "reasons": [
+          "log loss +0.0026 [-0.0003, +0.0058]",
+          "interval includes zero",
+          "gain under the 0.002 minimum",
+          "better in 6 of 13 yearly folds",
+          "calibration slope 0.97"
+        ],
+        "estimate": 0.002557938980853261,
+        "lo": -0.0002804121171769255,
+        "hi": 0.0058053737264416256,
+        "foldWinShare": 0.46153846153846156,
+        "adjustedInterval": {
+          "level": 0.9961538461538462,
+          "lo": -0.001990477734565261,
+          "hi": 0.007469337390536532,
+          "challengers": 13
+        }
+      }
+    },
+    "glicko2": {
+      "summary": {
+        "n": 6288,
+        "logLoss": 0.6802915489350365,
+        "brier": 0.24371102898061592,
+        "accuracy": 0.5619433842239185,
+        "auc": 0.587913166899886,
+        "calibration": {
+          "slope": 0.8809565231881902,
+          "intercept": -0.02254978818410679
+        }
+      },
+      "vsBaseline": {
+        "estimate": 0.028233731913228297,
+        "lo": 0.021611577482386013,
+        "hi": 0.03499643584485748
+      },
+      "decision": {
+        "mode": "reject",
+        "reasons": [
+          "log loss +0.0282 [+0.0216, +0.0350]",
+          "interval includes zero",
+          "gain under the 0.002 minimum",
+          "better in 1 of 13 yearly folds",
+          "calibration slope 0.88"
+        ],
+        "estimate": 0.028233731913228297,
+        "lo": 0.021611577482386013,
+        "hi": 0.03499643584485748,
+        "foldWinShare": 0.07692307692307693,
+        "adjustedInterval": {
+          "level": 0.9961538461538462,
+          "lo": 0.018431185398728706,
+          "hi": 0.037908777703965404,
+          "challengers": 13
+        }
+      }
+    },
+    "hier": {
+      "summary": {
+        "n": 6288,
+        "logLoss": 0.6520191226529736,
+        "brier": 0.23005870032349582,
+        "accuracy": 0.6174459287531806,
+        "auc": 0.662419209982567,
+        "calibration": {
+          "slope": 0.9214462664591262,
+          "intercept": -0.02364002246764904
+        }
+      },
+      "vsBaseline": {
+        "estimate": -3.869436883450662e-05,
+        "lo": -0.00012554978207340484,
+        "hi": 4.3258299660840194e-05
+      },
+      "decision": {
+        "mode": "shadow",
+        "reasons": [
+          "log loss -0.0000 [-0.0001, +0.0000]",
+          "interval includes zero",
+          "gain under the 0.002 minimum",
+          "better in 10 of 13 yearly folds",
+          "calibration slope 0.92"
+        ],
+        "estimate": -3.869436883450662e-05,
+        "lo": -0.00012554978207340484,
+        "hi": 4.3258299660840194e-05,
+        "foldWinShare": 0.7692307692307693,
+        "adjustedInterval": {
+          "level": 0.9961538461538462,
+          "lo": -0.00016115761573077313,
+          "hi": 7.798391444083145e-05,
+          "challengers": 13
+        }
+      }
+    },
+    "hier_decay": {
+      "summary": {
+        "n": 6288,
+        "logLoss": 0.6499004789942531,
+        "brier": 0.22900446796140353,
+        "accuracy": 0.6217398218829516,
+        "auc": 0.666887391288908,
+        "calibration": {
+          "slope": 0.9629091584994655,
+          "intercept": -0.026493818807302533
+        }
+      },
+      "vsBaseline": {
+        "estimate": -0.002157338027555146,
+        "lo": -0.003640048155448557,
+        "hi": -0.0007192551087200015
+      },
+      "decision": {
+        "mode": "promote",
+        "reasons": [
+          "log loss -0.0022 [-0.0036, -0.0007]",
+          "interval entirely below zero",
+          "gain at least 0.002",
+          "better in 10 of 13 yearly folds",
+          "calibration slope 0.96"
+        ],
+        "estimate": -0.002157338027555146,
+        "lo": -0.003640048155448557,
+        "hi": -0.0007192551087200015,
+        "foldWinShare": 0.7692307692307693,
+        "adjustedInterval": {
+          "level": 0.9961538461538462,
+          "lo": -0.004080316996895524,
+          "hi": -8.374663079995275e-05,
+          "challengers": 13
+        }
+      }
+    },
+    "lr_decay": {
+      "summary": {
+        "n": 6288,
+        "logLoss": 0.6500260469390238,
+        "brier": 0.22906420246197778,
+        "accuracy": 0.6214217557251909,
+        "auc": 0.6666316272652139,
+        "calibration": {
+          "slope": 0.9617991661297118,
+          "intercept": -0.02656658034947774
+        }
+      },
+      "vsBaseline": {
+        "estimate": -0.002031770082784476,
+        "lo": -0.003515479080675191,
+        "hi": -0.0005992266543708458
+      },
+      "decision": {
+        "mode": "shadow",
+        "reasons": [
+          "log loss -0.0020 [-0.0035, -0.0006]",
+          "interval entirely below zero",
+          "gain at least 0.002",
+          "better in 10 of 13 yearly folds",
+          "calibration slope 0.96",
+          "does not survive the multiple-comparison adjustment"
+        ],
+        "estimate": -0.002031770082784476,
+        "lo": -0.003515479080675191,
+        "hi": -0.0005992266543708458,
+        "foldWinShare": 0.7692307692307693,
+        "adjustedInterval": {
+          "level": 0.9961538461538462,
+          "lo": -0.003947197762805479,
+          "hi": 6.785292353954284e-05,
+          "challengers": 13
+        }
+      }
+    },
+    "lr_decay_noreach": {
+      "summary": {
+        "n": 6288,
+        "logLoss": 0.6503277533111633,
+        "brier": 0.22923497175989133,
+        "accuracy": 0.6150604325699746,
+        "auc": 0.6656586515469121,
+        "calibration": {
+          "slope": 0.9694687736659203,
+          "intercept": -0.026008042629803763
+        }
+      },
+      "vsBaseline": {
+        "estimate": -0.001730063710644817,
+        "lo": -0.004100749324712828,
+        "hi": 0.0007417801647749075
+      },
+      "decision": {
+        "mode": "shadow",
+        "reasons": [
+          "log loss -0.0017 [-0.0041, +0.0007]",
+          "interval includes zero",
+          "gain under the 0.002 minimum",
+          "better in 9 of 13 yearly folds",
+          "calibration slope 0.97"
+        ],
+        "estimate": -0.001730063710644817,
+        "lo": -0.004100749324712828,
+        "hi": 0.0007417801647749075,
+        "foldWinShare": 0.6923076923076923,
+        "adjustedInterval": {
+          "level": 0.9961538461538462,
+          "lo": -0.005131373029570519,
+          "hi": 0.001926386616430823,
+          "challengers": 13
+        }
+      }
+    },
+    "elo_only": {
+      "summary": {
+        "n": 6288,
+        "logLoss": 0.6817102312726354,
+        "brier": 0.24436918359175738,
+        "accuracy": 0.5576494910941476,
+        "auc": 0.5845571240549605,
+        "calibration": {
+          "slope": 0.8820909560371712,
+          "intercept": -0.023974138356114685
+        }
+      },
+      "vsBaseline": {
+        "estimate": 0.029652414250827246,
+        "lo": 0.023031758163611516,
+        "hi": 0.036535807796542245
+      },
+      "decision": {
+        "mode": "reject",
+        "reasons": [
+          "log loss +0.0297 [+0.0230, +0.0365]",
+          "interval includes zero",
+          "gain under the 0.002 minimum",
+          "better in 0 of 13 yearly folds",
+          "calibration slope 0.88"
+        ],
+        "estimate": 0.029652414250827246,
+        "lo": 0.023031758163611516,
+        "hi": 0.036535807796542245,
+        "foldWinShare": 0.0,
+        "adjustedInterval": {
+          "level": 0.9961538461538462,
+          "lo": 0.018664451379963438,
+          "hi": 0.03945986370161779,
+          "challengers": 13
+        }
+      }
+    },
+    "coin_flip": {
+      "summary": {
+        "n": 6288,
+        "logLoss": 0.6931471805599452,
+        "brier": 0.25,
+        "accuracy": 0.5,
+        "auc": 0.5,
+        "calibration": null
+      },
+      "vsBaseline": null,
+      "decision": null
+    },
+    "favourite_by_rating": {
+      "summary": {
+        "n": 6288,
+        "logLoss": 2.051107864706222,
+        "brier": 0.43539580152671753,
+        "accuracy": 0.5558206106870229,
+        "auc": 0.5560897181344888,
+        "calibration": {
+          "slope": -3666910537.4140167,
+          "intercept": 1913998935.3779683
+        }
+      },
+      "vsBaseline": null,
+      "decision": null,
+      "note": "Always pick the higher-rated fighter; probabilities are extreme, so log loss is not meaningful, only accuracy."
+    }
+  },
+  "ageReach": {
+    "no age, no reach": {
+      "summary": {
+        "n": 6288,
+        "logLoss": 0.6607323010483633,
+        "brier": 0.2342585638180554,
+        "accuracy": 0.6017016539440203,
+        "auc": 0.6433633738026617,
+        "calibration": {
+          "slope": 0.91189006059998,
+          "intercept": -0.02380591832572809
+        }
+      },
+      "vsNoAgeNoReach": null
+    },
+    "age only": {
+      "summary": {
+        "n": 6288,
+        "logLoss": 0.6510546303858035,
+        "brier": 0.22964723302310333,
+        "accuracy": 0.6161736641221374,
+        "auc": 0.6636589775246352,
+        "calibration": {
+          "slope": 0.954090364094896,
+          "intercept": -0.02319308598133604
+        }
+      },
+      "vsNoAgeNoReach": {
+        "estimate": -0.009677670662559838,
+        "lo": -0.012575673116066086,
+        "hi": -0.007148889396556146
+      }
+    },
+    "reach only": {
+      "summary": {
+        "n": 6288,
+        "logLoss": 0.6614169541159377,
+        "brier": 0.23453451820789525,
+        "accuracy": 0.6042461832061069,
+        "auc": 0.6430535330896223,
+        "calibration": {
+          "slope": 0.8639153669225583,
+          "intercept": -0.024243644742292802
+        }
+      },
+      "vsNoAgeNoReach": {
+        "estimate": 0.0006846530675744661,
+        "lo": -0.001929303548087525,
+        "hi": 0.003015889717933883
+      }
+    },
+    "age and reach": {
+      "summary": {
+        "n": 6288,
+        "logLoss": 0.6520578170218081,
+        "brier": 0.2300771127837085,
+        "accuracy": 0.616014631043257,
+        "auc": 0.6623672073290152,
+        "calibration": {
+          "slope": 0.9209869873156611,
+          "intercept": -0.02376990212440891
+        }
+      },
+      "vsNoAgeNoReach": {
+        "estimate": -0.008674484026555152,
+        "lo": -0.012339669969378181,
+        "hi": -0.005391609928390626
+      }
+    },
+    "age and reach + interaction": {
+      "summary": {
+        "n": 6288,
+        "logLoss": 0.6521526472118772,
+        "brier": 0.2301131621897578,
+        "accuracy": 0.6164917302798982,
+        "auc": 0.6622770626513603,
+        "calibration": {
+          "slope": 0.9194073025098715,
+          "intercept": -0.02558161969446551
+        }
+      },
+      "vsNoAgeNoReach": {
+        "estimate": -0.008579653836486244,
+        "lo": -0.012172304782143161,
+        "hi": -0.0053752607945838984
+      }
+    },
+    "age and reach + stance": {
+      "summary": {
+        "n": 6288,
+        "logLoss": 0.6520362823243245,
+        "brier": 0.2300704747234238,
+        "accuracy": 0.6147423664122137,
+        "auc": 0.6623651838794606,
+        "calibration": {
+          "slope": 0.9154738233916065,
+          "intercept": -0.023056523193617624
+        }
+      },
+      "vsNoAgeNoReach": {
+        "estimate": -0.008696018724038723,
+        "lo": -0.012632158070461206,
+        "hi": -0.005350839058756212
+      }
+    },
+    "_sum_of_separate_effects": -0.008993017594985372,
+    "_both_together": -0.008674484026555152
+  },
+  "recencySensitivity": {
+    "half-life 2 years": {
+      "summary": {
+        "n": 6288,
+        "logLoss": 0.6505565912508546,
+        "brier": 0.2292788925482944,
+        "accuracy": 0.6225349872773537,
+        "auc": 0.6660229736392074,
+        "calibration": {
+          "slope": 0.9499847247001693,
+          "intercept": -0.027836065595069227
+        }
+      },
+      "vsBaseline": {
+        "estimate": -0.0015012257709535164,
+        "lo": -0.003731691542565305,
+        "hi": 0.0006969275215876459
+      }
+    },
+    "half-life 4 years": {
+      "summary": {
+        "n": 6288,
+        "logLoss": 0.6500260469390238,
+        "brier": 0.22906420246197778,
+        "accuracy": 0.6214217557251909,
+        "auc": 0.6666316272652139,
+        "calibration": {
+          "slope": 0.9617991661297118,
+          "intercept": -0.02656658034947774
+        }
+      },
+      "vsBaseline": {
+        "estimate": -0.002031770082784476,
+        "lo": -0.003515479080675191,
+        "hi": -0.0005992266543708458
+      }
+    },
+    "half-life 8 years": {
+      "summary": {
+        "n": 6288,
+        "logLoss": 0.6503380471636846,
+        "brier": 0.2292405310777933,
+        "accuracy": 0.6196723918575063,
+        "auc": 0.6657672096155132,
+        "calibration": {
+          "slope": 0.9546151988417823,
+          "intercept": -0.02545434258520158
+        }
+      },
+      "vsBaseline": {
+        "estimate": -0.0017197698581235315,
+        "lo": -0.002630300312664419,
+        "hi": -0.000800122878528624
+      }
+    },
+    "half-life 16 years": {
+      "summary": {
+        "n": 6288,
+        "logLoss": 0.6508996202197372,
+        "brier": 0.22951999795802774,
+        "accuracy": 0.6184001272264631,
+        "auc": 0.6646152597841121,
+        "calibration": {
+          "slope": 0.9430580288680428,
+          "intercept": -0.02468096319376415
+        }
+      },
+      "vsBaseline": {
+        "estimate": -0.0011581968020708806,
+        "lo": -0.0016711924652519374,
+        "hi": -0.0006353701980046443
+      }
+    }
+  },
+  "ensembles": {
+    "period": "2016-2026",
+    "n": 5330,
+    "members": [
+      "lr_prod",
+      "histgb",
+      "lightgbm",
+      "xgboost",
+      "catboost",
+      "glicko2",
+      "hier"
+    ],
+    "stackRidge": 20.0,
+    "finalWeights": {
+      "stack": {
+        "lr_prod": 0.361,
+        "histgb": 0.016,
+        "lightgbm": 0.095,
+        "xgboost": 0.112,
+        "catboost": 0.185,
+        "glicko2": 0.139,
+        "hier": 0.373
+      },
+      "weighted": {
+        "lr_prod": 0.405,
+        "histgb": 0.0,
+        "lightgbm": 0.0,
+        "xgboost": 0.0,
+        "catboost": 0.105,
+        "glicko2": 0.082,
+        "hier": 0.408
+      }
+    },
+    "models": {
+      "lr_prod": {
+        "summary": {
+          "n": 5330,
+          "logLoss": 0.6491460755773198,
+          "brier": 0.22873631414935736,
+          "accuracy": 0.6209193245778611,
+          "auc": 0.6675451554350632,
+          "calibration": {
+            "slope": 0.9650524168341065,
+            "intercept": -0.019927322039036615
+          }
+        },
+        "vsBaseline": null,
+        "decision": null
+      },
+      "histgb": {
+        "summary": {
+          "n": 5330,
+          "logLoss": 0.6735124269356618,
+          "brier": 0.24023999419862785,
+          "accuracy": 0.6033771106941839,
+          "auc": 0.643606794115829,
+          "calibration": {
+            "slope": 2.665015070213503,
+            "intercept": -0.016407256749384445
+          }
+        },
+        "vsBaseline": {
+          "estimate": 0.024366351358341882,
+          "lo": 0.01813152927159619,
+          "hi": 0.030631344922764866
+        },
+        "decision": {
+          "mode": "reject",
+          "reasons": [
+            "log loss +0.0244 [+0.0181, +0.0306]",
+            "interval includes zero",
+            "gain under the 0.002 minimum",
+            "better in 0 of 11 yearly folds",
+            "calibration slope 2.67 is outside 0.8 to 1.2"
+          ],
+          "estimate": 0.024366351358341882,
+          "lo": 0.01813152927159619,
+          "hi": 0.030631344922764866,
+          "foldWinShare": 0.0,
+          "adjustedInterval": {
+            "level": 0.9961538461538462,
+            "lo": 0.015359250299465818,
+            "hi": 0.03288882887566718,
+            "challengers": 13
+          }
+        }
+      },
+      "lightgbm": {
+        "summary": {
+          "n": 5330,
+          "logLoss": 0.6732066495378095,
+          "brier": 0.24008913294199324,
+          "accuracy": 0.6029080675422139,
+          "auc": 0.6433463029759774,
+          "calibration": {
+            "slope": 2.587462376898583,
+            "intercept": -0.01878326583841144
+          }
+        },
+        "vsBaseline": {
+          "estimate": 0.024060573960489554,
+          "lo": 0.01777671660130035,
+          "hi": 0.030360277970975062
+        },
+        "decision": {
+          "mode": "reject",
+          "reasons": [
+            "log loss +0.0241 [+0.0178, +0.0304]",
+            "interval includes zero",
+            "gain under the 0.002 minimum",
+            "better in 0 of 11 yearly folds",
+            "calibration slope 2.59 is outside 0.8 to 1.2"
+          ],
+          "estimate": 0.024060573960489554,
+          "lo": 0.01777671660130035,
+          "hi": 0.030360277970975062,
+          "foldWinShare": 0.0,
+          "adjustedInterval": {
+            "level": 0.9961538461538462,
+            "lo": 0.015076174403496201,
+            "hi": 0.03247510699121953,
+            "challengers": 13
+          }
+        }
+      },
+      "xgboost": {
+        "summary": {
+          "n": 5330,
+          "logLoss": 0.6683105100125818,
+          "brier": 0.23768593061266316,
+          "accuracy": 0.6148217636022514,
+          "auc": 0.6555963564470642,
+          "calibration": {
+            "slope": 2.429843966730876,
+            "intercept": -0.019111368479794777
+          }
+        },
+        "vsBaseline": {
+          "estimate": 0.019164434435261824,
+          "lo": 0.013595839838622076,
+          "hi": 0.024902394606693995
+        },
+        "decision": {
+          "mode": "reject",
+          "reasons": [
+            "log loss +0.0192 [+0.0136, +0.0249]",
+            "interval includes zero",
+            "gain under the 0.002 minimum",
+            "better in 0 of 11 yearly folds",
+            "calibration slope 2.43 is outside 0.8 to 1.2"
+          ],
+          "estimate": 0.019164434435261824,
+          "lo": 0.013595839838622076,
+          "hi": 0.024902394606693995,
+          "foldWinShare": 0.0,
+          "adjustedInterval": {
+            "level": 0.9961538461538462,
+            "lo": 0.010861925979895003,
+            "hi": 0.02676135807711423,
+            "challengers": 13
+          }
+        }
+      },
+      "catboost": {
+        "summary": {
+          "n": 5330,
+          "logLoss": 0.6634881836839596,
+          "brier": 0.23538452607534974,
+          "accuracy": 0.6091932457786117,
+          "auc": 0.6523595780268825,
+          "calibration": {
+            "slope": 1.7392870271855465,
+            "intercept": -0.017415776055224454
+          }
+        },
+        "vsBaseline": {
+          "estimate": 0.01434210810663965,
+          "lo": 0.009228117025540444,
+          "hi": 0.019551456546056657
+        },
+        "decision": {
+          "mode": "reject",
+          "reasons": [
+            "log loss +0.0143 [+0.0092, +0.0196]",
+            "interval includes zero",
+            "gain under the 0.002 minimum",
+            "better in 0 of 11 yearly folds",
+            "calibration slope 1.74 is outside 0.8 to 1.2"
+          ],
+          "estimate": 0.01434210810663965,
+          "lo": 0.009228117025540444,
+          "hi": 0.019551456546056657,
+          "foldWinShare": 0.0,
+          "adjustedInterval": {
+            "level": 0.9961538461538462,
+            "lo": 0.006254817558040811,
+            "hi": 0.02136882020836599,
+            "challengers": 13
+          }
+        }
+      },
+      "glicko2": {
+        "summary": {
+          "n": 5330,
+          "logLoss": 0.680738101548856,
+          "brier": 0.24393390828338107,
+          "accuracy": 0.5595684803001876,
+          "auc": 0.5860572610215561,
+          "calibration": {
+            "slope": 0.8552052678609009,
+            "intercept": -0.01597013130080464
+          }
+        },
+        "vsBaseline": {
+          "estimate": 0.031592025971536,
+          "lo": 0.024560403896919113,
+          "hi": 0.03889283085675275
+        },
+        "decision": {
+          "mode": "reject",
+          "reasons": [
+            "log loss +0.0316 [+0.0246, +0.0389]",
+            "interval includes zero",
+            "gain under the 0.002 minimum",
+            "better in 0 of 11 yearly folds",
+            "calibration slope 0.86"
+          ],
+          "estimate": 0.031592025971536,
+          "lo": 0.024560403896919113,
+          "hi": 0.03889283085675275,
+          "foldWinShare": 0.0,
+          "adjustedInterval": {
+            "level": 0.9961538461538462,
+            "lo": 0.020302520034568266,
+            "hi": 0.04095453273356074,
+            "challengers": 13
+          }
+        }
+      },
+      "hier": {
+        "summary": {
+          "n": 5330,
+          "logLoss": 0.6491210992363655,
+          "brier": 0.22872437494894182,
+          "accuracy": 0.6226078799249531,
+          "auc": 0.6675589544251741,
+          "calibration": {
+            "slope": 0.9654397354673222,
+            "intercept": -0.019770349008217347
+          }
+        },
+        "vsBaseline": {
+          "estimate": -2.4976340954393197e-05,
+          "lo": -0.00011710758403958624,
+          "hi": 6.199586567514962e-05
+        },
+        "decision": {
+          "mode": "shadow",
+          "reasons": [
+            "log loss -0.0000 [-0.0001, +0.0001]",
+            "interval includes zero",
+            "gain under the 0.002 minimum",
+            "better in 8 of 11 yearly folds",
+            "calibration slope 0.97"
+          ],
+          "estimate": -2.4976340954393197e-05,
+          "lo": -0.00011710758403958624,
+          "hi": 6.199586567514962e-05,
+          "foldWinShare": 0.7272727272727273,
+          "adjustedInterval": {
+            "level": 0.9961538461538462,
+            "lo": -0.0001415840673793874,
+            "hi": 9.839218119870028e-05,
+            "challengers": 13
+          }
+        }
+      },
+      "average": {
+        "summary": {
+          "n": 5330,
+          "logLoss": 0.6581874467566039,
+          "brier": 0.23284010330821933,
+          "accuracy": 0.6222326454033771,
+          "auc": 0.6667370696774373,
+          "calibration": {
+            "slope": 1.840052564305954,
+            "intercept": -0.020171992852973705
+          }
+        },
+        "vsBaseline": {
+          "estimate": 0.009041371179283964,
+          "lo": 0.004736181142892236,
+          "hi": 0.013257693473187913
+        },
+        "decision": {
+          "mode": "reject",
+          "reasons": [
+            "log loss +0.0090 [+0.0047, +0.0133]",
+            "interval includes zero",
+            "gain under the 0.002 minimum",
+            "better in 1 of 11 yearly folds",
+            "calibration slope 1.84 is outside 0.8 to 1.2"
+          ],
+          "estimate": 0.009041371179283964,
+          "lo": 0.004736181142892236,
+          "hi": 0.013257693473187913,
+          "foldWinShare": 0.09090909090909091,
+          "adjustedInterval": {
+            "level": 0.9961538461538462,
+            "lo": 0.002560136217863692,
+            "hi": 0.014571745009553308,
+            "challengers": 13
+          }
+        }
+      },
+      "stack": {
+        "summary": {
+          "n": 5330,
+          "logLoss": 0.649487768516932,
+          "brier": 0.22889683547460574,
+          "accuracy": 0.6222326454033771,
+          "auc": 0.6687153942800932,
+          "calibration": {
+            "slope": 1.1857510440397299,
+            "intercept": -0.020441060855651994
+          }
+        },
+        "vsBaseline": {
+          "estimate": 0.00034169293961212605,
+          "lo": -0.0019035340060553874,
+          "hi": 0.0024760009712777075
+        },
+        "decision": {
+          "mode": "reject",
+          "reasons": [
+            "log loss +0.0003 [-0.0019, +0.0025]",
+            "interval includes zero",
+            "gain under the 0.002 minimum",
+            "better in 5 of 11 yearly folds",
+            "calibration slope 1.19"
+          ],
+          "estimate": 0.00034169293961212605,
+          "lo": -0.0019035340060553874,
+          "hi": 0.0024760009712777075,
+          "foldWinShare": 0.45454545454545453,
+          "adjustedInterval": {
+            "level": 0.9961538461538462,
+            "lo": -0.00317315791824192,
+            "hi": 0.0032038153887039246,
+            "challengers": 13
+          }
+        }
+      },
+      "weighted": {
+        "summary": {
+          "n": 5330,
+          "logLoss": 0.6497613797674607,
+          "brier": 0.2290290428266016,
+          "accuracy": 0.623545966228893,
+          "auc": 0.6688184642878616,
+          "calibration": {
+            "slope": 1.216078836696755,
+            "intercept": -0.020419053815049416
+          }
+        },
+        "vsBaseline": {
+          "estimate": 0.0006153041901408089,
+          "lo": -0.0015057912362547155,
+          "hi": 0.002701851763678294
+        },
+        "decision": {
+          "mode": "reject",
+          "reasons": [
+            "log loss +0.0006 [-0.0015, +0.0027]",
+            "interval includes zero",
+            "gain under the 0.002 minimum",
+            "better in 4 of 11 yearly folds",
+            "calibration slope 1.22 is outside 0.8 to 1.2"
+          ],
+          "estimate": 0.0006153041901408089,
+          "lo": -0.0015057912362547155,
+          "hi": 0.002701851763678294,
+          "foldWinShare": 0.36363636363636365,
+          "adjustedInterval": {
+            "level": 0.9961538461538462,
+            "lo": -0.0024656971098127633,
+            "hi": 0.003436244794688216,
+            "challengers": 13
+          }
+        }
+      },
+      "stack_by_experience": {
+        "summary": {
+          "n": 5330,
+          "logLoss": 0.6498081242642285,
+          "brier": 0.22904141279737783,
+          "accuracy": 0.6222326454033771,
+          "auc": 0.6686642816942737,
+          "calibration": {
+            "slope": 1.189276580636149,
+            "intercept": -0.020357523385936056
+          }
+        },
+        "vsBaseline": {
+          "estimate": 0.0006620486869085404,
+          "lo": -0.0016380502162859228,
+          "hi": 0.0029635360486450317
+        },
+        "decision": {
+          "mode": "reject",
+          "reasons": [
+            "log loss +0.0007 [-0.0016, +0.0030]",
+            "interval includes zero",
+            "gain under the 0.002 minimum",
+            "better in 4 of 11 yearly folds",
+            "calibration slope 1.19"
+          ],
+          "estimate": 0.0006620486869085404,
+          "lo": -0.0016380502162859228,
+          "hi": 0.0029635360486450317,
+          "foldWinShare": 0.36363636363636365,
+          "adjustedInterval": {
+            "level": 0.9961538461538462,
+            "lo": -0.0030915630843461853,
+            "hi": 0.003352820299623243,
+            "challengers": 13
+          }
+        }
+      }
+    },
+    "stackPlatt": {
+      "n": 4401,
+      "vsStack": {
+        "estimate": -0.0008292798617618208,
+        "lo": -0.0020709707071673725,
+        "hi": 0.00037035992242932087
+      }
+    }
+  },
+  "groups": {
+    "Newcomers (a fighter with under 3 UFC fights)": {
+      "n": 3157,
+      "lr_prod": 0.6598624703135768,
+      "lightgbm": 0.6745268044942017,
+      "catboost": 0.6667665268672625,
+      "hier": 0.6598775447790306,
+      "glicko2": 0.6800538917884148
+    },
+    "Both fighters with 3+ UFC fights": {
+      "n": 3131,
+      "lr_prod": 0.6441883534503888,
+      "lightgbm": 0.6727678629812995,
+      "catboost": 0.6617528446321844,
+      "hier": 0.6440954437478438,
+      "glicko2": 0.6805311795999629
+    },
+    "Five-round bouts": {
+      "n": 614,
+      "lr_prod": 0.6457023397053441,
+      "lightgbm": 0.6721411037038915,
+      "catboost": 0.6603713765195747,
+      "hier": 0.6458697401818807,
+      "glicko2": 0.6723473495772865
+    },
+    "Either fighter off for a year or more": {
+      "n": 1164,
+      "lr_prod": 0.6530340864066484,
+      "lightgbm": 0.6736439555386214,
+      "catboost": 0.6651871174942146,
+      "hier": 0.653030170126924,
+      "glicko2": 0.6810479563027448
+    },
+    "Division: Bantamweight": {
+      "n": 647,
+      "lr_prod": 0.6393362975862751,
+      "lightgbm": 0.6708040151583695,
+      "catboost": 0.6597305923813576,
+      "hier": 0.6392730509083829,
+      "glicko2": 0.6731816458069028
+    },
+    "Division: Featherweight": {
+      "n": 705,
+      "lr_prod": 0.6621573025643297,
+      "lightgbm": 0.6762242549935018,
+      "catboost": 0.6682241229843982,
+      "hier": 0.6620022377169316,
+      "glicko2": 0.6813407750150624
+    },
+    "Division: Flyweight": {
+      "n": 365,
+      "lr_prod": 0.6459053408010001,
+      "lightgbm": 0.670517731143013,
+      "catboost": 0.6596711464139924,
+      "hier": 0.645932820265702,
+      "glicko2": 0.67044472141451
+    },
+    "Division: Heavyweight": {
+      "n": 444,
+      "lr_prod": 0.619258861629719,
+      "lightgbm": 0.6628987718475559,
+      "catboost": 0.6450109951843785,
+      "hier": 0.6192192056377046,
+      "glicko2": 0.6754790278453109
+    },
+    "Division: Light Heavyweight": {
+      "n": 430,
+      "lr_prod": 0.685390546951394,
+      "lightgbm": 0.682719139470903,
+      "catboost": 0.6789034100083803,
+      "hier": 0.6853435637528426,
+      "glicko2": 0.6887461306008903
+    },
+    "Division: Lightweight": {
+      "n": 927,
+      "lr_prod": 0.6416851566393553,
+      "lightgbm": 0.6722255777559378,
+      "catboost": 0.6617131149184791,
+      "hier": 0.6416068145609787,
+      "glicko2": 0.6737631851394484
+    },
+    "Division: Middleweight": {
+      "n": 701,
+      "lr_prod": 0.6570438109349016,
+      "lightgbm": 0.6739727932022521,
+      "catboost": 0.6656779091645603,
+      "hier": 0.6568904535494113,
+      "glicko2": 0.694610716553215
+    },
+    "Division: Welterweight": {
+      "n": 862,
+      "lr_prod": 0.6613918617222009,
+      "lightgbm": 0.6728070789146275,
+      "catboost": 0.6652239627421849,
+      "hier": 0.6614309814553282,
+      "glicko2": 0.6867916589824047
+    },
+    "Division: Women's Bantamweight": {
+      "n": 218,
+      "lr_prod": 0.6944206143573136,
+      "lightgbm": 0.6829845760791912,
+      "catboost": 0.6826975762715316,
+      "hier": 0.694501015500989,
+      "glicko2": 0.6918800322935791
+    },
+    "Division: Women's Flyweight": {
+      "n": 267,
+      "lr_prod": 0.6616648684948876,
+      "lightgbm": 0.6744649379983708,
+      "catboost": 0.6666698366374896,
+      "hier": 0.6615454618333241,
+      "glicko2": 0.6877240817797248
+    },
+    "Division: Women's Strawweight": {
+      "n": 357,
+      "lr_prod": 0.6554901957863772,
+      "lightgbm": 0.6864731050190477,
+      "catboost": 0.6812499722914579,
+      "hier": 0.6554865368907838,
+      "glicko2": 0.6871837053663526
+    }
+  },
+  "experimentsRun": {
+    "modelFamilies": 14,
+    "tuningTrials": 96,
+    "ablations": 6,
+    "ensembles": 5
+  }
+}

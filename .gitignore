@@ -10,3 +10,8 @@ data/reports/
 
 test-results/
 playwright-report/
+data/experiments/features.csv
+data/experiments/oof.csv
+research/.venv/
+research/__pycache__/
+data/experiments/fights_long.csv

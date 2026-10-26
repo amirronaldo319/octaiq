@@ -3,6 +3,7 @@ import { isOddsEvents, oddsUrl, type OddsEvent } from '../lib/oddsApi.ts'
 import { MARKET_ATTRIBUTION, MARKET_METHOD, type MarketBout, type MarketFile } from '../lib/marketSnapshot.ts'
 import { marketFromFights } from '../odds/consensus.ts'
 import { pollIntervalMinutes } from '../odds/plan.ts'
+import { API_VERSION, type Health } from './contracts.ts'
 import { appendPoint, toPublished, type PriceHistory } from '../lib/priceHistory.ts'
 
 /**
@@ -82,7 +83,8 @@ export async function handleRequest(req: Request, deps: Deps): Promise<Response>
   if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: { ...headers, 'access-control-allow-methods': 'GET, OPTIONS', 'access-control-max-age': '600' } })
   if (req.method !== 'GET') return json({ error: 'Method not allowed' }, 405, { ...headers, allow: 'GET, OPTIONS' })
   const url = new URL(req.url)
-  if (url.pathname !== '/api/market' && url.pathname !== '/api/prices') return json({ error: 'Not found' }, 404, headers)
+  const known = ['/api/market', '/api/prices', '/api/system/health']
+  if (!known.includes(url.pathname)) return json({ error: 'Not found' }, 404, headers)
   for (const key of url.searchParams.keys()) if (key !== 'event') return json({ error: `Unknown parameter: ${key.slice(0, 40)}` }, 400, headers)
   const eventId = url.searchParams.get('event')
   if (eventId !== null && !EVENT_ID.test(eventId)) return json({ error: 'Invalid event id' }, 400, headers)
@@ -91,6 +93,20 @@ export async function handleRequest(req: Request, deps: Deps): Promise<Response>
   if (wait !== null) return json({ error: 'Too many requests' }, 429, { ...headers, 'retry-after': String(wait) })
 
   const meta = (await readJson<Meta>(deps.kv, 'meta')) ?? {}
+  if (url.pathname === '/api/system/health') {
+    const latest = await readJson<MarketFile>(deps.kv, 'market:latest')
+    const age = latest ? (deps.now().getTime() - Date.parse(latest.generatedAt)) / 3_600_000 : null
+    const failing = Boolean(meta.lastError && meta.lastAttemptAt && (!meta.lastSuccessAt || Date.parse(meta.lastAttemptAt) > Date.parse(meta.lastSuccessAt)))
+    const health: Health = {
+      apiVersion: API_VERSION,
+      status: !latest ? 'no-data' : failing || (age ?? 0) > STALE_AFTER_HOURS ? 'degraded' : 'ok',
+      now: deps.now().toISOString(),
+      lastSuccessAt: meta.lastSuccessAt ?? null, lastAttemptAt: meta.lastAttemptAt ?? null, lastError: failing ? (meta.lastError ?? null) : null,
+      marketAgeHours: age === null ? null : Math.round(age * 10) / 10,
+      quota: { remaining: meta.quotaRemaining ?? null, used: meta.quotaUsed ?? null, lastCost: meta.lastCost ?? null },
+    }
+    return json(health, 200, { ...headers, 'cache-control': 'no-store' })
+  }
   if (url.pathname === '/api/prices') {
     const prices = await readJson<ReturnType<typeof toPublished>>(deps.kv, 'prices:published')
     if (!prices) return json({ error: 'No price history yet' }, 503, headers)

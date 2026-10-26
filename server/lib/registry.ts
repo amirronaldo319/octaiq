@@ -107,3 +107,39 @@ export function rollback(reg: Registry, id: string): { registry: Registry; instr
     instructions: `Model ${id} is production again in the registry. To restore its behaviour: ${how}. The results data keeps growing, so predictions use data version ${target.dataVersion} only if that download is restored too.`,
   }
 }
+
+
+/** One model or variant from the Python research runs, already judged by the promotion gate. */
+export interface ResearchEntry {
+  name: string
+  mode: 'promote' | 'shadow' | 'reject'
+  estimate: number | null
+  lo: number | null
+  hi: number | null
+  logLoss: number
+  brier: number
+  accuracy: number
+  calibrationSlope: number | null
+  note?: string
+}
+
+/**
+ * Adds research-run models to the registry. Nothing here becomes production: a model that cleared the gate on paper but is not deployed
+ * is recorded as shadow with the reason, so the registry never claims a model is in use that is not.
+ */
+export function recordResearch(reg: Registry, run: { at: string; dataVersion: string; featurePipeline: string; codeCommit: string | null; seed: number; testPeriod: string; n: number; entries: ResearchEntry[] }): Registry {
+  const records = reg.records.map((r) => ({ ...r }))
+  for (const e of run.entries) {
+    const id = `research:${e.name}@${run.dataVersion}`
+    const status: ModelRecord['status'] = e.mode === 'reject' ? 'rejected' : 'shadow'
+    const decision = [e.mode === 'promote' ? 'Cleared the gate in research; not deployed as production' : e.mode === 'shadow' ? 'Inconclusive against the gate' : 'Rejected by the gate', e.estimate === null ? '' : `log loss ${e.estimate >= 0 ? '+' : ''}${e.estimate.toFixed(4)} against the baseline [${(e.lo ?? 0).toFixed(4)}, ${(e.hi ?? 0).toFixed(4)}]`, e.note ?? ''].filter(Boolean).join('; ')
+    const record: ModelRecord = {
+      id, model: e.name, createdAt: run.at, dataVersion: run.dataVersion, featurePipeline: run.featurePipeline, codeCommit: run.codeCommit, seed: run.seed, testPeriod: run.testPeriod, n: run.n,
+      logLoss: e.logLoss, logLossLo: NaN, logLossHi: NaN, brier: e.brier, accuracy: e.accuracy, calibrationSlope: e.calibrationSlope, config: { source: 'research/run.py' }, status, decision,
+    }
+    const at = records.findIndex((r) => r.id === id)
+    if (at >= 0) records[at] = record
+    else records.push(record)
+  }
+  return { ...reg, records }
+}

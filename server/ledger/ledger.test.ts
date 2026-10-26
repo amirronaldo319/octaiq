@@ -249,3 +249,53 @@ describe('canonical forecast ids', () => {
     expect(h[0].horizonHours).toBe(24)
   })
 })
+
+describe('forecast horizons and shadow forecasts', () => {
+  const CARD = '2026-11-01T02:00:00Z'
+  const hoursBefore = (h: number): string => new Date(Date.parse(CARD) - h * 3_600_000).toISOString()
+  const entry = (at: string, over: Partial<import('./ledger.ts').LedgerEntry> = {}): import('./ledger.ts').LedgerEntry => ({
+    recordedAt: at, model: 'm1', dataThrough: '2026-10-17', cardVersion: 1, bouts: [{ id: 'e-1', a: 'Ann Lee', b: 'Bea Kim', probA: 0.6 }], ...over,
+  })
+
+  it('names the horizon from the hours before the main card, at the boundaries', async () => {
+    const { horizonOf } = await import('./ledger.ts')
+    const at = (h: number): string => horizonOf(hoursBefore(h), CARD)
+    expect([at(900), at(720), at(300), at(168), at(100), at(72), at(30), at(24), at(10), at(6), at(2)]).toEqual(['early', '30d', '14d', '7d', '7d', '72h', '72h', '24h', '24h', 'final', 'final'])
+  })
+
+  it('saves a checkpoint when the card enters a new horizon even though nothing moved, and not within the same horizon', async () => {
+    const { shouldRecord } = await import('./ledger.ts')
+    const lock = '2026-10-31T21:00:00Z'
+    const ledger = { eventId: 'e', title: 'T', lockedAt: lock, mainCardStart: CARD, entries: [entry(hoursBefore(200))] }
+    expect(shouldRecord(ledger, entry(hoursBefore(190)), lock, CARD).record).toBe(false)
+    const next = shouldRecord(ledger, entry(hoursBefore(160)), lock, CARD)
+    expect(next).toMatchObject({ record: true, reason: 'The card entered a new forecast horizon.' })
+    expect(shouldRecord(ledger, entry(hoursBefore(160)), lock).record).toBe(false)
+  })
+
+  it('saves a forecast when a shadow challenger first appears', async () => {
+    const { shouldRecord, describeChange } = await import('./ledger.ts')
+    const lock = '2026-10-31T21:00:00Z'
+    const ledger = { eventId: 'e', title: 'T', lockedAt: lock, mainCardStart: CARD, entries: [entry(hoursBefore(100))] }
+    const withShadow = entry(hoursBefore(99), { shadowModel: 'shadow-1' })
+    expect(shouldRecord(ledger, withShadow, lock, CARD).reason).toBe('A shadow challenger was added.')
+    expect(describeChange(ledger.entries[0], withShadow)).toContain('shadow challenger')
+  })
+
+  it('grades each horizon on its own last forecast, and the lock window only counts forecasts made before the lock', async () => {
+    const { gradeLedger, summarizeLedgers } = await import('../ledger/grade.ts')
+    const dataset = [{ id: 'x', event: 'E', date: Date.parse('2026-11-01'), a: 'ann lee', b: 'bea kim', nameA: 'Ann Lee', nameB: 'Bea Kim', result: 'a', method: 'dec', weightClass: 'x' }] as unknown as import('../backtest/dataset.ts').Bout[]
+    const lock = '2026-10-31T21:00:00Z'
+    const early = entry(hoursBefore(200), { bouts: [{ id: 'e-1', a: 'Ann Lee', b: 'Bea Kim', probA: 0.4 }] })
+    const late = entry(hoursBefore(20), { bouts: [{ id: 'e-1', a: 'Ann Lee', b: 'Bea Kim', probA: 0.8 }] })
+    const afterLock = entry(hoursBefore(1), { bouts: [{ id: 'e-1', a: 'Ann Lee', b: 'Bea Kim', probA: 0.01 }] })
+    const g = gradeLedger({ eventId: 'e', title: 'T', lockedAt: lock, mainCardStart: CARD, entries: [early, late, afterLock] }, dataset, new Date('2026-11-05T00:00:00Z'))
+    const byId = Object.fromEntries((g.horizons ?? []).map((h) => [h.id, h]))
+    expect(byId['14d']).toMatchObject({ graded: 1, correct: 0 })
+    expect(byId['24h']).toMatchObject({ graded: 1, correct: 1 })
+    expect(byId.final).toBeUndefined()
+    expect(g.correct).toBe(1)
+    const summary = summarizeLedgers([g])
+    expect(summary.byHorizon.map((h) => h.id)).toEqual(['14d', '24h'])
+  })
+})

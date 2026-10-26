@@ -1,5 +1,6 @@
 import type { Bout } from '../backtest/dataset.ts'
 import { normalizeName } from '../lib/names.ts'
+import { HORIZONS, horizonOf } from '../../src/engine/horizons.ts'
 import type { Ledger, LedgerBout, LedgerEntry, LedgerHistoryEntry } from './ledger.ts'
 
 export interface GradedBout extends LedgerBout {
@@ -27,6 +28,8 @@ export interface GradedEvent {
   status: 'upcoming' | 'awaiting-results' | 'graded'
   /** Every saved forecast, oldest first (public site only) */
   history?: LedgerHistoryEntry[]
+  /** The last forecast saved in each named horizon, graded on its own */
+  horizons?: { id: string; at: string; graded: number; correct: number; logLoss: number | null }[]
 }
 
 const tokenKey = (n: string): string => normalizeName(n).split(' ').filter(Boolean).sort().join(' ')
@@ -56,7 +59,7 @@ export function gradeLedger(ledger: Ledger, dataset: readonly Bout[], now: Date)
     index.set(k, [...(index.get(k) ?? []), b])
   }
 
-  const bouts: GradedBout[] = (entry?.bouts ?? []).map((lb) => {
+  const gradeBouts = (list: readonly LedgerBout[]): GradedBout[] => list.map((lb) => {
     const found = index.get(pairKey(lb.a, lb.b))
     if (!found || found.length !== 1) return { ...lb }
     const d = found[0]
@@ -71,6 +74,16 @@ export function gradeLedger(ledger: Ledger, dataset: readonly Bout[], now: Date)
       ...(decisive ? { correct: (lb.probA >= 0.5) === (result === 'a'), logLoss: -Math.log(Math.max(1e-6, pWinner)) } : {}),
     }
   })
+  const bouts = gradeBouts(entry?.bouts ?? [])
+  // Each named horizon is graded on the last forecast saved inside it, before the lock.
+  const lockMs = Date.parse(ledger.lockedAt)
+  const horizons = HORIZONS.flatMap((h) => {
+    const inside = ledger.entries.filter((e) => Date.parse(e.recordedAt) < lockMs && horizonOf(e.recordedAt, ledger.mainCardStart) === h.id)
+    const last = inside[inside.length - 1]
+    if (!last) return []
+    const graded = gradeBouts(last.bouts).filter((b) => b.correct !== undefined)
+    return [{ id: h.id, at: last.recordedAt, graded: graded.length, correct: graded.filter((b) => b.correct).length, logLoss: graded.length ? graded.reduce((s, b) => s + (b.logLoss ?? 0), 0) / graded.length : null }]
+  })
 
   const decided = bouts.filter((b) => b.correct !== undefined)
   const status: GradedEvent['status'] = decided.length > 0 ? 'graded' : now.getTime() > start + 6 * 3_600_000 ? 'awaiting-results' : 'upcoming'
@@ -82,6 +95,7 @@ export function gradeLedger(ledger: Ledger, dataset: readonly Bout[], now: Date)
     bouts, graded: decided.length, correct: decided.filter((b) => b.correct).length,
     logLoss: decided.length ? decided.reduce((s, b) => s + (b.logLoss ?? 0), 0) / decided.length : null,
     status,
+    horizons,
   }
 }
 
@@ -90,11 +104,18 @@ export interface LedgerSummary {
   graded: number
   correct: number
   logLoss: number | null
+  /** Results by named forecast horizon across all graded events */
+  byHorizon: { id: string; label: string; graded: number; correct: number; logLoss: number | null }[]
 }
 
 export function summarizeLedgers(events: readonly GradedEvent[]): LedgerSummary {
   const graded = events.reduce((s, e) => s + e.graded, 0)
   const correct = events.reduce((s, e) => s + e.correct, 0)
   const ll = events.reduce((s, e) => s + (e.logLoss ?? 0) * e.graded, 0)
-  return { events: [...events], graded, correct, logLoss: graded ? ll / graded : null }
+  const byHorizon = HORIZONS.map((h) => {
+    const rows = events.flatMap((e) => (e.horizons ?? []).filter((x) => x.id === h.id))
+    const g = rows.reduce((n, x) => n + x.graded, 0)
+    return { id: h.id, label: h.label, graded: g, correct: rows.reduce((n, x) => n + x.correct, 0), logLoss: g ? rows.reduce((n, x) => n + (x.logLoss ?? 0) * x.graded, 0) / g : null }
+  }).filter((h) => h.graded > 0)
+  return { events: [...events], graded, correct, logLoss: graded ? ll / graded : null, byHorizon }
 }

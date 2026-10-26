@@ -35,6 +35,8 @@ export interface UpcomingPrediction {
   joint: JointProbs
   /** The main reasons behind the forecast, in plain language */
   why: Why
+  /** The shadow model's probability that A wins, when one was requested */
+  shadowProbA?: number
 }
 
 export interface UpcomingOptions {
@@ -50,6 +52,8 @@ export interface UpcomingOptions {
   /** Resamples for the probability range; 0 or absent skips it (it costs a few seconds) */
   bootstrap?: number
   seed?: number
+  /** Also forecast with older fights counting for less (a half-life in years), as a shadow model that is recorded but not shown as the forecast */
+  shadowHalfLifeYears?: number
 }
 
 export const upcomingDefaults = (eloK: number, statsDecay = 0.9, useStats = false): UpcomingOptions => ({
@@ -95,6 +99,13 @@ export function predictUpcoming(
   const xs = train.map((r) => keep.map((i) => r.x[i]))
   const ys = train.map((r) => r.y as number)
   const model = trainLogistic(xs, ys, opts.ridge)
+  const shadowModel = opts.shadowHalfLifeYears && inputs.length > 0
+    ? (() => {
+        const ref = Math.max(...inputs.map((i) => i.date))
+        const weights = train.map((r) => 0.5 ** ((ref - r.date) / (365.25 * 86_400_000 * (opts.shadowHalfLifeYears as number))))
+        return trainLogistic(xs, ys, opts.ridge, { weights })
+      })()
+    : null
   const outcome = trainOutcomeModels(rows.filter((r) => !r.id.startsWith('upcoming:')), opts.ridge)
 
   const upcoming = inputs.map((i) => {
@@ -132,6 +143,7 @@ export function predictUpcoming(
       priorA: row.priorA, priorB: row.priorB, eloDiff: row.x[0] * 400,
       distance: o.distance,
       joint: jointProbs(probA, o),
+      ...(shadowModel ? { shadowProbA: predictLogistic(shadowModel, keep.map((k) => row.x[k])) } : {}),
       why: explain(keep, keep.map((k) => row.x[k]), keep.map((k, j) => (model.weights[j] / model.scales[j]) * row.x[k]), probA),
     }
   })

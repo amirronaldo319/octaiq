@@ -22,7 +22,8 @@
     "identity": "node server/identity.ts",
     "registry": "node server/registry.ts",
     "model:rollback": "node server/registry.ts --rollback",
-    "report": "node server/report.ts"
+    "report": "node server/report.ts",
+    "research:export": "node server/export.ts"
   },
   "dependencies": {
     "@fontsource/barlow": "^5.3.0",

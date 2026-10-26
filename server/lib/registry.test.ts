@@ -49,3 +49,28 @@ describe('rollback', () => {
     expect(() => rollback(reg, 'Boosted trees@aaaa')).toThrow(/never in production/)
   })
 })
+
+describe('recordResearch', () => {
+  const meta = { at: '2026-10-26T00:00:00Z', dataVersion: 'aaaa', featurePipeline: 'features-3', codeCommit: 'abc', seed: 1, testPeriod: '2014-2026', n: 100 }
+  const entry = (name: string, mode: 'promote' | 'shadow' | 'reject') => ({ name, mode, estimate: -0.002, lo: -0.004, hi: -0.0001, logLoss: 0.65, brier: 0.23, accuracy: 0.62, calibrationSlope: 0.96 })
+
+  it('never records research as production, and says so when a model cleared the gate but is not deployed', async () => {
+    const { recordResearch } = await import('./registry.ts')
+    const base = recordRun(emptyRegistry(), run())
+    const reg = recordResearch(base, { ...meta, entries: [entry('recency', 'promote'), entry('trees', 'reject')] })
+    expect(reg.production).toBe(base.production)
+    expect(reg.records.filter((r) => r.status === 'production')).toHaveLength(1)
+    const promoted = reg.records.find((r) => r.model === 'recency')!
+    expect(promoted.status).toBe('shadow')
+    expect(promoted.decision).toContain('not deployed as production')
+    expect(reg.records.find((r) => r.model === 'trees')!.status).toBe('rejected')
+  })
+
+  it('updates a record for the same data version instead of duplicating it', async () => {
+    const { recordResearch } = await import('./registry.ts')
+    const once = recordResearch(emptyRegistry(), { ...meta, entries: [entry('x', 'shadow')] })
+    const twice = recordResearch(once, { ...meta, entries: [entry('x', 'reject')] })
+    expect(twice.records).toHaveLength(1)
+    expect(twice.records[0].status).toBe('rejected')
+  })
+})

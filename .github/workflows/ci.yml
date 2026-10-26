@@ -25,3 +25,8 @@ jobs:
         run: |
           npx playwright install --with-deps chromium
           npm run e2e
+      - name: Research code tests (Python)
+        run: |
+          python3 -m venv research/.venv
+          research/.venv/bin/pip install -q numpy pandas scipy scikit-learn
+          research/.venv/bin/python -m unittest discover -s research -p 'test_*.py'

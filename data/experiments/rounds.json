@@ -1,0 +1,148 @@
+{
+  "generatedAt": "2026-10-26T05:26:36.284336+00:00",
+  "dataVersion": "58ca637e2e2c",
+  "status": "unavailable",
+  "results": {
+    "3-round": {
+      "n": 5704,
+      "classes": [
+        "round 1",
+        "round 2",
+        "round 3",
+        "distance"
+      ],
+      "baseRate": [
+        0.2544,
+        0.1581,
+        0.0812,
+        0.5063
+      ],
+      "logLoss": {
+        "model": 1.1838032185107599,
+        "baseRate": 1.1943325116504553,
+        "difference": {
+          "estimate": -0.010529293139695335,
+          "lo": -0.02260503506312484,
+          "hi": 0.004640541765190603
+        }
+      },
+      "rankedProbabilityScore": {
+        "model": 0.21982524966584024,
+        "baseRate": 0.22950266781133855,
+        "difference": {
+          "estimate": -0.009677418145498308,
+          "lo": -0.012260700396273331,
+          "hi": -0.006918444116361343
+        }
+      },
+      "round1Calibration": [
+        {
+          "n": 1426,
+          "predicted": 0.13489210487577388,
+          "observed": 0.16830294530154277
+        },
+        {
+          "n": 1426,
+          "predicted": 0.20563458837053064,
+          "observed": 0.21037868162692847
+        },
+        {
+          "n": 1426,
+          "predicted": 0.2644818075010444,
+          "observed": 0.2762973352033661
+        },
+        {
+          "n": 1426,
+          "predicted": 0.3615992069945664,
+          "observed": 0.36255259467040674
+        }
+      ],
+      "decision": {
+        "mode": "shadow",
+        "reasons": [
+          "log loss -0.0105 [-0.0226, +0.0046]",
+          "interval includes zero",
+          "gain at least 0.002",
+          "better in 11 of 13 yearly folds"
+        ],
+        "estimate": -0.010529293139695335,
+        "lo": -0.02260503506312484,
+        "hi": 0.004640541765190603,
+        "foldWinShare": 0.8461538461538461
+      }
+    },
+    "5-round": {
+      "n": 617,
+      "classes": [
+        "round 1",
+        "round 2",
+        "round 3",
+        "round 4",
+        "round 5",
+        "distance"
+      ],
+      "baseRate": [
+        0.2139,
+        0.1588,
+        0.1102,
+        0.0551,
+        0.0519,
+        0.41
+      ],
+      "logLoss": {
+        "model": 1.6389995043607626,
+        "baseRate": 1.5588725358028097,
+        "difference": {
+          "estimate": 0.08012696855795304,
+          "lo": 0.024821417466221844,
+          "hi": 0.13252744744027872
+        }
+      },
+      "rankedProbabilityScore": {
+        "model": 0.2213459406770278,
+        "baseRate": 0.23067661288178143,
+        "difference": {
+          "estimate": -0.009330672204753632,
+          "lo": -0.019559768089810633,
+          "hi": 0.0001161027531519615
+        }
+      },
+      "round1Calibration": [
+        {
+          "n": 155,
+          "predicted": 0.07966018410092895,
+          "observed": 0.12903225806451613
+        },
+        {
+          "n": 154,
+          "predicted": 0.17228014278762072,
+          "observed": 0.16883116883116883
+        },
+        {
+          "n": 154,
+          "predicted": 0.2685197058360024,
+          "observed": 0.2077922077922078
+        },
+        {
+          "n": 154,
+          "predicted": 0.42186017568216966,
+          "observed": 0.35064935064935066
+        }
+      ],
+      "decision": {
+        "mode": "reject",
+        "reasons": [
+          "log loss +0.0801 [+0.0248, +0.1325]",
+          "interval includes zero",
+          "gain under the 0.002 minimum",
+          "better in 4 of 13 yearly folds"
+        ],
+        "estimate": 0.08012696855795304,
+        "lo": 0.024821417466221844,
+        "hi": 0.13252744744027872,
+        "foldWinShare": 0.3076923076923077
+      }
+    }
+  },
+  "note": "Round forecasts are shown only if the model beats the base rate with an interval below zero and passes the promotion gate; otherwise they stay unavailable."
+}
