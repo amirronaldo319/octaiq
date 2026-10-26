@@ -46,6 +46,10 @@ export interface FighterProfile {
   reachCm: number | null
   /** True for a southpaw; null when the stance is unknown. Stance does not change over a career. */
   southpaw?: boolean | null
+  /** The results source's own fighter ID (from the profile URL), when the name is unique; the stable key behind an internal ID */
+  externalId?: string | null
+  /** True when two people share this name, so no profile can be trusted */
+  ambiguous?: boolean
 }
 
 export interface RawFiles {
@@ -134,11 +138,11 @@ export function parseProfiles(csvText: string): { profiles: Map<string, FighterP
     // Two people sharing a name cannot be told apart in the results file, so their bio is unusable.
     if ((counts.get(key) ?? 0) > 1) {
       ambiguous++
-      profiles.set(key, { dob: null, reachCm: null, southpaw: null })
+      profiles.set(key, { dob: null, reachCm: null, southpaw: null, externalId: null, ambiguous: true })
       continue
     }
     const stance = (r.stance ?? '').trim().toLowerCase()
-    profiles.set(key, { dob: parseDate(r.dob ?? ''), reachCm: parseReach(r.reach ?? ''), southpaw: stance === '' ? null : stance === 'southpaw' })
+    profiles.set(key, { dob: parseDate(r.dob ?? ''), reachCm: parseReach(r.reach ?? ''), southpaw: stance === '' ? null : stance === 'southpaw', externalId: /fighter-details\/([0-9a-f]+)/i.exec(r.url ?? '')?.[1] ?? null, ambiguous: false })
   }
   return { profiles, ambiguous }
 }

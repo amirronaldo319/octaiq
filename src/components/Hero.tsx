@@ -44,11 +44,13 @@ interface HeroProps {
   onAbout: () => void
   /** When betting prices were last collected, if the site has them */
   marketUpdated?: string
+  /** How current the prices are, in words, and a longer explanation for hover */
+  marketLabel?: { label: string; detail: string; state: string }
   zoneChoice?: string
   onZoneChoice?: (id: string) => void
 }
 
-export function Hero({ payload, onAbout, marketUpdated, zoneChoice = 'venue', onZoneChoice }: HeroProps) {
+export function Hero({ payload, onAbout, marketUpdated, marketLabel, zoneChoice = 'venue', onZoneChoice }: HeroProps) {
   const now = useNow(30_000)
   const { event } = payload
   const { series, headline } = splitTitle(event.title)
@@ -79,7 +81,7 @@ export function Hero({ payload, onAbout, marketUpdated, zoneChoice = 'venue', on
             ? <button type="button" className="flag ok" onClick={onAbout}>Checked against ufc.com{checkedOn ? `, ${checkedOn}` : ''}</button>
             : <button type="button" className="flag" onClick={onAbout}>Card not verified against ufc.com</button>}
           {marketUpdated
-            ? <button type="button" className="flag" onClick={onAbout}>Prices updated {new Date(marketUpdated).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}</button>
+            ? <button type="button" className={`flag ${marketLabel ? `m-${marketLabel.state}` : ''}`} title={marketLabel?.detail} onClick={onAbout}>{marketLabel ? `Prices: ${marketLabel.label.replace(/^Updated/, 'updated')}` : `Prices updated ${new Date(marketUpdated).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}`}</button>
             : payload.odds.status !== 'live' && <button type="button" className="flag" onClick={onAbout}>No live odds</button>}
           {payload.static && <button type="button" className="flag" onClick={onAbout}>Public snapshot</button>}
         </div>

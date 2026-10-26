@@ -104,6 +104,11 @@ export interface ResultsModel {
   features?: 'results' | 'results+stats'
   trainedThrough?: string
   trainedOn?: number
+  /** Version of the data, the feature pipeline and the code that produced these forecasts, for tracing a forecast to its inputs */
+  dataVersion?: string
+  featurePipeline?: string
+  codeCommit?: string
+  featureCutoff?: string
   backtest?: {
     period: string
     n: number

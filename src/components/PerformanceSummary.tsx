@@ -2,6 +2,7 @@ import type { BacktestOutput } from '../../server/backtest/types'
 import type { PublishedLedger } from '../../server/lib/snapshot'
 import { withBase } from '../lib/fetchJson'
 import { useJson } from '../lib/useJson'
+import type { Monitor } from '../../server/lib/monitor'
 import { wilson } from '../lib/wilson'
 
 const isLedger = (b: unknown): boolean => typeof b === 'object' && b !== null && Array.isArray((b as PublishedLedger).events)
@@ -98,6 +99,28 @@ export function PerformanceSummary({ backtest }: { backtest: BacktestOutput }) {
         )}
         <p className="muted small">Lowest accuracy among groups with at least 100 fights. The full list is in the table further down.</p>
       </article>
+    </section>
+  )
+}
+
+const isMonitor = (b: unknown): boolean => typeof b === 'object' && b !== null && Array.isArray((b as Monitor).alerts)
+
+/** Operational checks from the last refresh: published results, inputs, drift and price freshness. */
+export function MonitorPanel() {
+  const m = useJson<Monitor>([withBase('data/monitor.json')], isMonitor)
+  if (m.status !== 'ready') return null
+  const d = m.data
+  return (
+    <section className="panel" aria-label="Monitoring">
+      <h2>Monitoring</h2>
+      {d.alerts.length === 0 ? <p><strong>No alerts</strong> at the last refresh.</p> : <ul className="alerts">{d.alerts.map((a) => <li key={a}>{a}</li>)}</ul>}
+      <ul className="small muted">
+        <li>Published forecasts graded: {d.prospective.graded}{d.prospective.logLoss !== null ? `, log loss ${d.prospective.logLoss.toFixed(3)} over the last ${d.prospective.window}` : ''}. {d.prospective.note}</li>
+        <li>Bouts on current cards: {d.inputs.fights}, with a forecast: {d.inputs.withForecast}, involving a UFC debutant: {d.inputs.debutantBouts}.</li>
+        <li>Fighter names checked against the results data: {d.inputs.identityChecked ?? 'not run'}; waiting for a person to confirm: {d.inputs.quarantined ?? 'not run'}.</li>
+        <li>Forecast confidence now {d.drift.currentMeanConfidence?.toFixed(2) ?? '–'} on average, against {d.drift.trainingMeanConfidence?.toFixed(2) ?? '–'} in the tests{d.drift.flagged ? ' (a notable shift)' : ''}.</li>
+        {d.market && <li>Betting prices: collected {d.market.ageHours} hours ago, covering {d.market.pricedBouts} of {d.market.fights} bouts.</li>}
+      </ul>
     </section>
   )
 }

@@ -1,0 +1,19 @@
+# Cloudflare Worker for OctaIQ prices. Not deployed by this repository.
+# Setup (once):  npx wrangler kv namespace create MARKET   then paste the id below
+#                npx wrangler secret put ODDS_API_KEY       (never commit the key)
+#                npx wrangler deploy --config server/worker/wrangler.toml
+name = "octaiq-prices"
+main = "entry.ts"
+compatibility_date = "2026-10-01"
+
+[triggers]
+# Fires every 10 minutes; the code skips the provider call unless one is due for the time left before the next event.
+crons = ["*/10 * * * *"]
+
+[[kv_namespaces]]
+binding = "MARKET"
+id = "REPLACE_WITH_KV_NAMESPACE_ID"
+
+[vars]
+ALLOWED_ORIGIN = "https://amirronaldo319.github.io"
+SITE_BASE = "https://amirronaldo319.github.io/octaiq/"

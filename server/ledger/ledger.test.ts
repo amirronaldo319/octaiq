@@ -227,3 +227,25 @@ describe('forecast history', () => {
     expect(h[1].reason).toContain('model was updated')
   })
 })
+
+describe('canonical forecast ids', () => {
+  const entry = (at: string, model = 'm1') => ({ recordedAt: at, model, dataThrough: '2026-10-17', cardVersion: 1, bouts: [{ id: 'e-1', a: 'A', b: 'B', probA: 0.6 }] })
+
+  it('are stable, distinct per version, and chain each version to the one it replaced', async () => {
+    const { forecastIdOf, historyOf } = await import('./ledger.ts')
+    const ledger = { eventId: 'e', title: 'T', lockedAt: '2026-11-01T00:00:00Z', mainCardStart: '2026-11-01T02:00:00Z', entries: [entry('2026-10-25T10:00:00Z'), entry('2026-10-26T10:00:00Z', 'm2')] }
+    const h = historyOf(ledger)
+    expect(h[0].forecastId).toBe(forecastIdOf('e', ledger.entries[0]))
+    expect(h[0].forecastId).toMatch(/^fc_[0-9a-f]{12}$/)
+    expect(h[1].forecastId).not.toBe(h[0].forecastId)
+    expect(h[0].supersedes).toBeNull()
+    expect(h[1].supersedes).toBe(h[0].forecastId)
+    expect(historyOf(ledger)[1].forecastId).toBe(h[1].forecastId)
+  })
+
+  it('records the prediction horizon in hours before the main card', async () => {
+    const { historyOf } = await import('./ledger.ts')
+    const h = historyOf({ eventId: 'e', title: 'T', lockedAt: 'x', mainCardStart: '2026-11-01T02:00:00Z', entries: [entry('2026-10-31T02:00:00Z')] })
+    expect(h[0].horizonHours).toBe(24)
+  })
+})

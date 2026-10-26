@@ -1,0 +1,557 @@
+{
+  "generatedAt": "2026-10-26T04:29:52.578Z",
+  "checked": 92,
+  "counts": {
+    "exact": 92
+  },
+  "quarantined": [],
+  "newcomers": [],
+  "mapping": [
+    {
+      "name": "Adrian Yanez",
+      "internalId": "fi_0232cabbc30a2372",
+      "externalId": "0232cabbc30a2372",
+      "via": "exact"
+    },
+    {
+      "name": "Aleksandre Topuria",
+      "internalId": "fi_4a6dff1b260bcf61",
+      "externalId": "4a6dff1b260bcf61",
+      "via": "exact"
+    },
+    {
+      "name": "Alessandro Costa",
+      "internalId": "fi_3fa97913cfd205d3",
+      "externalId": "3fa97913cfd205d3",
+      "via": "exact"
+    },
+    {
+      "name": "Aljamain Sterling",
+      "internalId": "fi_cb696ebfb6598724",
+      "externalId": "cb696ebfb6598724",
+      "via": "exact"
+    },
+    {
+      "name": "Alvin Hines",
+      "internalId": "fi_ab2a4b5e04dc5fe9",
+      "externalId": "ab2a4b5e04dc5fe9",
+      "via": "exact"
+    },
+    {
+      "name": "Amanda Nunes",
+      "internalId": "fi_80fa8218c99f9c58",
+      "externalId": "80fa8218c99f9c58",
+      "via": "exact"
+    },
+    {
+      "name": "Amir Albazi",
+      "internalId": "fi_6d35bf94f7d30241",
+      "externalId": "6d35bf94f7d30241",
+      "via": "exact"
+    },
+    {
+      "name": "Andre Petroski",
+      "internalId": "fi_5f61780fe5e9b6d0",
+      "externalId": "5f61780fe5e9b6d0",
+      "via": "exact"
+    },
+    {
+      "name": "Asu Almabayev",
+      "internalId": "fi_8d3273573b85be09",
+      "externalId": "8d3273573b85be09",
+      "via": "exact"
+    },
+    {
+      "name": "Austin Bashi",
+      "internalId": "fi_d3f89fa685bd8420",
+      "externalId": "d3f89fa685bd8420",
+      "via": "exact"
+    },
+    {
+      "name": "Baisangur Susurkaev",
+      "internalId": "fi_d1feea7a4bdcd503",
+      "externalId": "d1feea7a4bdcd503",
+      "via": "exact"
+    },
+    {
+      "name": "Bia Mesquita",
+      "internalId": "fi_eff9074bc066f0f2",
+      "externalId": "eff9074bc066f0f2",
+      "via": "exact"
+    },
+    {
+      "name": "Bilal Hasan",
+      "internalId": "fi_5182316da3c1d891",
+      "externalId": "5182316da3c1d891",
+      "via": "exact"
+    },
+    {
+      "name": "Billy Elekana",
+      "internalId": "fi_07a74004d964c7f4",
+      "externalId": "07a74004d964c7f4",
+      "via": "exact"
+    },
+    {
+      "name": "Brian Ortega",
+      "internalId": "fi_def8166ff24bd237",
+      "externalId": "def8166ff24bd237",
+      "via": "exact"
+    },
+    {
+      "name": "Caio Borralho",
+      "internalId": "fi_4126a78111c0855a",
+      "externalId": "4126a78111c0855a",
+      "via": "exact"
+    },
+    {
+      "name": "Charles Radtke",
+      "internalId": "fi_feedf3053472fe56",
+      "externalId": "feedf3053472fe56",
+      "via": "exact"
+    },
+    {
+      "name": "Chris Duncan",
+      "internalId": "fi_fd406a32a6fb3a29",
+      "externalId": "fd406a32a6fb3a29",
+      "via": "exact"
+    },
+    {
+      "name": "Ciryl Gane",
+      "internalId": "fi_787bb1f087ccff8a",
+      "externalId": "787bb1f087ccff8a",
+      "via": "exact"
+    },
+    {
+      "name": "Cody Durden",
+      "internalId": "fi_7f6ed67d3ed3c036",
+      "externalId": "7f6ed67d3ed3c036",
+      "via": "exact"
+    },
+    {
+      "name": "Dakota Hope",
+      "internalId": "fi_6142edbd477d20c9",
+      "externalId": "6142edbd477d20c9",
+      "via": "exact"
+    },
+    {
+      "name": "Dan Hooker",
+      "internalId": "fi_193b9d1858bc4df3",
+      "externalId": "193b9d1858bc4df3",
+      "via": "exact"
+    },
+    {
+      "name": "Davey Grant",
+      "internalId": "fi_113df4fde64735c6",
+      "externalId": "113df4fde64735c6",
+      "via": "exact"
+    },
+    {
+      "name": "Donte Johnson",
+      "internalId": "fi_ad5cb64af10fc946",
+      "externalId": "ad5cb64af10fc946",
+      "via": "exact"
+    },
+    {
+      "name": "Drew Dober",
+      "internalId": "fi_519e4fe37ce9ff75",
+      "externalId": "519e4fe37ce9ff75",
+      "via": "exact"
+    },
+    {
+      "name": "Elijah Smith",
+      "internalId": "fi_7478b7f959ba61f5",
+      "externalId": "7478b7f959ba61f5",
+      "via": "exact"
+    },
+    {
+      "name": "Farman Hasanov",
+      "internalId": "fi_c88f8a9c1ea7165d",
+      "externalId": "c88f8a9c1ea7165d",
+      "via": "exact"
+    },
+    {
+      "name": "Francis Marshall",
+      "internalId": "fi_5d495dec23d7c68e",
+      "externalId": "5d495dec23d7c68e",
+      "via": "exact"
+    },
+    {
+      "name": "Gabriel Bonfim",
+      "internalId": "fi_01641ba5df0c69b0",
+      "externalId": "01641ba5df0c69b0",
+      "via": "exact"
+    },
+    {
+      "name": "Gabriel Lorenco",
+      "internalId": "fi_e3fc6c1fab298561",
+      "externalId": "e3fc6c1fab298561",
+      "via": "exact"
+    },
+    {
+      "name": "Gabriella Fernandes",
+      "internalId": "fi_a6eb54ae17a551be",
+      "externalId": "a6eb54ae17a551be",
+      "via": "exact"
+    },
+    {
+      "name": "Ikram Aliskerov",
+      "internalId": "fi_b07aed698fba8624",
+      "externalId": "b07aed698fba8624",
+      "via": "exact"
+    },
+    {
+      "name": "Jacobe Smith",
+      "internalId": "fi_85497ffd934ecf7e",
+      "externalId": "85497ffd934ecf7e",
+      "via": "exact"
+    },
+    {
+      "name": "Jake Matthews",
+      "internalId": "fi_a845f0735bc67405",
+      "externalId": "a845f0735bc67405",
+      "via": "exact"
+    },
+    {
+      "name": "Jared Cannonier",
+      "internalId": "fi_13a0275fa13c4d26",
+      "externalId": "13a0275fa13c4d26",
+      "via": "exact"
+    },
+    {
+      "name": "Jean-Paul Lebosnoyani",
+      "internalId": "fi_a3dda21be645be93",
+      "externalId": "a3dda21be645be93",
+      "via": "exact"
+    },
+    {
+      "name": "Jefferson Nascimento",
+      "internalId": "fi_4b85abc5abbe657c",
+      "externalId": "4b85abc5abbe657c",
+      "via": "exact"
+    },
+    {
+      "name": "JeongYeong Lee",
+      "internalId": "fi_d008d785f6347dc2",
+      "externalId": "d008d785f6347dc2",
+      "via": "exact"
+    },
+    {
+      "name": "Jim Miller",
+      "internalId": "fi_d1941565abf50b16",
+      "externalId": "d1941565abf50b16",
+      "via": "exact"
+    },
+    {
+      "name": "Jiří Procházka",
+      "internalId": "fi_009341ed974bad72",
+      "externalId": "009341ed974bad72",
+      "via": "exact"
+    },
+    {
+      "name": "Jonny Parsons",
+      "internalId": "fi_2975297f505e9447",
+      "externalId": "2975297f505e9447",
+      "via": "exact"
+    },
+    {
+      "name": "Jose Delano",
+      "internalId": "fi_d7c4956d61ae76a9",
+      "externalId": "d7c4956d61ae76a9",
+      "via": "exact"
+    },
+    {
+      "name": "Joseph Kropschot",
+      "internalId": "fi_8a81a0707350c4a8",
+      "externalId": "8a81a0707350c4a8",
+      "via": "exact"
+    },
+    {
+      "name": "Josh Hokit",
+      "internalId": "fi_955da1675ad58a50",
+      "externalId": "955da1675ad58a50",
+      "via": "exact"
+    },
+    {
+      "name": "Juan Diaz",
+      "internalId": "fi_74939a16c7b56f33",
+      "externalId": "74939a16c7b56f33",
+      "via": "exact"
+    },
+    {
+      "name": "Julian Erosa",
+      "internalId": "fi_902ec2cc48c8ae8a",
+      "externalId": "902ec2cc48c8ae8a",
+      "via": "exact"
+    },
+    {
+      "name": "Karine Silva",
+      "internalId": "fi_9d62c2d8ee151f08",
+      "externalId": "9d62c2d8ee151f08",
+      "via": "exact"
+    },
+    {
+      "name": "Kayla Harrison",
+      "internalId": "fi_1af1170ed937cba7",
+      "externalId": "1af1170ed937cba7",
+      "via": "exact"
+    },
+    {
+      "name": "Keiichiro Nakamura",
+      "internalId": "fi_3618e0632ecdba9c",
+      "externalId": "3618e0632ecdba9c",
+      "via": "exact"
+    },
+    {
+      "name": "Kevin Holland",
+      "internalId": "fi_3a46b268013afede",
+      "externalId": "3a46b268013afede",
+      "via": "exact"
+    },
+    {
+      "name": "Kevin Vallejos",
+      "internalId": "fi_239d8e5359022f3b",
+      "externalId": "239d8e5359022f3b",
+      "via": "exact"
+    },
+    {
+      "name": "Kyoji Horiguchi",
+      "internalId": "fi_98aa60cf58071fd6",
+      "externalId": "98aa60cf58071fd6",
+      "via": "exact"
+    },
+    {
+      "name": "Luana Santos",
+      "internalId": "fi_5078e1dacf9d25f4",
+      "externalId": "5078e1dacf9d25f4",
+      "via": "exact"
+    },
+    {
+      "name": "Lucas Brennan",
+      "internalId": "fi_33a8708747b7f943",
+      "externalId": "33a8708747b7f943",
+      "via": "exact"
+    },
+    {
+      "name": "Lucas Fernando",
+      "internalId": "fi_3df223aeaacecf3f",
+      "externalId": "3df223aeaacecf3f",
+      "via": "exact"
+    },
+    {
+      "name": "Lucia Szabova",
+      "internalId": "fi_184f6ec4ee712e9f",
+      "externalId": "184f6ec4ee712e9f",
+      "via": "exact"
+    },
+    {
+      "name": "Luis Gurule",
+      "internalId": "fi_29162be25ebef5f0",
+      "externalId": "29162be25ebef5f0",
+      "via": "exact"
+    },
+    {
+      "name": "Macy Chiasson",
+      "internalId": "fi_9cdd2da1a9104a0b",
+      "externalId": "9cdd2da1a9104a0b",
+      "via": "exact"
+    },
+    {
+      "name": "Mantas Kondratavičius",
+      "internalId": "fi_3cc506f115cbb9d5",
+      "externalId": "3cc506f115cbb9d5",
+      "via": "exact"
+    },
+    {
+      "name": "Mickey Gall",
+      "internalId": "fi_9e50097a89442158",
+      "externalId": "9e50097a89442158",
+      "via": "exact"
+    },
+    {
+      "name": "Murtazali Magomedov",
+      "internalId": "fi_d436f5d55156a521",
+      "externalId": "d436f5d55156a521",
+      "via": "exact"
+    },
+    {
+      "name": "Navajo Stirling",
+      "internalId": "fi_b4b496ec2197ee3e",
+      "externalId": "b4b496ec2197ee3e",
+      "via": "exact"
+    },
+    {
+      "name": "Nazim Sadykhov",
+      "internalId": "fi_ff62013d2fce6d13",
+      "externalId": "ff62013d2fce6d13",
+      "via": "exact"
+    },
+    {
+      "name": "Nick Klein",
+      "internalId": "fi_7eaa5e31c2dd86aa",
+      "externalId": "7eaa5e31c2dd86aa",
+      "via": "exact"
+    },
+    {
+      "name": "Nina Milošević",
+      "internalId": "fi_eabece0edc2d62ca",
+      "externalId": "eabece0edc2d62ca",
+      "via": "exact"
+    },
+    {
+      "name": "Ode' Osbourne",
+      "internalId": "fi_6d68c1afe954f121",
+      "externalId": "6d68c1afe954f121",
+      "via": "exact"
+    },
+    {
+      "name": "Ollie Schmid",
+      "internalId": "fi_b701f095e6ccb149",
+      "externalId": "b701f095e6ccb149",
+      "via": "exact"
+    },
+    {
+      "name": "Piera Rodriguez",
+      "internalId": "fi_e375cb5caf4717b6",
+      "externalId": "e375cb5caf4717b6",
+      "via": "exact"
+    },
+    {
+      "name": "Priscila Cachoeira",
+      "internalId": "fi_b1e5bcaad32a3cac",
+      "externalId": "b1e5bcaad32a3cac",
+      "via": "exact"
+    },
+    {
+      "name": "Randy Brown",
+      "internalId": "fi_c6aee362c7a7d482",
+      "externalId": "c6aee362c7a7d482",
+      "via": "exact"
+    },
+    {
+      "name": "Renato Moicano",
+      "internalId": "fi_b6452706b373eea1",
+      "externalId": "b6452706b373eea1",
+      "via": "exact"
+    },
+    {
+      "name": "Rodrigo Sezinando",
+      "internalId": "fi_c06d6b18862f9a53",
+      "externalId": "c06d6b18862f9a53",
+      "via": "exact"
+    },
+    {
+      "name": "Santiago Luna",
+      "internalId": "fi_faf317c665546a36",
+      "externalId": "faf317c665546a36",
+      "via": "exact"
+    },
+    {
+      "name": "Sean Brady",
+      "internalId": "fi_45f7cb591c3ab00b",
+      "externalId": "45f7cb591c3ab00b",
+      "via": "exact"
+    },
+    {
+      "name": "Seokhyeon Ko",
+      "internalId": "fi_4a07b1988477502c",
+      "externalId": "4a07b1988477502c",
+      "via": "exact"
+    },
+    {
+      "name": "Shamil Gaziev",
+      "internalId": "fi_6747ccd6d1acd266",
+      "externalId": "6747ccd6d1acd266",
+      "via": "exact"
+    },
+    {
+      "name": "Stephen Thompson",
+      "internalId": "fi_4a28cb716c19157a",
+      "externalId": "4a28cb716c19157a",
+      "via": "exact"
+    },
+    {
+      "name": "Tahir Abdullayev",
+      "internalId": "fi_e047d3b541afd4a7",
+      "externalId": "e047d3b541afd4a7",
+      "via": "exact"
+    },
+    {
+      "name": "Tainara Lisboa",
+      "internalId": "fi_2c5f5749569eef66",
+      "externalId": "2c5f5749569eef66",
+      "via": "exact"
+    },
+    {
+      "name": "Talita Alencar",
+      "internalId": "fi_d35298b6df168456",
+      "externalId": "d35298b6df168456",
+      "via": "exact"
+    },
+    {
+      "name": "Tallison Teixeira",
+      "internalId": "fi_17923f676f100e16",
+      "externalId": "17923f676f100e16",
+      "via": "exact"
+    },
+    {
+      "name": "Tatiana Suarez",
+      "internalId": "fi_b08012bbe542592a",
+      "externalId": "b08012bbe542592a",
+      "via": "exact"
+    },
+    {
+      "name": "Terrance McKinney",
+      "internalId": "fi_809bd1a871491508",
+      "externalId": "809bd1a871491508",
+      "via": "exact"
+    },
+    {
+      "name": "Theodor Berggren",
+      "internalId": "fi_feef5f8f5629e5e7",
+      "externalId": "feef5f8f5629e5e7",
+      "via": "exact"
+    },
+    {
+      "name": "Tom Nolan",
+      "internalId": "fi_6c3b2525436cf5d4",
+      "externalId": "6c3b2525436cf5d4",
+      "via": "exact"
+    },
+    {
+      "name": "Uroš Medić",
+      "internalId": "fi_681399317dbf4701",
+      "externalId": "681399317dbf4701",
+      "via": "exact"
+    },
+    {
+      "name": "Virna Jandiroba",
+      "internalId": "fi_7dda2cf308f24a02",
+      "externalId": "7dda2cf308f24a02",
+      "via": "exact"
+    },
+    {
+      "name": "Wellington Turman",
+      "internalId": "fi_4dcfb28c011c11b2",
+      "externalId": "4dcfb28c011c11b2",
+      "via": "exact"
+    },
+    {
+      "name": "Yana Santos",
+      "internalId": "fi_3143bf892608139a",
+      "externalId": "3143bf892608139a",
+      "via": "exact"
+    },
+    {
+      "name": "Yousri Belgaroui",
+      "internalId": "fi_7674b836ce0698a0",
+      "externalId": "7674b836ce0698a0",
+      "via": "exact"
+    },
+    {
+      "name": "Zachary Reese",
+      "internalId": "fi_23dec7c47cb418f8",
+      "externalId": "23dec7c47cb418f8",
+      "via": "exact"
+    }
+  ]
+}

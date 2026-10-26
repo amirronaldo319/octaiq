@@ -11,8 +11,22 @@ export interface OddsEvent {
   bookmakers: {
     key: string
     title: string
-    markets: { key: string; outcomes: { name: string; price: number }[] }[]
+    /** Deprecated by the provider in favour of the market-level time */
+    last_update?: string
+    markets: { key: string; last_update?: string; outcomes: { name: string; price: number }[] }[]
   }[]
+}
+
+/** Accepts only a provider response that has the fields we rely on; anything else is rejected rather than half-read. */
+export function isOddsEvents(body: unknown): body is OddsEvent[] {
+  if (!Array.isArray(body)) return false
+  return body.every((e) => {
+    if (typeof e !== 'object' || e === null) return false
+    const o = e as Partial<OddsEvent>
+    return typeof o.id === 'string' && typeof o.commence_time === 'string' && Number.isFinite(Date.parse(o.commence_time))
+      && typeof o.home_team === 'string' && typeof o.away_team === 'string' && Array.isArray(o.bookmakers)
+      && o.bookmakers.every((b) => typeof b === 'object' && b !== null && typeof b.key === 'string' && Array.isArray(b.markets))
+  })
 }
 
 export const SPORT_KEY = 'mma_mixed_martial_arts'
@@ -32,8 +46,17 @@ export const PREFERRED_BOOKS: readonly string[] = [
   'betonlineag', 'betrivers', 'espnbet', 'fanatics', 'unibet_us', 'mybookieag',
 ]
 
-export function oddsUrl(apiKey: string): string {
-  const q = new URLSearchParams({ apiKey, regions: ODDS_REGIONS, markets: 'h2h', oddsFormat: 'american' })
+const REGION_LIST = /^[a-z0-9]+(,[a-z0-9]+){0,5}$/
+
+/** Regions to request: an explicit value, else the ODDS_REGIONS environment variable when valid, else the default. Fewer regions cost fewer credits. */
+export function regionsFor(explicit?: string): string {
+  const fromEnv = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env?.ODDS_REGIONS
+  for (const candidate of [explicit, fromEnv]) if (candidate && REGION_LIST.test(candidate.trim())) return candidate.trim()
+  return ODDS_REGIONS
+}
+
+export function oddsUrl(apiKey: string, regions?: string): string {
+  const q = new URLSearchParams({ apiKey, regions: regionsFor(regions), markets: 'h2h', oddsFormat: 'american' })
   return `https://api.the-odds-api.com/v4/sports/${SPORT_KEY}/odds?${q.toString()}`
 }
 

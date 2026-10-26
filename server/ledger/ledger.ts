@@ -18,9 +18,15 @@ export interface LedgerBout {
   joint?: JointOutcome
 }
 
+import { createHash } from 'node:crypto'
+
 export interface LedgerEntry {
   recordedAt: string
   model: string
+  /** Version of the data and feature pipeline behind this forecast (absent on the first entries) */
+  dataVersion?: string
+  featurePipeline?: string
+  codeCommit?: string
   /** Latest fight in the training data when this was made */
   dataThrough?: string
   cardVersion: number
@@ -45,6 +51,9 @@ export function entryFromPayload(payload: EventPayload, now: Date): LedgerEntry 
   return {
     recordedAt: now.toISOString(),
     model: model.version,
+    ...(model.dataVersion ? { dataVersion: model.dataVersion } : {}),
+    ...(model.featurePipeline ? { featurePipeline: model.featurePipeline } : {}),
+    ...(model.codeCommit ? { codeCommit: model.codeCommit } : {}),
     dataThrough: model.trainedThrough,
     cardVersion: payload.snapshot.version,
     bouts: payload.fights
@@ -65,8 +74,20 @@ export function entryFromPayload(payload: EventPayload, now: Date): LedgerEntry 
 
 const round4 = (n: number): number => Math.round(n * 10_000) / 10_000
 
+/** A stable ID for one saved forecast version. Pure in the event, the save time and the model, so older entries get the same ID today as they will tomorrow. */
+export function forecastIdOf(eventId: string, e: Pick<LedgerEntry, 'recordedAt' | 'model'>): string {
+  return `fc_${createHash('sha256').update(`${eventId}|${e.recordedAt}|${e.model}`).digest('hex').slice(0, 12)}`
+}
+
 /** One saved forecast, trimmed for the public site: win probability of fighter A for each bout and why it was saved. */
 export interface LedgerHistoryEntry {
+  /** Canonical ID of this version, the one it replaced, and when it was published relative to the event */
+  forecastId: string
+  supersedes: string | null
+  dataVersion?: string
+  featurePipeline?: string
+  /** Hours between saving this version and the main card, the forecast's prediction horizon */
+  horizonHours: number
   at: string
   model: string
   dataThrough?: string
@@ -88,6 +109,11 @@ export function describeChange(prev: LedgerEntry | undefined, next: LedgerEntry)
 
 export function historyOf(ledger: Ledger): LedgerHistoryEntry[] {
   return ledger.entries.map((e, i) => ({
+    forecastId: forecastIdOf(ledger.eventId, e),
+    supersedes: i > 0 ? forecastIdOf(ledger.eventId, ledger.entries[i - 1]) : null,
+    ...(e.dataVersion ? { dataVersion: e.dataVersion } : {}),
+    ...(e.featurePipeline ? { featurePipeline: e.featurePipeline } : {}),
+    horizonHours: Math.round(((Date.parse(ledger.mainCardStart) - Date.parse(e.recordedAt)) / 3_600_000) * 10) / 10,
     at: e.recordedAt, model: e.model, dataThrough: e.dataThrough, cardVersion: e.cardVersion,
     reason: describeChange(ledger.entries[i - 1], e),
     probs: Object.fromEntries(e.bouts.map((b) => [b.id, b.probA])),

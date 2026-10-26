@@ -66,6 +66,10 @@ Keys stay on the server and are never sent to the browser. Odds come from [The O
 | `npm run snapshot` | Rebuilds `public/data/` (events, fighters, ledger, backtest). Rewrites a file only when its content changed |
 | `npm run refresh` | `backtest`, then `ledger`, then `snapshot` |
 | `npm run prices` | Looks at live prices once, appends to `data/prices/` when the consensus moved, and writes `public/data/market.json` and `prices.json` (needs `ODDS_API_KEY`; skips cleanly without it) |
+| `npm run report` | Writes `docs/REPORT.md` from the latest backtest and registry |
+| `npm run registry` | Records the evaluated model, its data version and the gate decisions in `data/models/registry.json` |
+| `npm run identity` | Audits fighter names on the cards against the results data |
+| `npm run check:bundle` | Scans the build for secrets |
 | `npm run check-keys` | Checks API keys without printing them (`-- --no-odds` skips the one credit it costs) |
 | `npm test` | 300+ tests, including a browser-simulated app and accessibility scans |
 | `npm run e2e` | Real-browser checks (Chromium via Playwright, desktop and phone, both themes, with a colour-contrast audit); run `npx playwright install chromium` once first |
@@ -94,6 +98,16 @@ OctaIQ's own code is MIT licensed ([LICENSE](LICENSE)). Data keeps its own terms
 - **Fighter statistics API:** [UFCalendar](https://www.ufcalendar.com). Its terms forbid redistributing its data and using it for regulated betting operations, so it is used only locally and never published.
 - **Card information:** the official UFC event pages, read by an automated fetch, plus ESPN Deportes for records.
 - **Fonts:** Barlow and Barlow Condensed (SIL Open Font License), self-hosted.
+
+## Evaluation, odds and operations (more detail in `docs/`)
+
+- `docs/REPORT.md`: the full evaluation, generated from the saved backtest by `npm run report` (data and code versions, protocol, models on the same fights with calibration slope, promotion-gate decisions, market comparison, method models, calibration methods, subgroups, ablations).
+- `docs/ODDS.md`: provider research with dates, the price architecture, setup, environment variables and cost estimates.
+- `docs/CLAIMS.md`: what the product must not claim.
+- `data/models/registry.json`: every evaluated model with its data version, code commit and decision; `npm run registry -- --rollback <id>` points production at an earlier record and prints how to restore its code.
+- `npm run identity`: checks every fighter name on the cards against the results data; ambiguous or near-miss names are quarantined for review in `data/identity/report.json`, never matched automatically.
+- `npm run check:bundle`: fails if the built site contains a key.
+- Challengers (trees, ensemble, calibration methods, a direct method model) must pass fixed gates before they replace the production model; otherwise they run in shadow mode or are rejected.
 
 ## Stages of a forecast
 

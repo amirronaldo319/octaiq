@@ -5,6 +5,10 @@ const lock = '2026-10-31T21:00:00Z'
 const at = (iso: string): number => Date.parse(iso)
 
 describe('stageOf', () => {
+  it('is Draft before anything has been saved', () => {
+    expect(stageOf({ lockedAt: lock, entries: 0, status: 'upcoming' }, at('2026-10-26T00:00:00Z')).stage).toBe('draft')
+  })
+
   it('is Published before the lock, even though a forecast is already saved', () => {
     expect(stageOf({ lockedAt: lock, entries: 1, status: 'upcoming' }, at('2026-10-26T00:00:00Z')).stage).toBe('published')
   })

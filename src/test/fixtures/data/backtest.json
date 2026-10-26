@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-25T19:21:16.540Z",
+  "generatedAt": "2026-10-26T04:37:27.735Z",
   "dataset": {
     "source": "https://github.com/Greco1899/scrape_ufc_stats",
     "license": "GPL-3.0 (repository LICENSE file)",
@@ -237,7 +237,8 @@
               "meanPredicted": null,
               "observed": null
             }
-          ]
+          ],
+          "calibration": null
         },
         "logLoss": {
           "estimate": 0.6931471805599452,
@@ -330,7 +331,11 @@
               "meanPredicted": null,
               "observed": null
             }
-          ]
+          ],
+          "calibration": {
+            "slope": 0.8820909560371715,
+            "intercept": -0.02397413835611471
+          }
         },
         "logLoss": {
           "estimate": 0.6817102312726356,
@@ -423,7 +428,11 @@
               "meanPredicted": null,
               "observed": null
             }
-          ]
+          ],
+          "calibration": {
+            "slope": 1.0029094578753228,
+            "intercept": -0.020556333558866043
+          }
         },
         "logLoss": {
           "estimate": 0.6591914215249248,
@@ -516,7 +525,11 @@
               "meanPredicted": null,
               "observed": null
             }
-          ]
+          ],
+          "calibration": {
+            "slope": 0.9209242101127767,
+            "intercept": -0.023760942878201755
+          }
         },
         "logLoss": {
           "estimate": 0.6520590832887974,
@@ -609,7 +622,11 @@
               "meanPredicted": null,
               "observed": null
             }
-          ]
+          ],
+          "calibration": {
+            "slope": 1.0225246832736892,
+            "intercept": -0.019988902820055006
+          }
         },
         "logLoss": {
           "estimate": 0.6565084753420732,
@@ -702,7 +719,11 @@
               "meanPredicted": null,
               "observed": null
             }
-          ]
+          ],
+          "calibration": {
+            "slope": 1.0417363392413677,
+            "intercept": -0.0223846916712431
+          }
         },
         "logLoss": {
           "estimate": 0.6515533553462652,
@@ -722,6 +743,167 @@
       "hi": -0.0031612846212511424
     },
     "statsAdopted": true,
+    "calibrationMethods": [
+      {
+        "method": "none",
+        "n": 5330,
+        "logLoss": 0.6491522979968832,
+        "vsNone": null,
+        "foldDiffs": []
+      },
+      {
+        "method": "temperature",
+        "n": 5330,
+        "logLoss": 0.6497583368576941,
+        "vsNone": {
+          "estimate": 0.0006060388608094309,
+          "lo": -0.0009285044736477612,
+          "hi": 0.0022217995847414866
+        },
+        "foldDiffs": [
+          -0.0009688740907003063,
+          -0.0013458878334590648,
+          0.0019335812367678885,
+          -0.0014146686271004699,
+          0.0018813628757935353,
+          -0.0009745433638144675,
+          0.0010418074005346348,
+          0.0007261535952649089,
+          0.004123221373741142,
+          0.0018636309418189841,
+          -0.0004631987676803579
+        ]
+      },
+      {
+        "method": "platt",
+        "n": 5330,
+        "logLoss": 0.6497583368576941,
+        "vsNone": {
+          "estimate": 0.0006060388608094309,
+          "lo": -0.0009285044736476755,
+          "hi": 0.0022217995847414866
+        },
+        "foldDiffs": [
+          -0.0009688740907003045,
+          -0.0013458878334590648,
+          0.0019335812367678828,
+          -0.0014146686271004766,
+          0.0018813628757935494,
+          -0.0009745433638144697,
+          0.001041807400534633,
+          0.0007261535952649129,
+          0.0041232213737411256,
+          0.001863630941818988,
+          -0.0004631987676803515
+        ]
+      },
+      {
+        "method": "isotonic",
+        "n": 5330,
+        "logLoss": 0.6500276279293984,
+        "vsNone": {
+          "estimate": 0.0008753299325139719,
+          "lo": -0.0003491595455315503,
+          "hi": 0.0021278100421719876
+        },
+        "foldDiffs": [
+          0.0008373766589421051,
+          -0.0005750168652399763,
+          0.002345352363248,
+          -0.0027173005213397303,
+          0.0025762459635196027,
+          -0.00045182690149926896,
+          0.0007978794724192177,
+          -0.0014900230961174263,
+          0.0035708989029330823,
+          0.003176765896049765,
+          0.0016901877263361985
+        ]
+      }
+    ],
+    "promotion": [
+      {
+        "name": "Rolling fight statistics",
+        "incumbent": "results-only model",
+        "mode": "promote",
+        "reasons": [
+          "log loss -0.0071 versus results-only model [-0.0115, -0.0032]",
+          "the interval is entirely below zero",
+          "the improvement is at least 0.002",
+          "better in 11 of 13 yearly folds",
+          "calibration slope 0.92 is acceptable"
+        ],
+        "estimate": -0.007132338236127481,
+        "foldWinShare": 0.8461538461538461
+      },
+      {
+        "name": "Boosted trees",
+        "incumbent": "logistic stats model",
+        "mode": "reject",
+        "reasons": [
+          "log loss +0.0044 versus logistic stats model [+0.0005, +0.0081]",
+          "the interval includes zero",
+          "the improvement is under the 0.002 minimum",
+          "better in 4 of 13 yearly folds (needs 60%)",
+          "calibration slope 1.02 is acceptable"
+        ],
+        "estimate": 0.004449392053275919,
+        "foldWinShare": 0.3076923076923077
+      },
+      {
+        "name": "Ensemble of logistic and trees",
+        "incumbent": "logistic stats model",
+        "mode": "shadow",
+        "reasons": [
+          "log loss -0.0005 versus logistic stats model [-0.0025, +0.0013]",
+          "the interval includes zero",
+          "the improvement is under the 0.002 minimum",
+          "better in 8 of 13 yearly folds",
+          "calibration slope 1.04 is acceptable"
+        ],
+        "estimate": -0.0005057279425320162,
+        "foldWinShare": 0.6153846153846154
+      },
+      {
+        "name": "Calibration: temperature",
+        "incumbent": "no recalibration",
+        "mode": "reject",
+        "reasons": [
+          "log loss +0.0006 versus no recalibration [-0.0009, +0.0022]",
+          "the interval includes zero",
+          "the improvement is under the 0.002 minimum",
+          "better in 5 of 11 yearly folds (needs 60%)"
+        ],
+        "estimate": 0.0006060388608094309,
+        "foldWinShare": 0.45454545454545453
+      },
+      {
+        "name": "Calibration: platt",
+        "incumbent": "no recalibration",
+        "mode": "reject",
+        "reasons": [
+          "log loss +0.0006 versus no recalibration [-0.0009, +0.0022]",
+          "the interval includes zero",
+          "the improvement is under the 0.002 minimum",
+          "better in 5 of 11 yearly folds (needs 60%)"
+        ],
+        "estimate": 0.0006060388608094309,
+        "foldWinShare": 0.45454545454545453
+      },
+      {
+        "name": "Calibration: isotonic",
+        "incumbent": "no recalibration",
+        "mode": "reject",
+        "reasons": [
+          "log loss +0.0009 versus no recalibration [-0.0003, +0.0021]",
+          "the interval includes zero",
+          "the improvement is under the 0.002 minimum",
+          "better in 4 of 11 yearly folds (needs 60%)"
+        ],
+        "estimate": 0.0008753299325139719,
+        "foldWinShare": 0.36363636363636365
+      }
+    ],
     "treesVsStats": {
       "estimate": 0.004449392053275919,
       "lo": 0.0004952406458601083,
@@ -1696,6 +1878,19 @@
         "baselineAccuracy": 0.3170731707317073
       },
       "jointUsed": "independent",
+      "jointDecision": {
+        "name": "Direct six-outcome method model (hybrid with the win model)",
+        "incumbent": "independent winner-and-method joint",
+        "mode": "shadow",
+        "reasons": [
+          "log loss -0.0034 versus independent winner-and-method joint [-0.0101, +0.0030]",
+          "the interval includes zero",
+          "the improvement is at least 0.002",
+          "better in 7 of 13 yearly folds (needs 60%)"
+        ],
+        "estimate": -0.003444092189777405,
+        "foldWinShare": 0.5384615384615384
+      },
       "note": "The default joint distribution multiplies the win probability by the method model, assuming winner and method are independent given the features. A direct six-outcome model is tested against it each time and used only if it is clearly better."
     },
     "featureWeights": [
@@ -2036,7 +2231,11 @@
               "meanPredicted": null,
               "observed": null
             }
-          ]
+          ],
+          "calibration": {
+            "slope": 1.0360889743827135,
+            "intercept": -0.01964256218043178
+          }
         },
         "logLoss": {
           "estimate": 0.6179887079244122,
@@ -2129,7 +2328,8 @@
               "meanPredicted": null,
               "observed": null
             }
-          ]
+          ],
+          "calibration": null
         },
         "logLoss": {
           "estimate": 0.6931471805599454,
@@ -2222,7 +2422,11 @@
               "meanPredicted": null,
               "observed": null
             }
-          ]
+          ],
+          "calibration": {
+            "slope": 0.8059959718737044,
+            "intercept": -0.008798226195459438
+          }
         },
         "logLoss": {
           "estimate": 0.6839084748021325,
@@ -2315,7 +2519,11 @@
               "meanPredicted": null,
               "observed": null
             }
-          ]
+          ],
+          "calibration": {
+            "slope": 0.8456485589267055,
+            "intercept": -0.00352718522785924
+          }
         },
         "logLoss": {
           "estimate": 0.6688178633974804,
@@ -2408,7 +2616,11 @@
               "meanPredicted": null,
               "observed": null
             }
-          ]
+          ],
+          "calibration": {
+            "slope": 0.78386166204607,
+            "intercept": -0.004253636710448743
+          }
         },
         "logLoss": {
           "estimate": 0.663940119630124,
@@ -2564,7 +2776,11 @@
                 "meanPredicted": null,
                 "observed": null
               }
-            ]
+            ],
+            "calibration": {
+              "slope": 1.0476857909865829,
+              "intercept": -0.02210905125041734
+            }
           },
           "logLoss": {
             "estimate": 0.6211174368343184,
@@ -2657,7 +2873,11 @@
                 "meanPredicted": null,
                 "observed": null
               }
-            ]
+            ],
+            "calibration": {
+              "slope": 0.8050769303538313,
+              "intercept": -0.005972146354893543
+            }
           },
           "logLoss": {
             "estimate": 0.663025974351867,
@@ -2750,7 +2970,11 @@
                 "meanPredicted": null,
                 "observed": null
               }
-            ]
+            ],
+            "calibration": {
+              "slope": 1.0633457961323127,
+              "intercept": -0.02234816800366389
+            }
           },
           "logLoss": {
             "estimate": 0.6204506944989908,
@@ -2762,13 +2986,116 @@
             "lo": -0.0025364398916985446,
             "hi": 0.0012559463748810654
           }
+        },
+        {
+          "id": "marketCal",
+          "label": "Market, recalibrated (walk-forward)",
+          "metrics": {
+            "n": 2274,
+            "logLoss": 0.6213942108820748,
+            "brier": 0.21660447081183717,
+            "accuracy": 0.637203166226913,
+            "ece": 0.03259563799230696,
+            "reliability": [
+              {
+                "lo": 0.5,
+                "hi": 0.55,
+                "n": 390,
+                "meanPredicted": 0.5230480406108452,
+                "observed": 0.49230769230769234
+              },
+              {
+                "lo": 0.55,
+                "hi": 0.6,
+                "n": 495,
+                "meanPredicted": 0.5745315992669454,
+                "observed": 0.5454545454545454
+              },
+              {
+                "lo": 0.6,
+                "hi": 0.65,
+                "n": 420,
+                "meanPredicted": 0.6241269065756061,
+                "observed": 0.5738095238095238
+              },
+              {
+                "lo": 0.65,
+                "hi": 0.7,
+                "n": 303,
+                "meanPredicted": 0.6753275209458952,
+                "observed": 0.6963696369636964
+              },
+              {
+                "lo": 0.7,
+                "hi": 0.75,
+                "n": 281,
+                "meanPredicted": 0.7235189906273544,
+                "observed": 0.7437722419928826
+              },
+              {
+                "lo": 0.75,
+                "hi": 0.8,
+                "n": 201,
+                "meanPredicted": 0.7742944461283581,
+                "observed": 0.8009950248756219
+              },
+              {
+                "lo": 0.8,
+                "hi": 0.85,
+                "n": 133,
+                "meanPredicted": 0.8212561675663979,
+                "observed": 0.8646616541353384
+              },
+              {
+                "lo": 0.85,
+                "hi": 0.9,
+                "n": 46,
+                "meanPredicted": 0.8707416540052988,
+                "observed": 0.9347826086956522
+              },
+              {
+                "lo": 0.9,
+                "hi": 0.95,
+                "n": 5,
+                "meanPredicted": 0.9090504374697422,
+                "observed": 1
+              },
+              {
+                "lo": 0.95,
+                "hi": 1,
+                "n": 0,
+                "meanPredicted": null,
+                "observed": null
+              }
+            ],
+            "calibration": {
+              "slope": 1.0721352906615693,
+              "intercept": -0.021464670905697508
+            }
+          },
+          "logLoss": {
+            "estimate": 0.6213942108820744,
+            "lo": 0.6077851810513815,
+            "hi": 0.6345567725229151
+          },
+          "vsMarket": {
+            "estimate": 0.00027677404775604947,
+            "lo": -0.0003325251492478799,
+            "hi": 0.0009197588148192617
+          }
         }
       ],
       "marketWeight": 0.9591296314789903,
-      "modelWeight": 0.16057074186151582
+      "modelWeight": 0.16057074186151582,
+      "addsInformation": {
+        "estimate": -0.0009435163830835876,
+        "lo": -0.0026987623715925523,
+        "hi": 0.0007910758477262359
+      },
+      "marketSlope": 1.0302745014929837
     },
     "primaryModel": "lrStats",
-    "verdict": "On 2735 bouts with prices (2014-2020), the model's log loss 0.6639 is worse than the market's 0.6180 (gap +0.0460, 95% CI 0.0326 to 0.0589; positive means worse). Blending the model into the price changed log loss by -0.0007 [-0.0025, 0.0013] versus the price alone, so the model does not demonstrably add information beyond the price.",
+    "verdict": "On 2735 bouts with prices (2014-2020), the model's log loss 0.6639 is worse than the market's 0.6180 (gap +0.0460, 95% CI 0.0326 to 0.0589; positive means worse). Blending the model into the price changed log loss by -0.0007 [-0.0025, 0.0013] versus the raw price, and by -0.0009 [-0.0027, 0.0008] versus the price recalibrated on the same earlier years, so the model does not demonstrably add information beyond the price.",
     "caveats": [
       "The dataset does not say which bookmaker, or whether the price is opening, closing or best-available. Treat it as an as-recorded market price, not a verified closing line.",
       "Coverage ends March 2020 and only 2014 onward overlaps the model test years, so the comparison does not cover the last six years.",
@@ -5070,5 +5397,37 @@
       "accuracy": 0.38461538461538464,
       "logLoss": 0.8102768658560369
     }
-  ]
+  ],
+  "reproducibility": {
+    "dataVersion": "58ca637e2e2c",
+    "oddsDataVersion": "d03e93106059",
+    "featurePipeline": "features-3",
+    "codeCommit": "a9b1ae1cfd9322b15bedeb440f9387bc795bceb8",
+    "codeDirty": true,
+    "node": "v26.7.0",
+    "seed": 20261025,
+    "options": {
+      "firstTestYear": 2014,
+      "validationYears": 6,
+      "ridge": 5,
+      "bootstrap": 1000,
+      "eloK": 64,
+      "statsDecay": 0.9,
+      "excludedFeatures": [
+        "ageMissing",
+        "reachMissing",
+        "southpaw",
+        "wcMove",
+        "eloWc",
+        "agePast",
+        "ageClass",
+        "sinceLoss",
+        "koRecent",
+        "cageMin",
+        "tdClash",
+        "kdClash"
+      ]
+    },
+    "command": "npm run backtest"
+  }
 }

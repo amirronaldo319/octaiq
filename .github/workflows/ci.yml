@@ -19,6 +19,8 @@ jobs:
       - run: npx tsc --noEmit
       - run: npm test
       - run: npm run build
+      - name: Check the build for secrets
+        run: npm run check:bundle
       - name: Real-browser checks
         run: |
           npx playwright install --with-deps chromium

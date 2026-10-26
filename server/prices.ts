@@ -1,5 +1,6 @@
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
+import { isPollDue } from './odds/plan.ts'
 import { createMemoryHistory } from './lib/history.ts'
 import { buildMarketSnapshot } from './lib/marketSnapshot.ts'
 import { appendPoint, toPublished, type PriceHistory } from './lib/priceHistory.ts'
@@ -22,6 +23,19 @@ if (!key) {
   process.exit(0)
 }
 
+// Spend credits only when a request is useful for how close the next event is.
+const nowMs = Date.now()
+const starts = listEventFiles(resolve(ROOT, 'data/events')).files.map((f) => Date.parse(parseEventFile(JSON.parse(readFileSync(f.path, 'utf8'))).event.prelimsStart)).filter((t) => t > nowMs).sort((a, b) => a - b)
+let lastFetched: number | null = null
+try {
+  lastFetched = Date.parse((JSON.parse(readFileSync(resolve(OUT, 'market.json'), 'utf8')) as { generatedAt: string }).generatedAt)
+} catch { /* no earlier collection */ }
+const verdict = isPollDue(starts[0], Number.isFinite(lastFetched) ? lastFetched : null, nowMs)
+if (!verdict.due && !process.argv.includes('--force')) {
+  console.info(`Skipping the provider call: ${verdict.reason}`)
+  process.exit(0)
+}
+
 try {
   const service = createCardService({
     apiKey: key, fetchImpl: fetch, ttlMs: 0, history: createMemoryHistory(),
@@ -38,13 +52,13 @@ try {
   mkdirSync(PRICES, { recursive: true })
   mkdirSync(OUT, { recursive: true })
 
-  const starts = new Map(listEventFiles(resolve(ROOT, 'data/events')).files.map((f) => {
+  const evStarts = new Map(listEventFiles(resolve(ROOT, 'data/events')).files.map((f) => {
     const ev = parseEventFile(JSON.parse(readFileSync(f.path, 'utf8'))).event
     return [ev.id, Date.parse(ev.mainCardStart)] as const
   }))
   for (const [eventId, bouts] of Object.entries(market.events)) {
     // Once an event has started the last saved look is its closing line; later prices are in-play.
-    if ((starts.get(eventId) ?? Infinity) <= now.getTime()) continue
+    if ((evStarts.get(eventId) ?? Infinity) <= now.getTime()) continue
     const path = resolve(PRICES, `${eventId}.json`)
     const existing = existsSync(path) ? (JSON.parse(readFileSync(path, 'utf8')) as PriceHistory) : undefined
     const updated = appendPoint(existing, eventId, bouts, now)

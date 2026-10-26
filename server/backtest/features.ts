@@ -22,6 +22,9 @@ export const EXPERIMENTAL_FEATURES: readonly string[] = [
   'southpaw', 'wcMove', 'eloWc', 'agePast', 'ageClass', 'sinceLoss', 'koRecent', 'cageMin', 'tdClash', 'kdClash',
 ]
 
+/** Bump whenever feature code changes, so every forecast and report names the pipeline that produced its inputs. */
+export const FEATURE_PIPELINE_VERSION = 'features-3'
+
 export const FEATURE_NAMES = [...RESULT_FEATURES, ...STATS_FEATURES] as const
 
 export interface FeatureRow {

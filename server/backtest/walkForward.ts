@@ -1,4 +1,6 @@
 import type { Bout, FighterProfile } from './dataset.ts'
+import { compareCalibrators, type CalibrationComparison } from './calibrate.ts'
+import { decide, type Decision } from './promotion.ts'
 import { weightClassKey } from './outcomes.ts'
 import { predictTrees, trainTrees } from './trees.ts'
 import { buildFeatureRows, EXPERIMENTAL_FEATURES, FEATURE_NAMES, STATS_FEATURES } from './features.ts'
@@ -100,6 +102,10 @@ export interface BacktestReport {
    */
   statsVsResults: Interval
   statsAdopted: boolean
+  /** Out-of-sample comparison of calibration methods on the primary model, each fitted on earlier years only */
+  calibrationMethods: CalibrationComparison[] | null
+  /** Predeclared promotion-gate decisions for every challenger tested in this run */
+  promotion: Decision[]
   /** Paired log-loss difference of the trees and of the ensemble against the logistic stats model (negative is better); null without trees */
   treesVsStats: Interval | null
   ensembleVsStats: Interval | null
@@ -262,6 +268,18 @@ export function runBacktest(
   const statsAdopted = opts.bootstrap > 0 && statsVsResults.hi < 0
 
   const years = [...new Set(predictions.map((p) => p.year))]
+  const yearlyDiff = (cand: (p: Prediction) => number, inc: (p: Prediction) => number): number[] =>
+    years.map((yr) => {
+      const sub = predictions.filter((p) => p.year === yr)
+      return sub.reduce((s, p) => s + logLossOne(cand(p), p.y) - logLossOne(inc(p), p.y), 0) / sub.length
+    })
+  const slopeOf = (get: (p: Prediction) => number): number | null => metrics(predictions.map(get), ys).calibration?.slope ?? null
+  const promotion: Decision[] = []
+  promotion.push(decide({ name: 'Rolling fight statistics', incumbent: 'results-only model', diff: statsVsResults, foldDiffs: yearlyDiff((p) => p.lrStats, (p) => p.lr), calibrationSlope: slopeOf((p) => p.lrStats) }))
+  if (vsStats) {
+    promotion.push(decide({ name: 'Boosted trees', incumbent: 'logistic stats model', diff: vsStats.diffVsRef[4], foldDiffs: yearlyDiff((p) => p.gbm as number, (p) => p.lrStats), calibrationSlope: slopeOf((p) => p.gbm as number) }))
+    promotion.push(decide({ name: 'Ensemble of logistic and trees', incumbent: 'logistic stats model', diff: vsStats.diffVsRef[5], foldDiffs: yearlyDiff((p) => p.ens as number, (p) => p.lrStats), calibrationSlope: slopeOf((p) => p.ens as number) }))
+  }
   const byYear = years.map((year) => {
     const sub = predictions.filter((p) => p.year === year)
     const subY = sub.map((p) => p.y)
@@ -316,6 +334,12 @@ export function runBacktest(
   }
 
   const primary: 'lr' | 'lrStats' = statsAdopted ? 'lrStats' : 'lr'
+  const calibrationMethods = opts.bootstrap > 0
+    ? compareCalibrators(predictions.map((p) => ({ year: p.year, event: p.event, p: primary === 'lrStats' ? p.lrStats : p.lr, y: p.y })), { minRows: opts.minCalibrationRows, bootstrap: opts.bootstrap, seed: opts.seed + 5 })
+    : null
+  for (const c of calibrationMethods ?? []) {
+    if (c.vsNone) promotion.push(decide({ name: `Calibration: ${c.method}`, incumbent: 'no recalibration', diff: c.vsNone, foldDiffs: c.foldDiffs, calibrationSlope: null }))
+  }
   const pByBout = new Map(predictions.map((p) => [p.id, primary === 'lrStats' ? p.lrStats : p.lr]))
   const outcomes = opts.bootstrap > 0
     ? evaluateOutcomes(rows, pByBout, { firstTestYear: opts.firstTestYear, ridge: opts.ridge, bootstrap: opts.bootstrap, seed: opts.seed, ...(opts.trees ? { columns: primary === 'lrStats' ? keepStats : keepResults } : {}) })
@@ -337,7 +361,7 @@ export function runBacktest(
         testScored: predictions.length,
         testPeriod: `${years[0]}-${years[years.length - 1]}`,
       },
-      models, statsVsResults, statsAdopted, treesVsStats: vsStats?.diffVsRef[4] ?? null, ensembleVsStats: vsStats?.diffVsRef[5] ?? null, primary, byYear, experienced, calibration, folds, outcomes,
+      models, statsVsResults, statsAdopted, calibrationMethods, promotion, treesVsStats: vsStats?.diffVsRef[4] ?? null, ensembleVsStats: vsStats?.diffVsRef[5] ?? null, primary, byYear, experienced, calibration, folds, outcomes,
       featureWeights: primary === 'lrStats' ? names(keepStats, lastStatsWeights) : names(keepResults, lastResultsWeights),
     },
   }

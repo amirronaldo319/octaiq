@@ -1,4 +1,4 @@
-export type Stage = 'published' | 'updated' | 'locked' | 'graded'
+export type Stage = 'draft' | 'published' | 'updated' | 'locked' | 'graded'
 
 export interface StageInfo {
   stage: Stage
@@ -14,10 +14,11 @@ interface LedgerLike {
 }
 
 /**
- * Where a card's saved forecast stands: Published (saved, can still be replaced by a newer version), Updated
+ * Where a card's saved forecast stands: Draft (nothing saved yet), Published (saved, can still be replaced by a newer version), Updated
  * (replaced at least once), Locked (the event has begun, so the saved forecast is final), Graded (results are in).
  */
 export function stageOf(e: LedgerLike, now: number): StageInfo {
+  if (e.entries === 0 && now < Date.parse(e.lockedAt)) return { stage: 'draft', label: 'Draft', detail: 'No forecast has been saved for this card yet.' }
   if (e.status === 'graded') return { stage: 'graded', label: 'Graded', detail: 'The fights are in the results data and each saved pick has been scored.' }
   if (now >= Date.parse(e.lockedAt)) {
     return {
@@ -31,4 +32,4 @@ export function stageOf(e: LedgerLike, now: number): StageInfo {
     : { stage: 'published', label: 'Published', detail: 'Saved. A newer version replaces it if the card or the data changes, until the event starts.' }
 }
 
-export const STAGES: readonly Stage[] = ['published', 'updated', 'locked', 'graded']
+export const STAGES: readonly Stage[] = ['draft', 'published', 'updated', 'locked', 'graded']

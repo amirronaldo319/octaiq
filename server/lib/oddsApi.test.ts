@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { extractBooks, MAX_BOOKS, oddsUrl, PREFERRED_BOOKS, type OddsEvent } from './oddsApi.ts'
+import { extractBooks, isOddsEvents, MAX_BOOKS, oddsUrl, PREFERRED_BOOKS, regionsFor, type OddsEvent } from './oddsApi.ts'
 
 const book = (key: string, a = -150, b = 130) => ({
   key, title: key.toUpperCase(),
@@ -31,5 +31,20 @@ describe('extractBooks', () => {
   it('asks for the US, extra US and EU regions', () => {
     const url = new URL(oddsUrl('k'))
     expect(url.searchParams.get('regions')).toBe('us,us2,eu')
+  })
+
+  it('lets a valid region list override the default, and ignores anything else', () => {
+    expect(new URL(oddsUrl('k', 'us')).searchParams.get('regions')).toBe('us')
+    expect(regionsFor('us,uk')).toBe('us,uk')
+    expect(regionsFor('us;drop table')).toBe('us,us2,eu')
+    expect(regionsFor('')).toBe('us,us2,eu')
+  })
+
+  it('accepts only responses with the fields it relies on', () => {
+    expect(isOddsEvents([event(['dk'])])).toBe(true)
+    expect(isOddsEvents([])).toBe(true)
+    expect(isOddsEvents({})).toBe(false)
+    expect(isOddsEvents([{ id: 'x' }])).toBe(false)
+    expect(isOddsEvents([{ ...event(['dk']), commence_time: 'not a date' }])).toBe(false)
   })
 })

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { BacktestOutput } from '../../server/backtest/types'
 import { getFirstJson, withBase } from '../lib/fetchJson'
-import { CalibrationExplainer, PerformanceSummary } from './PerformanceSummary'
+import { CalibrationExplainer, MonitorPanel, PerformanceSummary } from './PerformanceSummary'
 
 type State = { status: 'loading' } | { status: 'missing'; message: string } | { status: 'ready'; data: BacktestOutput }
 
@@ -120,6 +120,7 @@ export function ModelHealth() {
 
       <PerformanceSummary backtest={state.data} />
       <CalibrationExplainer backtest={state.data} />
+      <MonitorPanel />
 
       <h2 className="section-title">The full technical detail</h2>
       <details className="fold panel">
@@ -132,14 +133,14 @@ export function ModelHealth() {
           scraped from {dataset.upstream}; retrieved {dataset.retrievedAt.slice(0, 10)}; {ingest.bouts} bouts, {ingest.firstDate} to {ingest.lastDate}.
         </p>
         <table className="tbl">
-          <thead><tr><th>Model</th><th>n</th><th>Log loss [95% CI]</th><th>Δ vs Elo [95% CI]</th><th>Brier</th><th>Accuracy</th><th>ECE</th></tr></thead>
+          <thead><tr><th>Model</th><th>n</th><th>Log loss [95% CI]</th><th>Δ vs Elo [95% CI]</th><th>Brier</th><th>Accuracy</th><th title="Slope of the outcome on the forecast's log-odds. 1 is well calibrated; below 1 means the forecasts are too extreme.">Calibration slope</th></tr></thead>
           <tbody>
             {r.models.map((m) => (
               <tr key={m.id}>
                 <td>{m.label}</td><td>{m.metrics.n}</td>
                 <td>{ci(m.logLoss.estimate, m.logLoss.lo, m.logLoss.hi)}</td>
                 <td>{m.id === 'elo' ? 'reference' : ci(m.logLossVsElo.estimate, m.logLossVsElo.lo, m.logLossVsElo.hi)}</td>
-                <td>{f(m.metrics.brier)}</td><td>{f(m.metrics.accuracy, 3)}</td><td>{f(m.metrics.ece, 3)}</td>
+                <td>{f(m.metrics.brier)}</td><td>{f(m.metrics.accuracy, 3)}</td><td>{m.metrics.calibration ? f(m.metrics.calibration.slope, 2) : '–'}</td>
               </tr>
             ))}
           </tbody>
@@ -173,6 +174,46 @@ export function ModelHealth() {
             [{f(r.statsVsResults.lo)}, {f(r.statsVsResults.hi)}] → {r.statsAdopted ? 'adopted.' : 'not adopted.'}{' '}
             Older statistics fade by a factor of {r.statsDecay} per fight, chosen on {r.options.firstTestYear - r.options.validationYears}–{r.options.firstTestYear - 1} only.
           </p>
+        )}
+        {r.promotion && r.promotion.length > 0 && (
+          <>
+            <h3>Promotion gates</h3>
+            <p className="muted small">
+              A challenger replaces the production model only if its paired log-loss interval is entirely below zero, the gain is at least 0.002, it wins in at least
+              60% of yearly folds and its calibration slope stays between 0.8 and 1.2. These limits were fixed in code before the results were read. A challenger that
+              looks better but misses a limit runs in shadow mode.
+            </p>
+            <table className="tbl" aria-label="Promotion gates">
+              <thead><tr><th>Challenger</th><th>Against</th><th>Decision</th><th>Why</th></tr></thead>
+              <tbody>
+                {[...r.promotion, ...(r.outcomes?.jointDecision ? [r.outcomes.jointDecision] : [])].map((d) => (
+                  <tr key={d.name}>
+                    <td>{d.name}</td><td>{d.incumbent}</td>
+                    <td><span className={`tag ${d.mode === 'promote' ? 'q-good' : d.mode === 'shadow' ? 'q-fair' : 'q-limited'}`}>{d.mode === 'promote' ? 'Promoted' : d.mode === 'shadow' ? 'Shadow mode' : 'Rejected'}</span></td>
+                    <td className="small">{d.reasons.slice(0, 4).join('; ')}.</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </>
+        )}
+        {r.calibrationMethods && (
+          <p className="small">
+            <strong>Recalibrating the probabilities</strong> (each method fitted only on earlier years, then scored on the next): {r.calibrationMethods.filter((c) => c.vsNone).map((c) => `${c.method} ${f(c.vsNone?.estimate ?? 0)} [${f(c.vsNone?.lo ?? 0)}, ${f(c.vsNone?.hi ?? 0)}]`).join('; ')} in log loss against no recalibration.
+            None clears the gate, so the model’s own probabilities are used.
+          </p>
+        )}
+        {state.data.reproducibility && (
+          <details className="fold inline-fold">
+            <summary>How to reproduce this report</summary>
+            <ul>
+              <li>Command: <code>{state.data.reproducibility.command}</code> (after <code>npm install</code>)</li>
+              <li>Results data version: <code>{state.data.reproducibility.dataVersion}</code>; price data version: <code>{state.data.reproducibility.oddsDataVersion ?? 'none'}</code></li>
+              <li>Feature pipeline: <code>{state.data.reproducibility.featurePipeline}</code>; code commit: <code>{state.data.reproducibility.codeCommit?.slice(0, 10) ?? 'unknown'}</code>; {state.data.reproducibility.node}</li>
+              <li>Random seed {state.data.reproducibility.seed}; Elo K {state.data.reproducibility.options.eloK}; ridge {state.data.reproducibility.options.ridge}; bootstrap {state.data.reproducibility.options.bootstrap} resamples by event.</li>
+            </ul>
+            <p className="muted small">The results data changes as new fights are added, so a later run gives slightly different numbers; the data version says which files a report used.</p>
+          </details>
         )}
         {r.ensembleVsStats && r.treesVsStats && (
           <p className="small">

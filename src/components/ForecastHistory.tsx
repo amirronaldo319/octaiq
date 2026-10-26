@@ -57,7 +57,14 @@ export function ForecastHistory({ eventId, fightId, nameA, nameB, currentProbA, 
             <li key={h.at} className={counted?.at === h.at ? 'counts' : ''}>
               <span className="fh-when">{when(h.at)}</span>
               <span className="fh-prob">{pctPair(h.probs[fightId])[0]}% <small className="muted">{nameA.split(' ').slice(-1)[0]}</small>{delta !== null && Math.abs(delta) >= 0.05 && <small className={delta > 0 ? 'pos' : 'neg'}> {delta > 0 ? '+' : ''}{delta.toFixed(1)}</small>}</span>
-              <span className="fh-why muted small">{h.reason}{counted?.at === h.at ? ' · counts for grading' : ''}</span>
+              <span className="fh-why muted small">
+                {h.reason}{counted?.at === h.at ? ' · counts for grading' : ''}
+                <br />
+                <span className="fh-meta">
+                  {h.forecastId}{h.supersedes ? `, replaces ${h.supersedes}` : ', the first version'} · {h.model} · data {h.dataVersion ?? 'version not recorded'}{h.dataThrough ? ` through ${h.dataThrough}` : ''} ·
+                  {' '}{h.horizonHours >= 0 ? `${h.horizonHours} hours before the main card` : 'after the main card started'}
+                </span>
+              </span>
               <button type="button" className="btn small" aria-pressed={viewing?.at === h.at} onClick={() => onVersion(versionId(h.at))}>View</button>
             </li>
           )

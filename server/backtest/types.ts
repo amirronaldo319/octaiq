@@ -21,6 +21,23 @@ export interface BacktestOutput {
   recentEvents: RecentEvent[]
   /** Why the market comparison is missing, when it is */
   marketNote?: string
+  /** What is needed to reproduce this report exactly */
+  reproducibility?: Reproducibility
+}
+
+export interface Reproducibility {
+  /** First 12 hex characters of the SHA-256 over the downloaded results files' own checksums */
+  dataVersion: string
+  oddsDataVersion: string | null
+  featurePipeline: string
+  codeCommit: string | null
+  /** True when the working tree had uncommitted changes, so the commit alone does not reproduce the run */
+  codeDirty?: boolean
+  node: string
+  seed: number
+  /** Options that shaped the run, for the record */
+  options: { firstTestYear: number; validationYears: number; ridge: number; bootstrap: number; eloK: number; statsDecay: number | null; excludedFeatures: string[] }
+  command: string
 }
 
 export interface Ablation {

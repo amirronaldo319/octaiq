@@ -5,8 +5,10 @@ import { download, fetchDataset, type Manifest } from './fetchDataset.ts'
 import { compareWithMarket, type MarketReport } from './market.ts'
 import { fetchOddsDataset, matchOdds, ODDS_SOURCE, parseOddsArff, type OddsManifest } from './oddsData.ts'
 import { formatReport } from './format.ts'
-import { EXPERIMENTAL_FEATURES } from './features.ts'
-import type { Ablation, BacktestOutput } from './types.ts'
+import { createHash } from 'node:crypto'
+import { execSync } from 'node:child_process'
+import { EXPERIMENTAL_FEATURES, FEATURE_PIPELINE_VERSION } from './features.ts'
+import type { Ablation, BacktestOutput, Reproducibility } from './types.ts'
 import { recentEventResults } from './recent.ts'
 import { runBacktest } from './walkForward.ts'
 
@@ -80,8 +82,38 @@ try {
   marketNote = `Market comparison skipped: ${err instanceof Error ? err.message : 'unknown error'}`
 }
 
+const sha = (parts: readonly string[]): string => createHash('sha256').update(parts.join('|')).digest('hex').slice(0, 12)
+const commit = ((): string | null => {
+  try {
+    return execSync('git rev-parse HEAD', { cwd: ROOT, stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim()
+  } catch {
+    return null
+  }
+})()
+const dirty = ((): boolean => {
+  try {
+    return execSync('git status --porcelain -- server src data/events data/aliases.json', { cwd: ROOT, stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim().length > 0
+  } catch {
+    return false
+  }
+})()
+const reproducibility: Reproducibility = {
+  dataVersion: sha([...manifest.files].sort((a, b) => a.name.localeCompare(b.name)).map((f) => `${f.name}:${f.sha256}`)),
+  oddsDataVersion: oddsDataset ? sha([`md5:${oddsDataset.md5}`, `bytes:${oddsDataset.bytes}`]) : null,
+  featurePipeline: FEATURE_PIPELINE_VERSION,
+  codeCommit: commit,
+  codeDirty: dirty,
+  node: process.version,
+  seed: report.options.seed,
+  options: {
+    firstTestYear: report.options.firstTestYear, validationYears: report.options.validationYears, ridge: report.options.ridge, bootstrap: report.options.bootstrap,
+    eloK: report.eloK, statsDecay: report.statsDecay ?? null, excludedFeatures: report.options.excludeFeatures,
+  },
+  command: 'npm run backtest',
+}
+
 const recentEvents = recentEventResults(bouts, predictions, report.primary, 24)
-const output: BacktestOutput = { generatedAt: new Date().toISOString(), dataset: manifest, ingest: stats, report, predictionCount: predictions.length, ablations, market, oddsDataset, marketNote, recentEvents }
+const output: BacktestOutput = { generatedAt: new Date().toISOString(), dataset: manifest, ingest: stats, report, predictionCount: predictions.length, ablations, market, oddsDataset, marketNote, recentEvents, reproducibility }
 mkdirSync(resolve(ROOT, 'data/reports'), { recursive: true })
 writeFileSync(OUT, JSON.stringify(output, null, 2))
 console.info(formatReport(output))

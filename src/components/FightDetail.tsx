@@ -7,6 +7,8 @@ import { agreementLabel, buildNarrative } from '../lib/narrative'
 import { accuracyStrip, leanOf, trustFor, type PrimaryView } from '../lib/primary'
 import { gapPoints, type MarketBout } from '../lib/market'
 import { apportion, pctPair } from '../lib/rounding'
+import { marketState } from '../lib/marketState'
+import { fairPrice, showPrice, type OddsFormat } from '../lib/oddsFormat'
 import { slugify } from '../lib/slug'
 import { Avatar } from './Avatar'
 import { LineChart } from './LineChart'
@@ -47,6 +49,7 @@ interface FightDetailProps {
   onSaveBout?: () => void
   careers?: { status: 'loading' | 'ready' | 'missing'; data?: Record<string, Career> }
   eventDate?: string
+  oddsFormat?: OddsFormat
 }
 
 const METHODS: Method[] = ['KO/TKO', 'Submission', 'Decision']
@@ -157,17 +160,19 @@ function Prediction({ analysis, view, results, meta }: { analysis: FightAnalysis
   )
 }
 
-function MarketPanel({ analysis, results, market, updated, meta, onAddFairLeg }: { analysis: FightAnalysis; results?: ResultsModelBout; market: MarketBout; updated?: string; meta?: ResultsModel; onAddFairLeg?: (side: 'a' | 'b') => void }) {
+function MarketPanel({ analysis, results, market, updated, meta, onAddFairLeg, oddsFormat = 'american' }: { analysis: FightAnalysis; results?: ResultsModelBout; market: MarketBout; updated?: string; meta?: ResultsModel; onAddFairLeg?: (side: 'a' | 'b') => void; oddsFormat?: OddsFormat }) {
   const { fight } = analysis
   const gap = results ? gapPoints(results.probA, market) : null
   const bt = meta?.backtest?.market
+  const state = updated ? marketState(market, updated, analysis.fight.commenceTime ?? new Date(0).toISOString(), Date.now()) : null
   const leans = gap === null ? null : Math.abs(gap) < 2 ? 'The model and the market agree.' : `The model gives ${gap > 0 ? fight.a.name : fight.b.name} ${Math.abs(gap).toFixed(0)} points more than the market does.`
   return (
     <section className="pred market-pred" aria-label="Betting market">
       <div className="pred-head">
         <h3>What the betting market says</h3>
-        <span className="pred-source">{market.books} bookmaker{market.books === 1 ? '' : 's'}{updated ? `, updated ${new Date(updated).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}` : ''}</span>
+        <span className="pred-source">{market.books} bookmaker{market.books === 1 ? '' : 's'}{state ? `, ${state.label.toLowerCase().replace(/^updated/, 'updated')}` : ''}</span>
       </div>
+      {state && <p className={`market-state s-${state.state}`} role="status">{state.detail}</p>}
       <div className="pred-split">
         <div className="pred-side a"><span>{fight.a.name}</span><strong>{pctPair(market.pA)[0]}%</strong></div>
         <div className="pred-side b"><span>{fight.b.name}</span><strong>{pctPair(market.pA)[1]}%</strong></div>
@@ -175,6 +180,10 @@ function MarketPanel({ analysis, results, market, updated, meta, onAddFairLeg }:
       <TugBar nameA={fight.a.name} nameB={fight.b.name} probA={market.pA} size="lg" lo={market.pLo} hi={market.pHi} />
       <p className="range-note">
         Consensus with the bookmakers’ margin removed. The pale band spans the lowest to highest single bookmaker ({pct0(market.pLo)} to {pct0(market.pHi)} for {fight.a.name}).
+      </p>
+      <p className="small">
+        Fair price with the margin removed: <strong>{fight.a.name} {fairPrice(market.pA, oddsFormat)}</strong>, <strong>{fight.b.name} {fairPrice(1 - market.pA, oddsFormat)}</strong>.{' '}
+        <span className="muted">A market-implied estimate from {market.books} bookmakers, not a true probability. Source: The Odds API; individual quotes are not shown.</span>
       </p>
       {onAddFairLeg && (
         <div className="row-actions">
@@ -184,8 +193,8 @@ function MarketPanel({ analysis, results, market, updated, meta, onAddFairLeg }:
       )}
       {leans && (
         <p className="pred-sentence">
-          <strong>{leans}</strong>{' '}
-          {bt && `In past tests the market was the more accurate of the two (${(bt.marketAccuracy ?? 0) * 100 > 0 ? `${((bt.marketAccuracy ?? 0) * 100).toFixed(1)}% of winners against ${((bt.modelAccuracy ?? 0) * 100).toFixed(1)}%` : ''}), so where they differ, lean toward the market.`}
+          <strong>Model–market disagreement: {leans}</strong>{' '}
+          {bt && `In past tests the market was the more accurate of the two (${(bt.marketAccuracy ?? 0) * 100 > 0 ? `${((bt.marketAccuracy ?? 0) * 100).toFixed(1)}% of winners against ${((bt.modelAccuracy ?? 0) * 100).toFixed(1)}%` : ''}), so where they differ, lean toward the market. A combined forecast is not offered: blending the model into the price did not improve on the price alone.`}
         </p>
       )}
     </section>
@@ -319,7 +328,7 @@ function Reasons({ title, items }: { title: string; items: string[] }) {
   )
 }
 
-function DeepDive({ analysis, isStatic, onBet, onAddLeg }: Pick<FightDetailProps, 'analysis' | 'isStatic' | 'onBet' | 'onAddLeg'>) {
+function DeepDive({ analysis, isStatic, onBet, onAddLeg, oddsFormat = 'american' }: Pick<FightDetailProps, 'analysis' | 'isStatic' | 'onBet' | 'onAddLeg' | 'oddsFormat'>) {
   const { fight, prediction, a, b, modelValid } = analysis
   const label = `${fight.a.name} vs ${fight.b.name}`
   const priced = fight.books.length > 0
@@ -410,8 +419,8 @@ function DeepDive({ analysis, isStatic, onBet, onAddLeg }: Pick<FightDetailProps
                 {fight.books.map((l) => (
                   <tr key={l.book}>
                     <td>{l.book}</td>
-                    <td className={l.a === a.bestOdds ? 'best' : ''}>{fmtOdds(l.a)}</td>
-                    <td className={l.b === b.bestOdds ? 'best' : ''}>{fmtOdds(l.b)}</td>
+                    <td className={l.a === a.bestOdds ? 'best' : ''}>{showPrice(l.a, oddsFormat)}</td>
+                    <td className={l.b === b.bestOdds ? 'best' : ''}>{showPrice(l.b, oddsFormat)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -425,7 +434,7 @@ function DeepDive({ analysis, isStatic, onBet, onAddLeg }: Pick<FightDetailProps
   )
 }
 
-export function FightDetail({ analysis, view, results, resultsMeta, market, marketUpdated, isStatic, onFighter, onShare, onBet, onAddLeg, eventId, myPick, onPick, onSaveImage, onAddFairLeg, version, onVersion, careers, eventDate, followedA, followedB, boutSaved, onFollow, onSaveBout }: FightDetailProps) {
+export function FightDetail({ analysis, view, results, resultsMeta, market, marketUpdated, isStatic, onFighter, onShare, onBet, onAddLeg, eventId, myPick, onPick, onSaveImage, onAddFairLeg, version, onVersion, careers, eventDate, followedA, followedB, boutSaved, onFollow, onSaveBout, oddsFormat }: FightDetailProps) {
   const { fight } = analysis
   const notes = fight.bout?.notes ?? []
   return (
@@ -475,7 +484,7 @@ export function FightDetail({ analysis, view, results, resultsMeta, market, mark
         )}
       </header>
 
-      {market && <MarketPanel analysis={analysis} results={results} market={market} updated={marketUpdated} meta={resultsMeta} onAddFairLeg={onAddFairLeg} />}
+      {market && <MarketPanel analysis={analysis} results={results} market={market} updated={marketUpdated} meta={resultsMeta} onAddFairLeg={onAddFairLeg} oddsFormat={oddsFormat} />}
       {market && eventId && <PriceMovement eventId={eventId} fightId={fight.id} nameA={fight.a.name} />}
       <Prediction analysis={analysis} view={view.source === 'market' && results ? { source: 'validated', probA: results.probA, probB: results.probB } : view} results={results} meta={resultsMeta} />
       {eventId && onVersion && <ForecastHistory eventId={eventId} fightId={fight.id} nameA={fight.a.name} nameB={fight.b.name} currentProbA={results?.probA} version={version} onVersion={onVersion} />}
@@ -491,7 +500,7 @@ export function FightDetail({ analysis, view, results, resultsMeta, market, mark
         </section>
       )}
 
-      <DeepDive analysis={analysis} isStatic={isStatic} onBet={onBet} onAddLeg={onAddLeg} />
+      <DeepDive analysis={analysis} isStatic={isStatic} onBet={onBet} onAddLeg={onAddLeg} oddsFormat={oddsFormat} />
     </article>
   )
 }

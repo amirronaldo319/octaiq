@@ -30,6 +30,8 @@ import { buildHighlights, primaryView, SORT_LABELS, sortRows, type SortKey, type
 import { shareUrl, useRoute, type Tab } from './lib/route'
 import { slugify } from './lib/slug'
 import { useTheme } from './lib/theme'
+import { marketState } from './lib/marketState'
+import { useOddsFormat } from './lib/oddsFormat'
 import { useScrollableTables } from './lib/scrollable'
 import { useZoneChoice } from './lib/timezone'
 import { useCard } from './lib/useCard'
@@ -52,6 +54,9 @@ const FILTERS: { id: Filter; label: string }[] = [
   { id: 'main', label: 'Main card' },
   { id: 'prelim', label: 'Prelims' },
 ]
+
+/** Optional public URL of the protected prices service; the static file is used when it is unset or unreachable. */
+const MARKET_API = ((import.meta.env.VITE_MARKET_API_URL as string | undefined) ?? '').replace(/\/$/, '')
 
 const isCareers = (b: unknown): boolean => typeof b === 'object' && b !== null && !Array.isArray(b)
 
@@ -112,6 +117,7 @@ export function App() {
   const [kellyScale, setKellyScale] = useState(0.25)
   const [toast, setToast] = useState<string | null>(null)
   useScrollableTables()
+  const [oddsFormat, setOddsFormat] = useOddsFormat()
   const [zoneChoice, setZoneChoice] = useZoneChoice()
   const [follows, setFollows] = useState<Follows>(() => loadFollows())
   const [picks, setPicks] = useState<Record<string, MyPick>>(() => loadPicks())
@@ -121,8 +127,8 @@ export function App() {
   const isStatic = event?.static === true
   const results = event?.resultsModel
   const careers = useJson<Record<string, Career>>(route.fighter || route.boutId ? [withBase('data/fighters.json')] : null, isCareers)
-  const marketState = useJson<MarketFile>([withBase('data/market.json')], isMarketFile)
-  const marketFile = marketState.status === 'ready' ? marketState.data : undefined
+  const marketRequest = useJson<MarketFile>([...(MARKET_API ? [`${MARKET_API}/api/market`] : []), withBase('data/market.json')], isMarketFile)
+  const marketFile = marketRequest.status === 'ready' ? marketRequest.data : undefined
   const hasMarket = Boolean(card.eventId && marketFile && Object.keys(marketFile.events[card.eventId] ?? {}).length > 0)
 
   const analyses = useMemo(() => analyzeCard(card.fights, kellyScale), [card.fights, kellyScale])
@@ -326,7 +332,7 @@ export function App() {
           card.loading ? <Skeleton /> : (
             <>
               {event && <EventPicker events={card.events} selectedId={card.eventId} onSelect={(id) => go({ tab: 'event', eventId: id })} />}
-              {event && <Hero payload={event} onAbout={goAbout} marketUpdated={hasMarket ? marketFile?.generatedAt : undefined} zoneChoice={zoneChoice} onZoneChoice={setZoneChoice} />}
+              {event && <Hero payload={event} onAbout={goAbout} marketUpdated={hasMarket ? marketFile?.generatedAt : undefined} marketLabel={hasMarket && marketFile && event ? marketState({}, marketFile.generatedAt, event.event.prelimsStart, Date.now()) : undefined} zoneChoice={zoneChoice} onZoneChoice={setZoneChoice} />}
               {event && <AboutData payload={event} open={aboutOpen} onToggle={setAboutOpen} marketAttribution={hasMarket ? marketFile?.attribution : undefined} />}
               {!event && <h1 className="plain-title">{card.source === 'demo' ? 'Demo fight card' : 'Live fight card'}</h1>}
 
@@ -358,6 +364,16 @@ export function App() {
                     </button>
                   ))}
                 </div>
+                {hasMarket && (
+                  <div className="chips" role="group" aria-label="Price format">
+                    <span className="muted small">Odds as</span>
+                    {(['american', 'decimal'] as const).map((f) => (
+                      <button key={f} type="button" className={`chip ${oddsFormat === f ? 'on' : ''}`} aria-pressed={oddsFormat === f} onClick={() => setOddsFormat(f)}>
+                        {f === 'american' ? 'American' : 'Decimal'}
+                      </button>
+                    ))}
+                  </div>
+                )}
                 {hasMarket && (
                   <div className="chips" role="group" aria-label="Headline probabilities">
                     <span className="muted small">Headline numbers</span>
@@ -453,7 +469,7 @@ export function App() {
         <BoutModal title={`${opened.fight.a.name} versus ${opened.fight.b.name}`} onClose={closeAll}>
           <FightDetail analysis={opened} view={openedRow.view} results={openedRow.r} resultsMeta={results} market={openedRow.m} marketUpdated={marketFile?.generatedAt} isStatic={isStatic}
             onFighter={openFighter} onShare={copyLink} onBet={logBet} onAddLeg={addLeg}
-            followedA={Boolean(follows.fighters[slugify(opened.fight.a.name)])} followedB={Boolean(follows.fighters[slugify(opened.fight.b.name)])} boutSaved={Boolean(follows.bouts[opened.fight.id])} onFollow={(side) => setFollows((f) => toggleFighter(f, slugify(side === 'a' ? opened.fight.a.name : opened.fight.b.name), side === 'a' ? opened.fight.a.name : opened.fight.b.name))} onSaveBout={() => setFollows((f) => toggleBout(f, { boutId: opened.fight.id, eventId: card.eventId ?? '', eventTitle: event?.event.title ?? '', a: opened.fight.a.name, b: opened.fight.b.name, at: Date.now() }))} eventId={card.eventId} careers={careers.status === 'ready' ? { status: 'ready', data: careers.data } : { status: careers.status === 'missing' ? 'missing' : 'loading' }} eventDate={event?.event.mainCardStart} version={route.version} onVersion={(v) => go(eventRoute({ boutId: route.boutId, version: v }))} myPick={picks[opened.fight.id]?.side} onPick={pickBout} onSaveImage={saveImage} onAddFairLeg={isStatic && openedRow.m ? addFairLeg : undefined} />
+            followedA={Boolean(follows.fighters[slugify(opened.fight.a.name)])} followedB={Boolean(follows.fighters[slugify(opened.fight.b.name)])} boutSaved={Boolean(follows.bouts[opened.fight.id])} onFollow={(side) => setFollows((f) => toggleFighter(f, slugify(side === 'a' ? opened.fight.a.name : opened.fight.b.name), side === 'a' ? opened.fight.a.name : opened.fight.b.name))} onSaveBout={() => setFollows((f) => toggleBout(f, { boutId: opened.fight.id, eventId: card.eventId ?? '', eventTitle: event?.event.title ?? '', a: opened.fight.a.name, b: opened.fight.b.name, at: Date.now() }))} eventId={card.eventId} careers={careers.status === 'ready' ? { status: 'ready', data: careers.data } : { status: careers.status === 'missing' ? 'missing' : 'loading' }} eventDate={event?.event.mainCardStart} oddsFormat={oddsFormat} version={route.version} onVersion={(v) => go(eventRoute({ boutId: route.boutId, version: v }))} myPick={picks[opened.fight.id]?.side} onPick={pickBout} onSaveImage={saveImage} onAddFairLeg={isStatic && openedRow.m ? addFairLeg : undefined} />
         </BoutModal>
       )}
       <nav className="bottom-nav" aria-label="Main destinations">

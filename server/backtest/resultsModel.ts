@@ -102,6 +102,8 @@ export function createResultsModelService(root: string, options: { bootstrap?: n
       version: useStats ? STATS_MODEL_VERSION : RESULTS_MODEL_VERSION,
       features: useStats ? 'results+stats' : 'results',
       trainedThrough: out.ingest.lastDate,
+      featureCutoff: out.ingest.lastDate,
+      ...(out.reproducibility ? { dataVersion: out.reproducibility.dataVersion, featurePipeline: out.reproducibility.featurePipeline, ...(out.reproducibility.codeCommit ? { codeCommit: out.reproducibility.codeCommit } : {}) } : {}),
       trainedOn: out.report.rows.scoredDecisive,
       backtest: {
         period: out.report.rows.testPeriod,

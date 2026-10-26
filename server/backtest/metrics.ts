@@ -15,6 +15,51 @@ export interface ReliabilityBin {
   observed: number
 }
 
+export interface CalibrationFit {
+  /** Slope of the outcome on the forecast's log-odds: 1 is well calibrated, below 1 means forecasts are too extreme */
+  slope: number
+  /** Intercept at the same fit: 0 means no overall bias toward fighter A */
+  intercept: number
+}
+
+const logit = (p: number): number => Math.log(clamp(p) / (1 - clamp(p)))
+
+/**
+ * Logistic recalibration of outcomes on forecast log-odds, fitted by Newton's method with a tiny ridge for stability.
+ * The slope and intercept describe calibration without the binning choices that an error summary depends on.
+ * Returns null with too few fights or an outcome that never varies.
+ */
+export function calibrationFit(preds: readonly number[], y: readonly number[]): CalibrationFit | null {
+  const n = preds.length
+  if (n < 30 || y.every((v) => v === y[0])) return null
+  const z = preds.map(logit)
+  // Identical forecasts (a coin flip) have no spread to fit a slope to.
+  if (z.every((v) => Math.abs(v - z[0]) < 1e-9)) return null
+  let a = 0
+  let b = 1
+  for (let it = 0; it < 25; it++) {
+    let ga = 0, gb = 0, haa = 1e-6, hab = 0, hbb = 1e-6
+    for (let i = 0; i < n; i++) {
+      const p = 1 / (1 + Math.exp(-(a + b * z[i])))
+      const r = p - y[i]
+      const w = p * (1 - p)
+      ga += r
+      gb += r * z[i]
+      haa += w
+      hab += w * z[i]
+      hbb += w * z[i] * z[i]
+    }
+    const det = haa * hbb - hab * hab
+    if (Math.abs(det) < 1e-12) return null
+    const da = (hbb * ga - hab * gb) / det
+    const db = (haa * gb - hab * ga) / det
+    a -= da
+    b -= db
+    if (Math.max(Math.abs(da), Math.abs(db)) < 1e-9) break
+  }
+  return { slope: b, intercept: a }
+}
+
 export interface Metrics {
   n: number
   logLoss: number
@@ -23,12 +68,14 @@ export interface Metrics {
   /** Expected calibration error over 10 bins of the favored side's probability */
   ece: number
   reliability: ReliabilityBin[]
+  /** Calibration slope and intercept; null when there are too few fights */
+  calibration: CalibrationFit | null
 }
 
 /** Folds every prediction onto the favored side so calibration is not diluted by orientation. */
 export function metrics(preds: readonly number[], y: readonly number[], bins = 10): Metrics {
   const n = preds.length
-  if (n === 0) return { n: 0, logLoss: NaN, brier: NaN, accuracy: NaN, ece: NaN, reliability: [] }
+  if (n === 0) return { n: 0, logLoss: NaN, brier: NaN, accuracy: NaN, ece: NaN, reliability: [], calibration: null }
   let ll = 0
   let br = 0
   let correct = 0
@@ -54,7 +101,7 @@ export function metrics(preds: readonly number[], y: readonly number[], bins = 1
     observed: b.n ? b.o / b.n : NaN,
   }))
   const ece = acc.reduce((s, b) => s + (b.n ? (b.n / n) * Math.abs(b.p / b.n - b.o / b.n) : 0), 0)
-  return { n, logLoss: ll / n, brier: br / n, accuracy: correct / n, ece, reliability }
+  return { n, logLoss: ll / n, brier: br / n, accuracy: correct / n, ece, reliability, calibration: calibrationFit(preds, y) }
 }
 
 export interface EventAgg {

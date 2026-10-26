@@ -15,9 +15,14 @@
     "backtest": "node server/backtest/run.ts",
     "snapshot": "node server/snapshot.ts",
     "ledger": "node server/ledger.ts",
-    "refresh": "npm run backtest && npm run ledger && npm run snapshot",
+    "refresh": "npm run backtest && npm run registry && npm run identity && npm run ledger && npm run snapshot",
     "prices": "node server/prices.ts",
-    "e2e": "playwright test"
+    "e2e": "playwright test",
+    "check:bundle": "node server/checkBundle.ts",
+    "identity": "node server/identity.ts",
+    "registry": "node server/registry.ts",
+    "model:rollback": "node server/registry.ts --rollback",
+    "report": "node server/report.ts"
   },
   "dependencies": {
     "@fontsource/barlow": "^5.3.0",

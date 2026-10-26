@@ -21,7 +21,13 @@ export interface MarketReport {
   models: MarketModelResult[]
   byYear: { year: number; n: number; market: number; elo: number; lr: number; lrStats: number }[]
   /** Does the model add information beyond the price? Walk-forward stack of market and model logits. */
-  stack: { period: string; n: number; models: MarketModelResult[]; modelWeight: number | null; marketWeight: number | null } | null
+  stack: {
+    period: string; n: number; models: MarketModelResult[]; modelWeight: number | null; marketWeight: number | null
+    /** Paired log-loss difference of the market+model blend against the market recalibrated on the same earlier years; negative means the model adds information */
+    addsInformation?: Interval | null
+    /** Slope on the market's log-odds when it is recalibrated alone, fitted on all matched years before the last */
+    marketSlope?: number | null
+  } | null
   /** Model used for the headline comparison */
   primaryModel: 'lr' | 'lrStats'
   verdict: string
@@ -92,15 +98,19 @@ export function compareWithMarket(
 
   // Walk-forward stack: for each year, fit on earlier matched years only.
   const modelOf = (r: Row): number => (primary === 'lrStats' ? r.lrStats : r.lr)
-  const stackRows: { row: Row; p: number }[] = []
+  const stackRows: { row: Row; p: number; calMarket: number }[] = []
   let lastWeights: number[] | null = null
+  let lastMarketSlope: number | null = null
   for (const year of years) {
     const train = rows.filter((r) => r.year < year)
     const test = rows.filter((r) => r.year === year)
     if (train.length < 400) continue
     const m = trainLogistic(train.map((r) => [logit(r.market), logit(modelOf(r))]), train.map((r) => r.y), 1)
     lastWeights = m.weights.map((w, j) => w / m.scales[j])
-    for (const r of test) stackRows.push({ row: r, p: predictLogistic(m, [logit(r.market), logit(modelOf(r))]) })
+    // The fair benchmark for "does the model add information" is the market after the same recalibration, not the raw price.
+    const mk = trainLogistic(train.map((r) => [logit(r.market)]), train.map((r) => r.y), 1)
+    lastMarketSlope = mk.weights[0] / mk.scales[0]
+    for (const r of test) stackRows.push({ row: r, p: predictLogistic(m, [logit(r.market), logit(modelOf(r))]), calMarket: predictLogistic(mk, [logit(r.market)]) })
   }
   let stack: MarketReport['stack'] = null
   if (stackRows.length >= 200) {
@@ -109,6 +119,7 @@ export function compareWithMarket(
       { id: 'market', label: 'Betting market', get: (i) => sub[i].market },
       { id: 'model', label: 'Model alone', get: (i) => modelOf(sub[i]) },
       { id: 'stack', label: 'Market + model (walk-forward blend)', get: (i) => stackRows[i].p },
+      { id: 'marketCal', label: 'Market, recalibrated (walk-forward)', get: (i) => stackRows[i].calMarket },
     ]
     const by = new Map<string, EventAgg>()
     sub.forEach((r, i) => {
@@ -118,6 +129,7 @@ export function compareWithMarket(
       by.set(`${r.year}|${r.event}`, a)
     })
     const sb = bootstrapLogLoss([...by.values()], 0, opts.bootstrap, opts.seed + 7)
+    const vsCal = bootstrapLogLoss([...by.values()], 3, opts.bootstrap, opts.seed + 7)
     const sy = sub.map((r) => r.y)
     stack = {
       period: `${Math.min(...sub.map((r) => r.year))}-${Math.max(...sub.map((r) => r.year))}`,
@@ -125,6 +137,8 @@ export function compareWithMarket(
       models: sdefs.map((d, k) => toResult(d.id, d.label, sub.map((_, i) => d.get(i)), sy, sb.logLoss[k], sb.diffVsRef[k])),
       marketWeight: lastWeights ? lastWeights[0] : null,
       modelWeight: lastWeights ? lastWeights[1] : null,
+      addsInformation: opts.bootstrap > 0 ? vsCal.diffVsRef[2] : null,
+      marketSlope: lastMarketSlope,
     }
   }
 
@@ -135,7 +149,11 @@ export function compareWithMarket(
   let verdict = `On ${rows.length} bouts with prices (${years[0]}-${years[years.length - 1]}), the model's log loss ${fmt(own.logLoss.estimate)} is ${sig} the market's ${fmt(market.logLoss.estimate)} (gap ${gap.estimate >= 0 ? '+' : ''}${fmt(gap.estimate)}, 95% CI ${fmt(gap.lo)} to ${fmt(gap.hi)}; positive means worse).`
   if (stack) {
     const s = stack.models[2]
-    verdict += ` Blending the model into the price changed log loss by ${s.vsMarket.estimate >= 0 ? '+' : ''}${fmt(s.vsMarket.estimate)} [${fmt(s.vsMarket.lo)}, ${fmt(s.vsMarket.hi)}] versus the price alone, ${s.vsMarket.hi < 0 ? 'so the model adds information the price lacks' : 'so the model does not demonstrably add information beyond the price'}.`
+    const c = stack.addsInformation
+    verdict += ` Blending the model into the price changed log loss by ${s.vsMarket.estimate >= 0 ? '+' : ''}${fmt(s.vsMarket.estimate)} [${fmt(s.vsMarket.lo)}, ${fmt(s.vsMarket.hi)}] versus the raw price`
+    verdict += c
+      ? `, and by ${c.estimate >= 0 ? '+' : ''}${fmt(c.estimate)} [${fmt(c.lo)}, ${fmt(c.hi)}] versus the price recalibrated on the same earlier years, ${c.hi < 0 ? 'so the model adds information the price lacks' : 'so the model does not demonstrably add information beyond the price'}.`
+      : `, ${s.vsMarket.hi < 0 ? 'so the model adds information the price lacks' : 'so the model does not demonstrably add information beyond the price'}.`
   }
   return {
     match, period: `${years[0]}-${years[years.length - 1]}`, n: rows.length,

@@ -1,5 +1,6 @@
 import type { FeatureRow } from './features.ts'
 import { bootstrapLogLoss, logLossOne, type EventAgg, type Interval } from './metrics.ts'
+import { decide, type Decision } from './promotion.ts'
 import { hybridJoint, predictDirect, trainDirect } from './jointDirect.ts'
 import { predictLogistic, trainLogistic, type LogisticModel } from './models.ts'
 
@@ -129,6 +130,8 @@ export interface OutcomeReport {
   jointHybrid?: OutcomeMetric
   /** Which joint the site uses: the hybrid only when its paired interval against the independent one is entirely below zero */
   jointUsed: 'independent' | 'hybrid'
+  /** The promotion-gate decision behind jointUsed */
+  jointDecision?: Decision
   note: string
 }
 
@@ -227,13 +230,25 @@ export function evaluateOutcomes(
     }
   }
   if (dist.length < 100 || ko.length < 100 || joint.length < 100) return null
+  const hybridSummary = hybrid.length > 100 && opts.bootstrap > 0 ? summarize(hybrid, opts.bootstrap, opts.seed + 15) : null
+  const jointDecision = hybridSummary
+    ? decide({
+        name: 'Direct six-outcome method model (hybrid with the win model)', incumbent: 'independent winner-and-method joint', diff: hybridSummary.gain,
+        foldDiffs: years.map((yr) => {
+          const sub = hybrid.filter((h) => h.event.startsWith(`${yr}|`))
+          return sub.length ? sub.reduce((s, h) => s + h.model - h.base, 0) / sub.length : 0
+        }),
+        calibrationSlope: null,
+      })
+    : undefined
   return {
     period: `${years[0]}-${years[years.length - 1]}`,
     distance: summarize(dist, opts.bootstrap, opts.seed + 11),
     koShare: summarize(ko, opts.bootstrap, opts.seed + 12),
     joint: summarize(joint, opts.bootstrap, opts.seed + 13),
     ...(direct.length > 100 ? { jointDirect: summarize(direct, opts.bootstrap, opts.seed + 14), jointHybrid: summarize(hybrid, opts.bootstrap, opts.seed + 15) } : {}),
-    jointUsed: hybrid.length > 100 && opts.bootstrap > 0 && summarize(hybrid, opts.bootstrap, opts.seed + 15).gain.hi < 0 ? 'hybrid' : 'independent',
+    jointUsed: jointDecision?.mode === 'promote' ? 'hybrid' : 'independent',
+    ...(jointDecision ? { jointDecision } : {}),
     note: 'The default joint distribution multiplies the win probability by the method model, assuming winner and method are independent given the features. A direct six-outcome model is tested against it each time and used only if it is clearly better.',
   }
 }

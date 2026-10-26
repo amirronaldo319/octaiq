@@ -645,3 +645,12 @@ label.inline { display: inline-flex; gap: 4px; align-items: center; }
 .review h4 { margin: 0 0 6px; }
 .review ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
 .rec-review { grid-column: 1 / -1; }
+.fh-meta { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.75rem; overflow-wrap: anywhere; }
+
+/* Market freshness */
+.market-state { margin: 6px 0 0; font-size: 0.85rem; color: var(--ink-2); }
+.market-state.s-stale { color: var(--bad); }
+.market-state.s-aging, .market-state.s-closed { color: var(--warn); }
+.flag.m-stale { border-color: rgba(239, 107, 107, 0.6); color: var(--bad); }
+.flag.m-fresh { border-color: rgba(61, 190, 139, 0.5); color: var(--ok); }
+.alerts { margin: 0 0 8px; padding-left: 18px; color: var(--warn); }

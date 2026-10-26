@@ -565,3 +565,36 @@ describe('retention features', () => {
     }
   })
 })
+
+describe('market presentation', () => {
+  it('says how current the prices are, shows fair prices in either format, and never shows bookmaker names', async () => {
+    const user = userEvent.setup()
+    stubFetchWith({ 'market.json': { ...marketFor(0.6), generatedAt: '2026-10-26T06:00:00Z', method: 'x' } })
+    window.location.hash = '#/event/ufc-vegas-123/bout/ufc-vegas-123-1'
+    const first = render(<App />)
+    const dialog = await screen.findByRole('dialog')
+    const panel = await within(dialog).findByRole('region', { name: 'Betting market' })
+    expect(within(panel).getByRole('status').textContent).toMatch(/collected every few hours, not live/)
+    expect(within(panel).getByText(/Model–market disagreement/)).toBeTruthy()
+    expect(within(panel).getByText(/market-implied estimate from 9 bookmakers/)).toBeTruthy()
+    expect(within(panel).getByText(/-150/)).toBeTruthy()
+    first.unmount()
+    window.location.hash = '#/'
+    render(<App />)
+    await headline()
+    await waitFor(() => expect(screen.getByRole('group', { name: 'Price format' })).toBeTruthy())
+    await user.click(screen.getByRole('button', { name: 'Decimal' }))
+    window.location.hash = '#/event/ufc-vegas-123/bout/ufc-vegas-123-1'
+    const again = await screen.findByRole('region', { name: 'Betting market' })
+    expect(within(again).getByText(/1\.67/)).toBeTruthy()
+    expect(document.body.textContent).not.toMatch(/draftkings|fanduel|pinnacle/i)
+  })
+
+  it('labels prices as stale when the last collection is old', async () => {
+    stubFetchWith({ 'market.json': { ...marketFor(0.6), generatedAt: '2026-10-24T06:00:00Z' } })
+    window.location.hash = '#/event/ufc-vegas-123/bout/ufc-vegas-123-1'
+    render(<App />)
+    const panel = await screen.findByRole('region', { name: 'Betting market' })
+    expect(within(panel).getByRole('status').textContent).toMatch(/longer than expected/)
+  })
+})
