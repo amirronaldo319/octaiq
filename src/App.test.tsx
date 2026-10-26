@@ -441,7 +441,7 @@ describe('trust and context features', () => {
     render(<App />)
     const history = await screen.findByRole('region', { name: 'Forecast history' })
     expect(within(history).getByText('First forecast for this card')).toBeTruthy()
-    expect(within(history).getByText(/The model was updated/)).toBeTruthy()
+    expect(within(history).getAllByText(/The model was updated/).length).toBeGreaterThanOrEqual(2)
     await user.click(within(history).getAllByRole('button', { name: 'View' })[1])
     expect(window.location.hash).toContain('/v/2026')
     expect(await screen.findByText(/You are looking at the forecast saved/)).toBeTruthy()

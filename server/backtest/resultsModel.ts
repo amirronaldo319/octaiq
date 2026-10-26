@@ -23,8 +23,8 @@ export function loadAliases(root: string): Record<string, string> {
   }
 }
 
-export const RESULTS_MODEL_VERSION = 'octa-results-lr-0.2'
-export const STATS_MODEL_VERSION = 'octa-results-stats-lr-0.2'
+export const RESULTS_MODEL_VERSION = 'octa-results-lr-0.3'
+export const STATS_MODEL_VERSION = 'octa-results-stats-lr-0.3'
 
 /**
  * The recency-weighted challenger that research found better than production in testing but that did not clear the promotion gate

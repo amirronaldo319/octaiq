@@ -37,6 +37,8 @@ excluded = set(report["reproducibility"]["options"]["excludedFeatures"])
 xcols = [c for c in df.columns if c.startswith("x_")]
 names = {c: c[2:] for c in xcols}
 prod_cols = [c for c in xcols if names[c] not in excluded]
+# For the age and reach comparison only: the production set with reach put back, since production now leaves reach out.
+ab_cols = [c for c in xcols if names[c] not in (excluded - {"reach"})]
 tree_cols = [c for c in xcols if names[c] not in {"ageMissing", "reachMissing"}]
 first_test = report["report"]["options"]["firstTestYear"]
 dec = df[df["y"].notna()].reset_index(drop=True)
@@ -126,14 +128,13 @@ glicko_by_id = dict(zip(df["id"], glicko_all))
 dec["glicko2"] = dec["id"].map(glicko_by_id)
 
 ABLATION_SETS = {
-    "no age, no reach": [c for c in prod_cols if names[c] not in {"age", "reach"}],
-    "age only": [c for c in prod_cols if names[c] != "reach"],
-    "reach only": [c for c in prod_cols if names[c] != "age"],
-    "age and reach": prod_cols,
+    "no age, no reach": [c for c in ab_cols if names[c] not in {"age", "reach"}],
+    "age only": [c for c in ab_cols if names[c] != "reach"],
+    "reach only": [c for c in ab_cols if names[c] != "age"],
+    "age and reach": ab_cols,
 }
-oof: dict[str, list] = {k: [] for k in ["lr_prod", "lr_all", "histgb", "lightgbm", "xgboost", "catboost", "lightgbm_es", "xgboost_es", "catboost_es", "glicko2", "hier", "hier_decay", "lr_decay", "lr_decay_noreach"]}
+oof: dict[str, list] = {k: [] for k in ["lr_prod", "lr_all", "histgb", "lightgbm", "xgboost", "catboost", "lightgbm_es", "xgboost_es", "catboost_es", "glicko2", "hier", "hier_decay", "lr_decay", "lr_decay_with_reach"]}
 oof_sens: dict[str, list] = {f"half-life {h} years": [] for h in [2, 4, 8, 16]}
-noreach_cols = [c for c in prod_cols if names[c] != "reach"]
 oof_abl: dict[str, list] = {k: [] for k in [*ABLATION_SETS, "age and reach + interaction", "age and reach + stance"]}
 rows_eval: list[pd.DataFrame] = []
 
@@ -152,7 +153,7 @@ for yr in years:
         oof[f"{fam}_es"].append(EarlyStopped(fam, best_params[fam]).fit(X(tr, tree_cols), ytr_, fit_mask).predict(X(te, tree_cols)))
     w_dec = None if tuning["recency"]["halfLifeYears"] is None else 0.5 ** (((cut - tr["dt"]).dt.days.to_numpy() / 365.25) / tuning["recency"]["halfLifeYears"])
     oof["lr_decay"].append(Logistic(5.0).fit(X(tr, prod_cols), ytr_, w_dec).predict(X(te, prod_cols)))
-    oof["lr_decay_noreach"].append(Logistic(5.0).fit(X(tr, noreach_cols), ytr_, w_dec).predict(X(te, noreach_cols)))
+    oof["lr_decay_with_reach"].append(Logistic(5.0).fit(X(tr, ab_cols), ytr_, w_dec).predict(X(te, ab_cols)))
     for h in [2, 4, 8, 16]:
         oof_sens[f"half-life {h} years"].append(Logistic(5.0).fit(X(tr, prod_cols), ytr_, 0.5 ** (((cut - tr["dt"]).dt.days.to_numpy() / 365.25) / h)).predict(X(te, prod_cols)))
     age = (cut - tr["dt"]).dt.days.to_numpy() / 365.25
@@ -161,8 +162,8 @@ for yr in years:
     for label, cols in ABLATION_SETS.items():
         oof_abl[label].append(Logistic(5.0).fit(X(tr, cols), ytr_).predict(X(te, cols)))
     inter = lambda d: (d["x_age"] * d["x_reach"]).to_numpy()[:, None]
-    oof_abl["age and reach + interaction"].append(Logistic(5.0).fit(np.hstack([X(tr, prod_cols), inter(tr)]), ytr_).predict(np.hstack([X(te, prod_cols), inter(te)])))
-    oof_abl["age and reach + stance"].append(Logistic(5.0).fit(X(tr, prod_cols + ["x_southpaw"]), ytr_).predict(X(te, prod_cols + ["x_southpaw"])))
+    oof_abl["age and reach + interaction"].append(Logistic(5.0).fit(np.hstack([X(tr, ab_cols), inter(tr)]), ytr_).predict(np.hstack([X(te, ab_cols), inter(te)])))
+    oof_abl["age and reach + stance"].append(Logistic(5.0).fit(X(tr, ab_cols + ["x_southpaw"]), ytr_).predict(X(te, ab_cols + ["x_southpaw"])))
     log(f"fitted fold {yr} ({len(tr)} train, {len(te)} test)")
 
 E = pd.concat(rows_eval).reset_index(drop=True)

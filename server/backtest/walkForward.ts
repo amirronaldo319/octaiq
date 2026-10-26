@@ -36,7 +36,9 @@ export const DEFAULT_OPTIONS: BacktestOptions = {
   validationYears: 6,
   eloKCandidates: [16, 24, 32, 48, 64, 96, 128],
   statsDecayCandidates: [1, 0.9, 0.8, 0.7],
-  excludeFeatures: ['ageMissing', 'reachMissing', ...EXPERIMENTAL_FEATURES],
+  // Reach comes from one current profile snapshot with no effective date, so its value at an earlier fight cannot be verified,
+  // and tested on its own it adds nothing (docs/RESEARCH.md: +0.0007 [-0.0019, +0.0030]); age, from the fixed date of birth, carries the gain.
+  excludeFeatures: ['ageMissing', 'reachMissing', 'reach', ...EXPERIMENTAL_FEATURES],
   ridge: 5,
   minCalibrationRows: 800,
   bootstrap: 1000,

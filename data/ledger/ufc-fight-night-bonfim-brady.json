@@ -707,6 +707,252 @@
           }
         }
       ]
+    },
+    {
+      "recordedAt": "2026-10-26T05:50:50.567Z",
+      "model": "octa-results-stats-lr-0.3",
+      "dataVersion": "58ca637e2e2c",
+      "featurePipeline": "features-3",
+      "codeCommit": "f915205bb37ccb7612ef5015d491306ad7500fd1",
+      "shadowModel": "octa-results-stats-lr-recency4y-0.1",
+      "dataThrough": "2026-10-17",
+      "cardVersion": 1,
+      "bouts": [
+        {
+          "id": "ufc-fight-night-bonfim-brady-1",
+          "a": "Gabriel Bonfim",
+          "b": "Sean Brady",
+          "probA": 0.4515,
+          "probLo": 0.4295,
+          "probHi": 0.4763,
+          "shadowProbA": 0.4696,
+          "distance": 0.4122,
+          "joint": {
+            "aKo": 0.1789,
+            "aSub": 0.0865,
+            "aDec": 0.1861,
+            "bKo": 0.1384,
+            "bSub": 0.184,
+            "bDec": 0.2261
+          }
+        },
+        {
+          "id": "ufc-fight-night-bonfim-brady-2",
+          "a": "Tatiana Suarez",
+          "b": "Virna Jandiroba",
+          "probA": 0.6317,
+          "probLo": 0.6063,
+          "probHi": 0.6641,
+          "shadowProbA": 0.6309,
+          "distance": 0.74,
+          "joint": {
+            "aKo": 0.0404,
+            "aSub": 0.1238,
+            "aDec": 0.4675,
+            "bKo": 0.0273,
+            "bSub": 0.0685,
+            "bDec": 0.2725
+          }
+        },
+        {
+          "id": "ufc-fight-night-bonfim-brady-3",
+          "a": "Davey Grant",
+          "b": "Elijah Smith",
+          "probA": 0.2033,
+          "probLo": 0.1712,
+          "probHi": 0.2414,
+          "shadowProbA": 0.1677,
+          "distance": 0.5422,
+          "joint": {
+            "aKo": 0.0685,
+            "aSub": 0.0245,
+            "aDec": 0.1102,
+            "bKo": 0.1229,
+            "bSub": 0.2418,
+            "bDec": 0.432
+          }
+        },
+        {
+          "id": "ufc-fight-night-bonfim-brady-4",
+          "a": "Seokhyeon Ko",
+          "b": "Wellington Turman",
+          "probA": 0.8077,
+          "probLo": 0.7689,
+          "probHi": 0.8411,
+          "shadowProbA": 0.8091,
+          "distance": 0.5984,
+          "joint": {
+            "aKo": 0.2277,
+            "aSub": 0.0967,
+            "aDec": 0.4833,
+            "bKo": 0.0429,
+            "bSub": 0.0343,
+            "bDec": 0.1151
+          }
+        },
+        {
+          "id": "ufc-fight-night-bonfim-brady-5",
+          "a": "Mantas Kondratavičius",
+          "b": "Andre Petroski",
+          "probA": 0.709,
+          "probLo": 0.6772,
+          "probHi": 0.7432,
+          "shadowProbA": 0.7568,
+          "distance": 0.4776,
+          "joint": {
+            "aKo": 0.2915,
+            "aSub": 0.0788,
+            "aDec": 0.3386,
+            "bKo": 0.0839,
+            "bSub": 0.0681,
+            "bDec": 0.139
+          }
+        },
+        {
+          "id": "ufc-fight-night-bonfim-brady-6",
+          "a": "Billy Elekana",
+          "b": "Lucas Fernando",
+          "probA": 0.375,
+          "probLo": 0.328,
+          "probHi": 0.422,
+          "shadowProbA": 0.3819,
+          "distance": 0.3308,
+          "joint": {
+            "aKo": 0.1236,
+            "aSub": 0.1274,
+            "aDec": 0.1241,
+            "bKo": 0.3049,
+            "bSub": 0.1133,
+            "bDec": 0.2067
+          }
+        },
+        {
+          "id": "ufc-fight-night-bonfim-brady-7",
+          "a": "Gabriel Lorenco",
+          "b": "Alvin Hines",
+          "probA": 0.659,
+          "probLo": 0.6318,
+          "probHi": 0.693,
+          "shadowProbA": 0.7176,
+          "distance": 0.3707,
+          "joint": {
+            "aKo": 0.3205,
+            "aSub": 0.0942,
+            "aDec": 0.2443,
+            "bKo": 0.1615,
+            "bSub": 0.0531,
+            "bDec": 0.1264
+          }
+        },
+        {
+          "id": "ufc-fight-night-bonfim-brady-8",
+          "a": "Karine Silva",
+          "b": "Gabriella Fernandes",
+          "probA": 0.7434,
+          "probLo": 0.7101,
+          "probHi": 0.7737,
+          "shadowProbA": 0.7277,
+          "distance": 0.6602,
+          "joint": {
+            "aKo": 0.0766,
+            "aSub": 0.1759,
+            "aDec": 0.4908,
+            "bKo": 0.0359,
+            "bSub": 0.0513,
+            "bDec": 0.1694
+          }
+        },
+        {
+          "id": "ufc-fight-night-bonfim-brady-9",
+          "a": "Jose Delano",
+          "b": "Murtazali Magomedov",
+          "probA": 0.4461,
+          "probLo": 0.41,
+          "probHi": 0.4756,
+          "shadowProbA": 0.4368,
+          "distance": 0.5197,
+          "joint": {
+            "aKo": 0.1433,
+            "aSub": 0.0709,
+            "aDec": 0.2319,
+            "bKo": 0.1084,
+            "bSub": 0.1576,
+            "bDec": 0.2879
+          }
+        },
+        {
+          "id": "ufc-fight-night-bonfim-brady-10",
+          "a": "Keiichiro Nakamura",
+          "b": "Ollie Schmid",
+          "probA": 0.551,
+          "probLo": 0.5121,
+          "probHi": 0.5859,
+          "shadowProbA": 0.5544,
+          "distance": 0.4387,
+          "joint": {
+            "aKo": 0.2552,
+            "aSub": 0.054,
+            "aDec": 0.2417,
+            "bKo": 0.1571,
+            "bSub": 0.095,
+            "bDec": 0.197
+          }
+        },
+        {
+          "id": "ufc-fight-night-bonfim-brady-11",
+          "a": "Austin Bashi",
+          "b": "Lucas Brennan",
+          "probA": 0.6843,
+          "probLo": 0.662,
+          "probHi": 0.7062,
+          "shadowProbA": 0.6854,
+          "distance": 0.6104,
+          "joint": {
+            "aKo": 0.1281,
+            "aSub": 0.1385,
+            "aDec": 0.4177,
+            "bKo": 0.0787,
+            "bSub": 0.0443,
+            "bDec": 0.1927
+          }
+        },
+        {
+          "id": "ufc-fight-night-bonfim-brady-12",
+          "a": "Priscila Cachoeira",
+          "b": "Nina Milošević",
+          "probA": 0.1383,
+          "probLo": 0.1165,
+          "probHi": 0.1681,
+          "shadowProbA": 0.117,
+          "distance": 0.4752,
+          "joint": {
+            "aKo": 0.0608,
+            "aSub": 0.0118,
+            "aDec": 0.0657,
+            "bKo": 0.2375,
+            "bSub": 0.2147,
+            "bDec": 0.4095
+          }
+        },
+        {
+          "id": "ufc-fight-night-bonfim-brady-13",
+          "a": "Jonny Parsons",
+          "b": "José Souza",
+          "probA": 0.4717,
+          "probLo": 0.4329,
+          "probHi": 0.5076,
+          "shadowProbA": 0.4656,
+          "distance": 0.4595,
+          "joint": {
+            "aKo": 0.1981,
+            "aSub": 0.0568,
+            "aDec": 0.2167,
+            "bKo": 0.1974,
+            "bSub": 0.0881,
+            "bDec": 0.2428
+          }
+        }
+      ]
     }
   ]
 }

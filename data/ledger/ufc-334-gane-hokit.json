@@ -655,6 +655,234 @@
           }
         }
       ]
+    },
+    {
+      "recordedAt": "2026-10-26T05:50:50.567Z",
+      "model": "octa-results-stats-lr-0.3",
+      "dataVersion": "58ca637e2e2c",
+      "featurePipeline": "features-3",
+      "codeCommit": "f915205bb37ccb7612ef5015d491306ad7500fd1",
+      "shadowModel": "octa-results-stats-lr-recency4y-0.1",
+      "dataThrough": "2026-10-17",
+      "cardVersion": 1,
+      "bouts": [
+        {
+          "id": "ufc-334-gane-hokit-1",
+          "a": "Ciryl Gane",
+          "b": "Josh Hokit",
+          "probA": 0.5356,
+          "probLo": 0.4913,
+          "probHi": 0.5931,
+          "shadowProbA": 0.5225,
+          "distance": 0.2967,
+          "joint": {
+            "aKo": 0.3175,
+            "aSub": 0.0592,
+            "aDec": 0.1589,
+            "bKo": 0.2758,
+            "bSub": 0.0508,
+            "bDec": 0.1378
+          }
+        },
+        {
+          "id": "ufc-334-gane-hokit-2",
+          "a": "Kayla Harrison",
+          "b": "Amanda Nunes",
+          "probA": 0.6258,
+          "probLo": 0.5638,
+          "probHi": 0.6928,
+          "shadowProbA": 0.6286,
+          "distance": 0.4705,
+          "joint": {
+            "aKo": 0.1093,
+            "aSub": 0.2221,
+            "aDec": 0.2944,
+            "bKo": 0.1296,
+            "bSub": 0.0685,
+            "bDec": 0.176
+          }
+        },
+        {
+          "id": "ufc-334-gane-hokit-3",
+          "a": "Caio Borralho",
+          "b": "Yousri Belgaroui",
+          "probA": 0.4265,
+          "probLo": 0.3643,
+          "probHi": 0.4865,
+          "shadowProbA": 0.4582,
+          "distance": 0.4996,
+          "joint": {
+            "aKo": 0.1454,
+            "aSub": 0.0681,
+            "aDec": 0.2131,
+            "bKo": 0.2446,
+            "bSub": 0.0424,
+            "bDec": 0.2865
+          }
+        },
+        {
+          "id": "ufc-334-gane-hokit-4",
+          "a": "Uroš Medić",
+          "b": "Kevin Holland",
+          "probA": 0.445,
+          "probLo": 0.3945,
+          "probHi": 0.5024,
+          "shadowProbA": 0.4952,
+          "distance": 0.3959,
+          "joint": {
+            "aKo": 0.2438,
+            "aSub": 0.025,
+            "aDec": 0.1762,
+            "bKo": 0.2079,
+            "bSub": 0.1273,
+            "bDec": 0.2197
+          }
+        },
+        {
+          "id": "ufc-334-gane-hokit-5",
+          "a": "Bilal Hasan",
+          "b": "Luis Gurule",
+          "probA": 0.7562,
+          "probLo": 0.7226,
+          "probHi": 0.785,
+          "shadowProbA": 0.7957,
+          "distance": 0.5202,
+          "joint": {
+            "aKo": 0.2365,
+            "aSub": 0.1264,
+            "aDec": 0.3933,
+            "bKo": 0.0677,
+            "bSub": 0.0493,
+            "bDec": 0.1268
+          }
+        },
+        {
+          "id": "ufc-334-gane-hokit-6",
+          "a": "Stephen Thompson",
+          "b": "Charles Radtke",
+          "probA": 0.4173,
+          "probLo": 0.3713,
+          "probHi": 0.4759,
+          "shadowProbA": 0.3907,
+          "distance": 0.5203,
+          "joint": {
+            "aKo": 0.1908,
+            "aSub": 0.0094,
+            "aDec": 0.2171,
+            "bKo": 0.2131,
+            "bSub": 0.0664,
+            "bDec": 0.3032
+          }
+        },
+        {
+          "id": "ufc-334-gane-hokit-7",
+          "a": "Drew Dober",
+          "b": "Chris Duncan",
+          "probA": 0.31,
+          "probLo": 0.2749,
+          "probHi": 0.3507,
+          "shadowProbA": 0.3036,
+          "distance": 0.4302,
+          "joint": {
+            "aKo": 0.1441,
+            "aSub": 0.0325,
+            "aDec": 0.1334,
+            "bKo": 0.1303,
+            "bSub": 0.2628,
+            "bDec": 0.2968
+          }
+        },
+        {
+          "id": "ufc-334-gane-hokit-8",
+          "a": "Jim Miller",
+          "b": "Terrance McKinney",
+          "probA": 0.2368,
+          "probLo": 0.1819,
+          "probHi": 0.2905,
+          "shadowProbA": 0.2373,
+          "distance": 0.3989,
+          "joint": {
+            "aKo": 0.0759,
+            "aSub": 0.0665,
+            "aDec": 0.0944,
+            "bKo": 0.2632,
+            "bSub": 0.1955,
+            "bDec": 0.3044
+          }
+        },
+        {
+          "id": "ufc-334-gane-hokit-9",
+          "a": "Donte Johnson",
+          "b": "Baisangur Susurkaev",
+          "probA": 0.4211,
+          "probLo": 0.3941,
+          "probHi": 0.4489,
+          "shadowProbA": 0.4294,
+          "distance": 0.4142,
+          "joint": {
+            "aKo": 0.1566,
+            "aSub": 0.09,
+            "aDec": 0.1745,
+            "bKo": 0.1869,
+            "bSub": 0.1522,
+            "bDec": 0.2398
+          }
+        },
+        {
+          "id": "ufc-334-gane-hokit-10",
+          "a": "Macy Chiasson",
+          "b": "Bia Mesquita",
+          "probA": 0.368,
+          "probLo": 0.322,
+          "probHi": 0.4077,
+          "shadowProbA": 0.336,
+          "distance": 0.5577,
+          "joint": {
+            "aKo": 0.1022,
+            "aSub": 0.0606,
+            "aDec": 0.2052,
+            "bKo": 0.0621,
+            "bSub": 0.2174,
+            "bDec": 0.3525
+          }
+        },
+        {
+          "id": "ufc-334-gane-hokit-11",
+          "a": "Adrian Yanez",
+          "b": "Juan Diaz",
+          "probA": 0.4202,
+          "probLo": 0.3828,
+          "probHi": 0.4718,
+          "shadowProbA": 0.4029,
+          "distance": 0.4758,
+          "joint": {
+            "aKo": 0.1932,
+            "aSub": 0.027,
+            "aDec": 0.1999,
+            "bKo": 0.1449,
+            "bSub": 0.1591,
+            "bDec": 0.2759
+          }
+        },
+        {
+          "id": "ufc-334-gane-hokit-12",
+          "a": "Nazim Sadykhov",
+          "b": "Jefferson Nascimento",
+          "probA": 0.4489,
+          "probLo": 0.42,
+          "probHi": 0.4901,
+          "shadowProbA": 0.4541,
+          "distance": 0.3709,
+          "joint": {
+            "aKo": 0.2296,
+            "aSub": 0.0528,
+            "aDec": 0.1665,
+            "bKo": 0.2644,
+            "bSub": 0.0823,
+            "bDec": 0.2044
+          }
+        }
+      ]
     }
   ]
 }

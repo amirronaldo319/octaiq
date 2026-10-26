@@ -39,7 +39,7 @@ const LABEL: Record<string, string> = {
   lr_prod: 'Production-form ridge logistic regression (baseline)', lr_all: 'Logistic regression, all features, tuned ridge', histgb: 'HistGradientBoosting', lightgbm: 'LightGBM', xgboost: 'XGBoost', catboost: 'CatBoost',
   lightgbm_es: 'LightGBM, trees chosen inside the training period', xgboost_es: 'XGBoost, trees chosen inside the training period', catboost_es: 'CatBoost, trees chosen inside the training period',
   glicko2: 'Glicko-2 ratings', hier: 'Hierarchical: production features plus fighter effects', hier_decay: 'Hierarchical, with older fights counting for less', lr_decay: 'Logistic regression, older fights count for less',
-  lr_decay_noreach: 'Same, without reach', elo_only: 'Elo only', coin_flip: 'Coin flip', favourite_by_rating: 'Always pick the higher-rated fighter',
+  lr_decay_with_reach: 'Same, with reach put back (the earlier production form)', elo_only: 'Elo only', coin_flip: 'Coin flip', favourite_by_rating: 'Always pick the higher-rated fighter',
   average: 'Average of the members', stack: 'Logistic stack of the members', weighted: 'Constrained weighted average', stack_by_experience: 'Stack fitted separately for newcomers and veterans',
   linear_torch: 'Neural framework, linear part only (a check)', mlp: 'Engineered features through a small neural network', gru: 'GRU over each fighter\'s last 8 fights', attn: 'Self-attention over each fighter\'s last 8 fights',
 }
@@ -70,9 +70,12 @@ export function renderResearch(r: Results, neural: NeuralResults | null, rounds:
 
   const rec = Object.entries(r.recencySensitivity ?? {})
   if (rec.length) {
-    push('## Older fights count for less', 'The one change that helped consistently: weighting recent fights more when fitting. The half-life used (4 years) was chosen on 2008-2013 only. The other half-lives are shown for sensitivity, not selection.')
+    const four = r.recencySensitivity?.['half-life 4 years']
+    const decayModel = r.models.lr_decay
+    const helped = rec.filter(([, v]) => v.vsBaseline.hi < 0).length
+    push('## Older fights count for less', 'Weighting recent fights more when fitting. The half-life used (4 years) was chosen on 2008-2013 only. The other half-lives are shown for sensitivity, not selection.')
     push(table(['Half-life', 'Log loss', 'Against the baseline [95% CI]'], rec.map(([k, v]) => [k, f(v.summary.logLoss), ci(v.vsBaseline)])))
-    push('The gain is small (about 0.001 to 0.002 in log loss) but present at every half-life tried, which points to a real drift in what predicts wins as the sport changes. The fighter-effects ("hierarchical") model adds nothing by itself; its apparent promotion comes entirely from the recency weights, so the simpler recency-weighted logistic regression is the candidate. Its multiplicity-adjusted interval narrowly includes zero, so it runs in **shadow mode**: it forecasts alongside production, is saved with each forecast, and is graded prospectively (see the Monitoring panel).')
+    push(`With the production feature set as it now stands (reach left out), recency weighting at the chosen half-life changes log loss by ${four ? ci(four.vsBaseline) : '–'}; ${helped} of ${rec.length} half-lives have an interval entirely below zero. Earlier, with reach still in the model, the same weighting looked stronger (about -0.0020); once the unverifiable input is gone most of that disappears. It does not clear the gate${decayModel?.decision ? ` (${decayModel.decision.mode})` : ''}, so the recency-weighted model runs only as a **shadow**: it forecasts alongside production, is saved with each forecast, and is graded prospectively (see the Monitoring panel). The fighter-effects ("hierarchical") model adds nothing by itself.`)
   }
 
   push('## Age and reach, one at a time', 'Age comes from the date of birth, which is fixed. Reach, stance and height come from a single current profile snapshot with no effective date, so their value at an earlier fight is unverified.')
@@ -81,7 +84,7 @@ export function renderResearch(r: Results, neural: NeuralResults | null, rounds:
     const e = v as { summary: Summary; vsNoAgeNoReach: Ci | null }
     return [k, f(e.summary.logLoss), ci(e.vsNoAgeNoReach)]
   })))
-  push(`Age alone recovers essentially the whole gain (${sg((r.ageReach['age only'] as { vsNoAgeNoReach: Ci }).vsNoAgeNoReach.estimate)}); reach alone does nothing demonstrable (${sg((r.ageReach['reach only'] as { vsNoAgeNoReach: Ci }).vsNoAgeNoReach.estimate)}), and neither an age-by-reach interaction nor stance adds anything. The earlier combined ablation was therefore carried by age. Reach is both unhelpful and of unverified historical accuracy, so it is a candidate for removal. (Baseline without either: ${f(base.summary.logLoss)}.)`)
+  push(`Age alone recovers essentially the whole gain (${sg((r.ageReach['age only'] as { vsNoAgeNoReach: Ci }).vsNoAgeNoReach.estimate)}); reach alone does nothing demonstrable (${sg((r.ageReach['reach only'] as { vsNoAgeNoReach: Ci }).vsNoAgeNoReach.estimate)}), and neither an age-by-reach interaction nor stance adds anything. The earlier combined ablation was therefore carried by age. Because reach was both unhelpful and of unverified historical accuracy, **it was removed from the production model** (model version 0.3); this table puts it back only to run the comparison. (Baseline without either: ${f(base.summary.logLoss)}.)`)
 
   const e = r.ensembles
   push('## Ensembles', `Members fixed before any result was read: ${e.members.join(', ')}. Weights are learned only from earlier years' out-of-fold forecasts. Compared on the later fights where a stack can be trained: ${e.period}, ${e.n} fights.`)

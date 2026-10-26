@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "production": "octa-results-stats-lr-0.2@58ca637e2e2c",
+  "production": "octa-results-stats-lr-0.3@58ca637e2e2c",
   "records": [
     {
       "id": "octa-results-stats-lr-0.2@58ca637e2e2c",
@@ -41,7 +41,7 @@
         ],
         "features": "results + rolling fight statistics"
       },
-      "status": "production"
+      "status": "previous"
     },
     {
       "id": "Boosted trees@58ca637e2e2c",
@@ -64,7 +64,7 @@
         "logLossDifference": 0.004449392053275919
       },
       "status": "rejected",
-      "decision": "log loss +0.0044 versus logistic stats model [+0.0005, +0.0081]; the interval includes zero"
+      "decision": "log loss +0.0055 versus logistic stats model [+0.0011, +0.0097]; the interval includes zero"
     },
     {
       "id": "Ensemble of logistic and trees@58ca637e2e2c",
@@ -87,7 +87,7 @@
         "logLossDifference": -0.0005057279425320162
       },
       "status": "shadow",
-      "decision": "log loss -0.0005 versus logistic stats model [-0.0025, +0.0013]; the interval includes zero"
+      "decision": "log loss -0.0007 versus logistic stats model [-0.0029, +0.0014]; the interval includes zero"
     },
     {
       "id": "Calibration: temperature@58ca637e2e2c",
@@ -110,7 +110,7 @@
         "logLossDifference": 0.0006060388608094309
       },
       "status": "rejected",
-      "decision": "log loss +0.0006 versus no recalibration [-0.0009, +0.0022]; the interval includes zero"
+      "decision": "log loss +0.0004 versus no recalibration [-0.0007, +0.0014]; the interval includes zero"
     },
     {
       "id": "Calibration: platt@58ca637e2e2c",
@@ -133,7 +133,7 @@
         "logLossDifference": 0.0006060388608094309
       },
       "status": "rejected",
-      "decision": "log loss +0.0006 versus no recalibration [-0.0009, +0.0022]; the interval includes zero"
+      "decision": "log loss +0.0004 versus no recalibration [-0.0007, +0.0014]; the interval includes zero"
     },
     {
       "id": "Calibration: isotonic@58ca637e2e2c",
@@ -156,7 +156,7 @@
         "logLossDifference": 0.0008753299325139719
       },
       "status": "rejected",
-      "decision": "log loss +0.0009 versus no recalibration [-0.0003, +0.0021]; the interval includes zero"
+      "decision": "log loss +0.0014 versus no recalibration [+0.0001, +0.0027]; the interval includes zero"
     },
     {
       "id": "Direct six-outcome method model (hybrid with the win model)@58ca637e2e2c",
@@ -179,7 +179,7 @@
         "logLossDifference": -0.003444092189777405
       },
       "status": "shadow",
-      "decision": "log loss -0.0034 versus independent winner-and-method joint [-0.0101, +0.0030]; the interval includes zero"
+      "decision": "log loss -0.0033 versus independent winner-and-method joint [-0.0095, +0.0033]; the interval includes zero"
     },
     {
       "id": "octa-results-stats-lr-0.2@0075c265d94e",
@@ -363,10 +363,10 @@
     {
       "id": "research:lr_all@58ca637e2e2c",
       "model": "lr_all",
-      "createdAt": "2026-10-26T05:36:03.178Z",
+      "createdAt": "2026-10-26T05:46:37.660Z",
       "dataVersion": "58ca637e2e2c",
       "featurePipeline": "features-3",
-      "codeCommit": "34554fed1e675339cebd9afa51fa8a3a8eff9b1a",
+      "codeCommit": "f915205bb37ccb7612ef5015d491306ad7500fd1",
       "seed": 20261025,
       "testPeriod": "2014-2026",
       "n": 6288,
@@ -379,16 +379,16 @@
       "config": {
         "source": "research/run.py"
       },
-      "status": "shadow",
-      "decision": "Inconclusive against the gate; log loss -0.0001 against the baseline [-0.0017, 0.0015]"
+      "status": "rejected",
+      "decision": "Rejected by the gate; log loss +0.0009 against the baseline [-0.0019, 0.0034]"
     },
     {
       "id": "research:histgb@58ca637e2e2c",
       "model": "histgb",
-      "createdAt": "2026-10-26T05:36:03.178Z",
+      "createdAt": "2026-10-26T05:46:37.660Z",
       "dataVersion": "58ca637e2e2c",
       "featurePipeline": "features-3",
-      "codeCommit": "34554fed1e675339cebd9afa51fa8a3a8eff9b1a",
+      "codeCommit": "f915205bb37ccb7612ef5015d491306ad7500fd1",
       "seed": 20261025,
       "testPeriod": "2014-2026",
       "n": 6288,
@@ -402,15 +402,15 @@
         "source": "research/run.py"
       },
       "status": "rejected",
-      "decision": "Rejected by the gate; log loss +0.0223 against the baseline [0.0172, 0.0281]"
+      "decision": "Rejected by the gate; log loss +0.0233 against the baseline [0.0181, 0.0293]"
     },
     {
       "id": "research:lightgbm@58ca637e2e2c",
       "model": "lightgbm",
-      "createdAt": "2026-10-26T05:36:03.178Z",
+      "createdAt": "2026-10-26T05:46:37.660Z",
       "dataVersion": "58ca637e2e2c",
       "featurePipeline": "features-3",
-      "codeCommit": "34554fed1e675339cebd9afa51fa8a3a8eff9b1a",
+      "codeCommit": "f915205bb37ccb7612ef5015d491306ad7500fd1",
       "seed": 20261025,
       "testPeriod": "2014-2026",
       "n": 6288,
@@ -424,15 +424,15 @@
         "source": "research/run.py"
       },
       "status": "rejected",
-      "decision": "Rejected by the gate; log loss +0.0216 against the baseline [0.0165, 0.0273]"
+      "decision": "Rejected by the gate; log loss +0.0226 against the baseline [0.0174, 0.0286]"
     },
     {
       "id": "research:xgboost@58ca637e2e2c",
       "model": "xgboost",
-      "createdAt": "2026-10-26T05:36:03.178Z",
+      "createdAt": "2026-10-26T05:46:37.660Z",
       "dataVersion": "58ca637e2e2c",
       "featurePipeline": "features-3",
-      "codeCommit": "34554fed1e675339cebd9afa51fa8a3a8eff9b1a",
+      "codeCommit": "f915205bb37ccb7612ef5015d491306ad7500fd1",
       "seed": 20261025,
       "testPeriod": "2014-2026",
       "n": 6288,
@@ -446,15 +446,15 @@
         "source": "research/run.py"
       },
       "status": "rejected",
-      "decision": "Rejected by the gate; log loss +0.0172 against the baseline [0.0123, 0.0224]"
+      "decision": "Rejected by the gate; log loss +0.0182 against the baseline [0.0133, 0.0237]"
     },
     {
       "id": "research:catboost@58ca637e2e2c",
       "model": "catboost",
-      "createdAt": "2026-10-26T05:36:03.178Z",
+      "createdAt": "2026-10-26T05:46:37.660Z",
       "dataVersion": "58ca637e2e2c",
       "featurePipeline": "features-3",
-      "codeCommit": "34554fed1e675339cebd9afa51fa8a3a8eff9b1a",
+      "codeCommit": "f915205bb37ccb7612ef5015d491306ad7500fd1",
       "seed": 20261025,
       "testPeriod": "2014-2026",
       "n": 6288,
@@ -468,15 +468,15 @@
         "source": "research/run.py"
       },
       "status": "rejected",
-      "decision": "Rejected by the gate; log loss +0.0122 against the baseline [0.0080, 0.0170]"
+      "decision": "Rejected by the gate; log loss +0.0132 against the baseline [0.0088, 0.0183]"
     },
     {
       "id": "research:lightgbm_es@58ca637e2e2c",
       "model": "lightgbm_es",
-      "createdAt": "2026-10-26T05:36:03.178Z",
+      "createdAt": "2026-10-26T05:46:37.660Z",
       "dataVersion": "58ca637e2e2c",
       "featurePipeline": "features-3",
-      "codeCommit": "34554fed1e675339cebd9afa51fa8a3a8eff9b1a",
+      "codeCommit": "f915205bb37ccb7612ef5015d491306ad7500fd1",
       "seed": 20261025,
       "testPeriod": "2014-2026",
       "n": 6288,
@@ -490,15 +490,15 @@
         "source": "research/run.py"
       },
       "status": "rejected",
-      "decision": "Rejected by the gate; log loss +0.0036 against the baseline [0.0005, 0.0069]"
+      "decision": "Rejected by the gate; log loss +0.0046 against the baseline [0.0007, 0.0088]"
     },
     {
       "id": "research:xgboost_es@58ca637e2e2c",
       "model": "xgboost_es",
-      "createdAt": "2026-10-26T05:36:03.178Z",
+      "createdAt": "2026-10-26T05:46:37.660Z",
       "dataVersion": "58ca637e2e2c",
       "featurePipeline": "features-3",
-      "codeCommit": "34554fed1e675339cebd9afa51fa8a3a8eff9b1a",
+      "codeCommit": "f915205bb37ccb7612ef5015d491306ad7500fd1",
       "seed": 20261025,
       "testPeriod": "2014-2026",
       "n": 6288,
@@ -512,15 +512,15 @@
         "source": "research/run.py"
       },
       "status": "rejected",
-      "decision": "Rejected by the gate; log loss +0.0046 against the baseline [0.0013, 0.0082]"
+      "decision": "Rejected by the gate; log loss +0.0056 against the baseline [0.0019, 0.0099]"
     },
     {
       "id": "research:catboost_es@58ca637e2e2c",
       "model": "catboost_es",
-      "createdAt": "2026-10-26T05:36:03.178Z",
+      "createdAt": "2026-10-26T05:46:37.660Z",
       "dataVersion": "58ca637e2e2c",
       "featurePipeline": "features-3",
-      "codeCommit": "34554fed1e675339cebd9afa51fa8a3a8eff9b1a",
+      "codeCommit": "f915205bb37ccb7612ef5015d491306ad7500fd1",
       "seed": 20261025,
       "testPeriod": "2014-2026",
       "n": 6288,
@@ -534,15 +534,15 @@
         "source": "research/run.py"
       },
       "status": "rejected",
-      "decision": "Rejected by the gate; log loss +0.0026 against the baseline [-0.0003, 0.0058]"
+      "decision": "Rejected by the gate; log loss +0.0036 against the baseline [-0.0001, 0.0075]"
     },
     {
       "id": "research:glicko2@58ca637e2e2c",
       "model": "glicko2",
-      "createdAt": "2026-10-26T05:36:03.178Z",
+      "createdAt": "2026-10-26T05:46:37.660Z",
       "dataVersion": "58ca637e2e2c",
       "featurePipeline": "features-3",
-      "codeCommit": "34554fed1e675339cebd9afa51fa8a3a8eff9b1a",
+      "codeCommit": "f915205bb37ccb7612ef5015d491306ad7500fd1",
       "seed": 20261025,
       "testPeriod": "2014-2026",
       "n": 6288,
@@ -556,103 +556,103 @@
         "source": "research/run.py"
       },
       "status": "rejected",
-      "decision": "Rejected by the gate; log loss +0.0282 against the baseline [0.0216, 0.0350]"
+      "decision": "Rejected by the gate; log loss +0.0292 against the baseline [0.0226, 0.0358]"
     },
     {
       "id": "research:hier@58ca637e2e2c",
       "model": "hier",
-      "createdAt": "2026-10-26T05:36:03.178Z",
+      "createdAt": "2026-10-26T05:46:37.660Z",
       "dataVersion": "58ca637e2e2c",
       "featurePipeline": "features-3",
-      "codeCommit": "34554fed1e675339cebd9afa51fa8a3a8eff9b1a",
+      "codeCommit": "f915205bb37ccb7612ef5015d491306ad7500fd1",
       "seed": 20261025,
       "testPeriod": "2014-2026",
       "n": 6288,
-      "logLoss": 0.6520191226529736,
+      "logLoss": 0.6509006724091472,
       "logLossLo": null,
       "logLossHi": null,
-      "brier": 0.23005870032349582,
-      "accuracy": 0.6174459287531806,
-      "calibrationSlope": 0.9214462664591262,
+      "brier": 0.2295723036894695,
+      "accuracy": 0.6158555979643766,
+      "calibrationSlope": 0.9556898366925718,
       "config": {
         "source": "research/run.py"
       },
       "status": "shadow",
-      "decision": "Inconclusive against the gate; log loss -0.0000 against the baseline [-0.0001, 0.0000]"
+      "decision": "Inconclusive against the gate; log loss -0.0002 against the baseline [-0.0004, 0.0002]"
     },
     {
       "id": "research:hier_decay@58ca637e2e2c",
       "model": "hier_decay",
-      "createdAt": "2026-10-26T05:36:03.178Z",
+      "createdAt": "2026-10-26T05:46:37.660Z",
       "dataVersion": "58ca637e2e2c",
       "featurePipeline": "features-3",
-      "codeCommit": "34554fed1e675339cebd9afa51fa8a3a8eff9b1a",
+      "codeCommit": "f915205bb37ccb7612ef5015d491306ad7500fd1",
       "seed": 20261025,
       "testPeriod": "2014-2026",
       "n": 6288,
-      "logLoss": 0.6499004789942531,
+      "logLoss": 0.6498155385294573,
       "logLossLo": null,
       "logLossHi": null,
-      "brier": 0.22900446796140353,
-      "accuracy": 0.6217398218829516,
-      "calibrationSlope": 0.9629091584994655,
+      "brier": 0.22901272907532558,
+      "accuracy": 0.6163326972010178,
+      "calibrationSlope": 0.9737060104234969,
       "config": {
         "source": "research/run.py"
       },
       "status": "shadow",
-      "decision": "Cleared the gate in research; not deployed as production; log loss -0.0022 against the baseline [-0.0036, -0.0007]"
+      "decision": "Inconclusive against the gate; log loss -0.0012 against the baseline [-0.0022, -0.0003]"
     },
     {
       "id": "research:lr_decay@58ca637e2e2c",
       "model": "lr_decay",
-      "createdAt": "2026-10-26T05:36:03.178Z",
+      "createdAt": "2026-10-26T05:46:37.660Z",
       "dataVersion": "58ca637e2e2c",
       "featurePipeline": "features-3",
-      "codeCommit": "34554fed1e675339cebd9afa51fa8a3a8eff9b1a",
+      "codeCommit": "f915205bb37ccb7612ef5015d491306ad7500fd1",
       "seed": 20261025,
       "testPeriod": "2014-2026",
       "n": 6288,
-      "logLoss": 0.6500260469390238,
+      "logLoss": 0.6510546303858035,
       "logLossLo": null,
       "logLossHi": null,
-      "brier": 0.22906420246197778,
-      "accuracy": 0.6214217557251909,
-      "calibrationSlope": 0.9617991661297118,
+      "brier": 0.22964723302310333,
+      "accuracy": 0.6161736641221374,
+      "calibrationSlope": 0.954090364094896,
       "config": {
         "source": "research/run.py"
       },
-      "status": "shadow",
-      "decision": "Inconclusive against the gate; log loss -0.0020 against the baseline [-0.0035, -0.0006]"
+      "status": "rejected",
+      "decision": "Rejected by the gate; log loss +0.0000 against the baseline [0.0000, 0.0000]"
     },
     {
       "id": "research:lr_decay_noreach@58ca637e2e2c",
       "model": "lr_decay_noreach",
-      "createdAt": "2026-10-26T05:36:03.178Z",
+      "createdAt": "2026-10-26T05:46:37.660Z",
       "dataVersion": "58ca637e2e2c",
       "featurePipeline": "features-3",
-      "codeCommit": "34554fed1e675339cebd9afa51fa8a3a8eff9b1a",
+      "codeCommit": "f915205bb37ccb7612ef5015d491306ad7500fd1",
       "seed": 20261025,
       "testPeriod": "2014-2026",
       "n": 6288,
-      "logLoss": 0.6503277533111633,
+      "logLoss": 0.6510546303858035,
       "logLossLo": null,
       "logLossHi": null,
-      "brier": 0.22923497175989133,
-      "accuracy": 0.6150604325699746,
-      "calibrationSlope": 0.9694687736659203,
+      "brier": 0.22964723302310333,
+      "accuracy": 0.6161736641221374,
+      "calibrationSlope": 0.954090364094896,
       "config": {
         "source": "research/run.py"
       },
-      "status": "shadow",
-      "decision": "Inconclusive against the gate; log loss -0.0017 against the baseline [-0.0041, 0.0007]"
+      "status": "rejected",
+      "decision": "Rejected by the gate; log loss +0.0000 against the baseline [0.0000, 0.0000]"
     },
     {
       "id": "research:elo_only@58ca637e2e2c",
       "model": "elo_only",
-      "createdAt": "2026-10-26T05:36:03.178Z",
+      "createdAt": "2026-10-26T05:46:37.660Z",
       "dataVersion": "58ca637e2e2c",
       "featurePipeline": "features-3",
-      "codeCommit": "34554fed1e675339cebd9afa51fa8a3a8eff9b1a",
+      "codeCommit": "f915205bb37ccb7612ef5015d491306ad7500fd1",
       "seed": 20261025,
       "testPeriod": "2014-2026",
       "n": 6288,
@@ -666,95 +666,159 @@
         "source": "research/run.py"
       },
       "status": "rejected",
-      "decision": "Rejected by the gate; log loss +0.0297 against the baseline [0.0230, 0.0365]"
+      "decision": "Rejected by the gate; log loss +0.0307 against the baseline [0.0239, 0.0374]"
     },
     {
       "id": "research:neural: linear_torch@58ca637e2e2c",
       "model": "neural: linear_torch",
-      "createdAt": "2026-10-26T05:36:03.178Z",
+      "createdAt": "2026-10-26T05:46:37.660Z",
       "dataVersion": "58ca637e2e2c",
       "featurePipeline": "features-3",
-      "codeCommit": "34554fed1e675339cebd9afa51fa8a3a8eff9b1a",
+      "codeCommit": "f915205bb37ccb7612ef5015d491306ad7500fd1",
       "seed": 20261025,
       "testPeriod": "2014-2026",
       "n": 6288,
-      "logLoss": 0.6521171586924919,
+      "logLoss": 0.6525059874009608,
       "logLossLo": null,
       "logLossHi": null,
-      "brier": 0.23014773827462537,
-      "accuracy": 0.6171278625954199,
-      "calibrationSlope": 1.0268016029798186,
+      "brier": 0.23036455556337757,
+      "accuracy": 0.6156965648854962,
+      "calibrationSlope": 1.0208203016190407,
       "config": {
         "source": "research/run.py"
       },
       "status": "rejected",
-      "decision": "Rejected by the gate; log loss +0.0001 against the baseline [-0.0018, 0.0020]"
+      "decision": "Rejected by the gate; log loss +0.0015 against the baseline [-0.0001, 0.0033]"
     },
     {
       "id": "research:neural: mlp@58ca637e2e2c",
       "model": "neural: mlp",
-      "createdAt": "2026-10-26T05:36:03.178Z",
+      "createdAt": "2026-10-26T05:46:37.660Z",
       "dataVersion": "58ca637e2e2c",
       "featurePipeline": "features-3",
-      "codeCommit": "34554fed1e675339cebd9afa51fa8a3a8eff9b1a",
+      "codeCommit": "f915205bb37ccb7612ef5015d491306ad7500fd1",
       "seed": 20261025,
       "testPeriod": "2014-2026",
       "n": 6288,
-      "logLoss": 0.6525691409509443,
+      "logLoss": 0.6520369427801606,
       "logLossLo": null,
       "logLossHi": null,
-      "brier": 0.23037597496025736,
-      "accuracy": 0.6171278625954199,
-      "calibrationSlope": 0.9827992488804937,
+      "brier": 0.2301360613108423,
+      "accuracy": 0.6163326972010178,
+      "calibrationSlope": 0.9873853817533349,
       "config": {
         "source": "research/run.py"
       },
       "status": "rejected",
-      "decision": "Rejected by the gate; log loss +0.0005 against the baseline [-0.0018, 0.0028]"
+      "decision": "Rejected by the gate; log loss +0.0010 against the baseline [-0.0008, 0.0029]"
     },
     {
       "id": "research:neural: gru@58ca637e2e2c",
       "model": "neural: gru",
-      "createdAt": "2026-10-26T05:36:03.178Z",
+      "createdAt": "2026-10-26T05:46:37.660Z",
       "dataVersion": "58ca637e2e2c",
       "featurePipeline": "features-3",
-      "codeCommit": "34554fed1e675339cebd9afa51fa8a3a8eff9b1a",
+      "codeCommit": "f915205bb37ccb7612ef5015d491306ad7500fd1",
       "seed": 20261025,
       "testPeriod": "2014-2026",
       "n": 6288,
-      "logLoss": 0.6522367890459663,
+      "logLoss": 0.6538900743206703,
       "logLossLo": null,
       "logLossHi": null,
-      "brier": 0.23021869663611383,
-      "accuracy": 0.616809796437659,
-      "calibrationSlope": 0.9666400080605673,
+      "brier": 0.230907057151325,
+      "accuracy": 0.6177639949109415,
+      "calibrationSlope": 0.9465269809484296,
       "config": {
         "source": "research/run.py"
       },
       "status": "rejected",
-      "decision": "Rejected by the gate; log loss +0.0002 against the baseline [-0.0028, 0.0033]"
+      "decision": "Rejected by the gate; log loss +0.0028 against the baseline [-0.0001, 0.0059]"
     },
     {
       "id": "research:neural: attn@58ca637e2e2c",
       "model": "neural: attn",
-      "createdAt": "2026-10-26T05:36:03.178Z",
+      "createdAt": "2026-10-26T05:46:37.660Z",
       "dataVersion": "58ca637e2e2c",
       "featurePipeline": "features-3",
-      "codeCommit": "34554fed1e675339cebd9afa51fa8a3a8eff9b1a",
+      "codeCommit": "f915205bb37ccb7612ef5015d491306ad7500fd1",
       "seed": 20261025,
       "testPeriod": "2014-2026",
       "n": 6288,
-      "logLoss": 0.6528218018508335,
+      "logLoss": 0.6523341975717016,
       "logLossLo": null,
       "logLossHi": null,
-      "brier": 0.2304810120754893,
-      "accuracy": 0.6199904580152672,
-      "calibrationSlope": 0.9763335496981822,
+      "brier": 0.23025518389540503,
+      "accuracy": 0.6174459287531806,
+      "calibrationSlope": 0.9633054213142187,
       "config": {
         "source": "research/run.py"
       },
       "status": "rejected",
-      "decision": "Rejected by the gate; log loss +0.0008 against the baseline [-0.0018, 0.0036]"
+      "decision": "Rejected by the gate; log loss +0.0013 against the baseline [-0.0012, 0.0042]"
+    },
+    {
+      "id": "octa-results-stats-lr-0.3@58ca637e2e2c",
+      "model": "octa-results-stats-lr-0.3",
+      "createdAt": "2026-10-26T05:46:37.660Z",
+      "dataVersion": "58ca637e2e2c",
+      "featurePipeline": "features-3",
+      "codeCommit": "f915205bb37ccb7612ef5015d491306ad7500fd1",
+      "seed": 20261025,
+      "testPeriod": "2014-2026",
+      "n": 6288,
+      "logLoss": 0.651051724009629,
+      "logLossLo": 0.644365778772418,
+      "logLossHi": 0.6582791059691724,
+      "brier": 0.22964642522262446,
+      "accuracy": 0.6158555979643766,
+      "calibrationSlope": 0.9540042722176723,
+      "config": {
+        "firstTestYear": 2014,
+        "validationYears": 6,
+        "ridge": 5,
+        "bootstrap": 1000,
+        "eloK": 64,
+        "statsDecay": 0.9,
+        "excludedFeatures": [
+          "ageMissing",
+          "reachMissing",
+          "reach",
+          "southpaw",
+          "wcMove",
+          "eloWc",
+          "agePast",
+          "ageClass",
+          "sinceLoss",
+          "koRecent",
+          "cageMin",
+          "tdClash",
+          "kdClash"
+        ],
+        "features": "results + rolling fight statistics"
+      },
+      "status": "production"
+    },
+    {
+      "id": "research:lr_decay_with_reach@58ca637e2e2c",
+      "model": "lr_decay_with_reach",
+      "createdAt": "2026-10-26T05:46:37.660Z",
+      "dataVersion": "58ca637e2e2c",
+      "featurePipeline": "features-3",
+      "codeCommit": "f915205bb37ccb7612ef5015d491306ad7500fd1",
+      "seed": 20261025,
+      "testPeriod": "2014-2026",
+      "n": 6288,
+      "logLoss": 0.6520578170218081,
+      "logLossLo": null,
+      "logLossHi": null,
+      "brier": 0.2300771127837085,
+      "accuracy": 0.616014631043257,
+      "calibrationSlope": 0.9209869873156611,
+      "config": {
+        "source": "research/run.py"
+      },
+      "status": "rejected",
+      "decision": "Rejected by the gate; log loss +0.0010 against the baseline [-0.0013, 0.0030]"
     }
   ]
 }
