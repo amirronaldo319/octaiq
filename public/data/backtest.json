@@ -1,10 +1,10 @@
 {
-  "generatedAt": "2026-10-30T22:12:01.945Z",
+  "generatedAt": "2026-10-31T05:01:51.447Z",
   "dataset": {
     "source": "https://github.com/Greco1899/scrape_ufc_stats",
     "license": "GPL-3.0 (repository LICENSE file)",
     "upstream": "ufcstats.com (scraped by the repository author)",
-    "retrievedAt": "2026-10-30T22:07:48.126Z",
+    "retrievedAt": "2026-10-31T04:57:29.450Z",
     "files": [
       {
         "name": "ufc_event_details.csv",
@@ -3110,7 +3110,7 @@
     "attribution": "UFC Fights (2010-2020) with Betting Odds, OpenML dataset 43464, CC BY 4.0. The original uploader is not named in the OpenML metadata.",
     "md5": "5a25fab3ff4bd389d40ce432462e4443",
     "bytes": 545652,
-    "retrievedAt": "2026-10-30T22:12:01.749Z"
+    "retrievedAt": "2026-10-31T05:01:51.254Z"
   },
   "recentEvents": [
     {
@@ -5410,7 +5410,7 @@
     "dataVersion": "0075c265d94e",
     "oddsDataVersion": "d03e93106059",
     "featurePipeline": "features-3",
-    "codeCommit": "eb6c1c1d084b2687fb5c8320b662289a4cfebfcb",
+    "codeCommit": "34d49e75de4027bf304e6c508469d2b233da3e39",
     "codeDirty": false,
     "node": "v22.23.4",
     "seed": 20261025,
