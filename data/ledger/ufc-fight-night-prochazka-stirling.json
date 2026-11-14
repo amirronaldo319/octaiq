@@ -847,6 +847,180 @@
           }
         }
       ]
+    },
+    {
+      "recordedAt": "2026-11-14T22:15:21.952Z",
+      "model": "octa-results-stats-lr-0.3",
+      "dataVersion": "032eb21c2f8d",
+      "featurePipeline": "features-3",
+      "codeCommit": "7522351c48930dac20c6b091b394f8fc122dbc29",
+      "shadowModel": "octa-results-stats-lr-recency4y-0.1",
+      "dataThrough": "2026-11-07",
+      "cardVersion": 1,
+      "bouts": [
+        {
+          "id": "ufc-fight-night-prochazka-stirling-1",
+          "a": "Jiří Procházka",
+          "b": "Navajo Stirling",
+          "probA": 0.3815,
+          "probLo": 0.3398,
+          "probHi": 0.4414,
+          "shadowProbA": 0.3662,
+          "distance": 0.2657,
+          "joint": {
+            "aKo": 0.2407,
+            "aSub": 0.0395,
+            "aDec": 0.1014,
+            "bKo": 0.4254,
+            "bSub": 0.0287,
+            "bDec": 0.1643
+          }
+        },
+        {
+          "id": "ufc-fight-night-prochazka-stirling-2",
+          "a": "Aljamain Sterling",
+          "b": "Kevin Vallejos",
+          "probA": 0.4569,
+          "probLo": 0.4069,
+          "probHi": 0.5372,
+          "shadowProbA": 0.417,
+          "distance": 0.6399,
+          "joint": {
+            "aKo": 0.0903,
+            "aSub": 0.0742,
+            "aDec": 0.2924,
+            "bKo": 0.1773,
+            "bSub": 0.0182,
+            "bDec": 0.3476
+          }
+        },
+        {
+          "id": "ufc-fight-night-prochazka-stirling-3",
+          "a": "Dan Hooker",
+          "b": "Brian Ortega",
+          "probA": 0.428,
+          "probLo": 0.3815,
+          "probHi": 0.4767,
+          "shadowProbA": 0.4414,
+          "distance": 0.4229,
+          "joint": {
+            "aKo": 0.2133,
+            "aSub": 0.0337,
+            "aDec": 0.181,
+            "bKo": 0.2262,
+            "bSub": 0.1039,
+            "bDec": 0.2419
+          }
+        },
+        {
+          "id": "ufc-fight-night-prochazka-stirling-4",
+          "a": "Jared Cannonier",
+          "b": "Ikram Aliskerov",
+          "probA": 0.215,
+          "probLo": 0.1903,
+          "probHi": 0.2423,
+          "shadowProbA": 0.195,
+          "distance": 0.4973,
+          "joint": {
+            "aKo": 0.1012,
+            "aSub": 0.0069,
+            "aDec": 0.1069,
+            "bKo": 0.3543,
+            "bSub": 0.0404,
+            "bDec": 0.3904
+          }
+        },
+        {
+          "id": "ufc-fight-night-prochazka-stirling-5",
+          "a": "Shamil Gaziev",
+          "b": "Tallison Teixeira",
+          "probA": 0.2889,
+          "probLo": 0.2564,
+          "probHi": 0.3219,
+          "shadowProbA": 0.2678,
+          "distance": 0.3036,
+          "joint": {
+            "aKo": 0.1893,
+            "aSub": 0.0119,
+            "aDec": 0.0877,
+            "bKo": 0.4474,
+            "bSub": 0.0478,
+            "bDec": 0.2159
+          }
+        },
+        {
+          "id": "ufc-fight-night-prochazka-stirling-6",
+          "a": "Jake Matthews",
+          "b": "Tahir Abdullayev",
+          "probA": 0.5005,
+          "probLo": 0.4524,
+          "probHi": 0.5455,
+          "shadowProbA": 0.5098,
+          "distance": 0.5064,
+          "joint": {
+            "aKo": 0.1339,
+            "aSub": 0.1131,
+            "aDec": 0.2534,
+            "bKo": 0.1667,
+            "bSub": 0.0799,
+            "bDec": 0.253
+          }
+        },
+        {
+          "id": "ufc-fight-night-prochazka-stirling-7",
+          "a": "Aleksandre Topuria",
+          "b": "Santiago Luna",
+          "probA": 0.3347,
+          "probLo": 0.2955,
+          "probHi": 0.3788,
+          "shadowProbA": 0.3501,
+          "distance": 0.5722,
+          "joint": {
+            "aKo": 0.0728,
+            "aSub": 0.0704,
+            "aDec": 0.1915,
+            "bKo": 0.1895,
+            "bSub": 0.0952,
+            "bDec": 0.3807
+          }
+        },
+        {
+          "id": "ufc-fight-night-prochazka-stirling-8",
+          "a": "Asu Almabayev",
+          "b": "Kyoji Horiguchi",
+          "probA": 0.6627,
+          "probLo": 0.6244,
+          "probHi": 0.6938,
+          "shadowProbA": 0.6578,
+          "distance": 0.6136,
+          "joint": {
+            "aKo": 0.0589,
+            "aSub": 0.1971,
+            "aDec": 0.4066,
+            "bKo": 0.0948,
+            "bSub": 0.0355,
+            "bDec": 0.207
+          }
+        },
+        {
+          "id": "ufc-fight-night-prochazka-stirling-9",
+          "a": "Amir Albazi",
+          "b": "Alessandro Costa",
+          "probA": 0.4244,
+          "probLo": 0.3767,
+          "probHi": 0.4796,
+          "shadowProbA": 0.4201,
+          "distance": 0.5036,
+          "joint": {
+            "aKo": 0.1361,
+            "aSub": 0.0745,
+            "aDec": 0.2137,
+            "bKo": 0.1991,
+            "bSub": 0.0867,
+            "bDec": 0.2899
+          }
+        }
+      ]
     }
   ]
 }
