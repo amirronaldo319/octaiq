@@ -1,10 +1,10 @@
 {
-  "generatedAt": "2026-11-18T15:30:17.302Z",
+  "generatedAt": "2026-11-19T00:10:51.268Z",
   "dataset": {
     "source": "https://github.com/Greco1899/scrape_ufc_stats",
     "license": "GPL-3.0 (repository LICENSE file)",
     "upstream": "ufcstats.com (scraped by the repository author)",
-    "retrievedAt": "2026-11-18T15:25:56.446Z",
+    "retrievedAt": "2026-11-19T00:06:17.640Z",
     "files": [
       {
         "name": "ufc_event_details.csv",
@@ -21,8 +21,8 @@
       {
         "name": "ufc_fighter_tott.csv",
         "url": "https://raw.githubusercontent.com/Greco1899/scrape_ufc_stats/main/ufc_fighter_tott.csv",
-        "bytes": 508399,
-        "sha256": "3296e67941f984cd5484488226e5a5d94de3249c63fe289fbc66d98546311ea1"
+        "bytes": 508505,
+        "sha256": "d8d0a75556a86a18b236916fc67bb581385f7c72361ac3e83ade6a121c362fdc"
       },
       {
         "name": "ufc_fight_stats.csv",
@@ -50,7 +50,7 @@
       "draw": 67,
       "nc": 90
     },
-    "fighterProfiles": 4620,
+    "fighterProfiles": 4621,
     "ambiguousNames": 18,
     "firstDate": "1994-03-11",
     "lastDate": "2026-11-14",
@@ -3110,7 +3110,7 @@
     "attribution": "UFC Fights (2010-2020) with Betting Odds, OpenML dataset 43464, CC BY 4.0. The original uploader is not named in the OpenML metadata.",
     "md5": "5a25fab3ff4bd389d40ce432462e4443",
     "bytes": 545652,
-    "retrievedAt": "2026-11-18T15:30:17.131Z"
+    "retrievedAt": "2026-11-19T00:10:51.066Z"
   },
   "recentEvents": [
     {
@@ -5400,10 +5400,10 @@
     }
   ],
   "reproducibility": {
-    "dataVersion": "225d1f21fb70",
+    "dataVersion": "fdfdfbd42c74",
     "oddsDataVersion": "d03e93106059",
     "featurePipeline": "features-3",
-    "codeCommit": "b8cc21b803cbd5707dbd4933be2d43be8bcd4074",
+    "codeCommit": "c19f07b86787db783ec9dc9c262d531a2686cbda",
     "codeDirty": false,
     "node": "v22.23.4",
     "seed": 20261025,
